@@ -6,56 +6,69 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import java.util.HashMap;
+
 public abstract class CursorPagerAdapter<F extends Fragment> extends FragmentStatePagerAdapter {
-    private final Class<F> fragmentClass;
-    private Cursor cursor;
+  private final Class<F> fragmentClass;
+  private final HashMap<Integer, Fragment> mHash = new HashMap<Integer, Fragment>();
+  private Cursor cursor;
 
-    abstract public Bundle buildArguments(Cursor cursor);
+  abstract public Bundle buildArguments(Cursor cursor);
 
-    public CursorPagerAdapter(FragmentManager fm, Class<F> fragmentClass, Cursor cursor) {
-        super(fm);
-        this.fragmentClass = fragmentClass;
-        this.cursor = cursor;
+  public CursorPagerAdapter(FragmentManager fm, Class<F> fragmentClass, Cursor cursor) {
+    super(fm);
+    this.fragmentClass = fragmentClass;
+    this.cursor = cursor;
+  }
+
+  @Override
+  public F getItem(int position) {
+    if (cursor == null) // shouldn't happen
+      return null;
+
+    cursor.moveToPosition(position);
+    F frag;
+    try {
+      frag = fragmentClass.newInstance();
+      mHash.put(position, frag);
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
     }
 
-    @Override
-    public F getItem(int position) {
-        if (cursor == null) // shouldn't happen
-            return null;
+    frag.setArguments(buildArguments(cursor));
 
-        cursor.moveToPosition(position);
-        F frag;
-        try {
-            frag = fragmentClass.newInstance();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+    return frag;
+  }
 
-        frag.setArguments(buildArguments(cursor));
+  @Override
+  public int getCount() {
+    if (cursor == null)
+      return 0;
+    else
+      return cursor.getCount();
+  }
 
-        return frag;
-    }
+  @Override
+  public int getItemPosition(Object object) {
+    return POSITION_NONE;
+  }
 
-    @Override
-    public int getCount() {
-        if (cursor == null)
-            return 0;
-        else
-            return cursor.getCount();
-    }
+  public void swapCursor(Cursor c) {
+    if (cursor == c)
+      return;
 
-    public void swapCursor(Cursor c) {
-        if (cursor == c)
-            return;
+    if (cursor != null)
+      cursor.close();
 
-        if (cursor != null)
-            cursor.close();
+    cursor = c;
+    notifyDataSetChanged();
+  }
 
-        cursor = c;
-        notifyDataSetChanged();
-    }
+  public Cursor getCursor() {
+    return cursor;
+  }
 
-    public Cursor getCursor() {
-        return cursor;
-    }
+  public Fragment getFragment(int position) {
+    return mHash.get(position);
+  }
 }

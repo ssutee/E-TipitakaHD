@@ -95,9 +95,9 @@
         <item>" ๔๕. พระอภิธรรมปิฎก เล่มที่ ๑๒ ปัฏฐานปกรณ์ ภาค ๖ "</item>
     </string-array>
     <string-array name="sections">
-        <item>" พระวินัยปิฎก "</item>
-        <item>" พระสุตตันตปิฎก "</item>
-        <item>" พระอภิธรรมปิฎก "</item>
+        <item>"พระวินัยปิฎก "</item>
+        <item>"พระสุตตันตปิฎก "</item>
+        <item>"พระอภิธรรมปิฎก "</item>
     </string-array>
 
     <integer-array name="volumes_per_category">
@@ -247,7 +247,7 @@
         <item>538</item>
     </integer-array>
 
-    <string-array name="thai_number">
+    <string-array name="thai_numbers">
         <item>๐</item>
         <item>๑</item>
         <item>๒</item>

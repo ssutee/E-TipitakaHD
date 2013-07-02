@@ -5,4 +5,69 @@
     <string name="search">ค้นหา</string>
     <string name="history">ประวัติ</string>
     <string name="bookmark">จดจำ</string>
+    <string name="thai">ไทย</string>
+    <string name="pali">บาลี</string>
+    <string name="thai_full_name"> พระไตรปิฎกไทย (ฉบับหลวง) </string>
+    <string name="pali_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ) </string>
+    <string name="subtitle_template">เล่มที่ %1$s หน้าที่ %2$s ข้อที่ %3$s</string>
+    <string name="non_item_subtitle_template">เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="go_to">ข้ามไปที่</string>
+    <string name="go_to_page">หน้าที่</string>
+    <string name="go_to_item">ข้อที่</string>
+    <string name="save">บันทึก</string>
+    <string name="compare">เทียบเคียง</string>
+    <string name="goto_page_title">ข้ามไปที่หน้า</string>
+    <string name="goto_page_message">ป้อนเลขหน้าที่ต้องการ (%1$d ถึง %2$d)</string>
+    <string name="goto_item_title">ข้ามไปที่ข้อ</string>
+    <string name="goto_item_message">ป้อนเลขข้อที่ต้องการ (%1$d ถึง %2$d)</string>
+    <string name="query_hint">ป้อนคำค้นหาที่ต้องการ</string>
+    <string name="searching">กำลังค้นหาข้อมูล</string>
+    <string name="please_wait">กรุณารอซักครู่</string>
+    <string name="please_select_category">โปรดเลือกหมวดหมู่ที่ต้องการค้นหา</string>
+    <string name="please_enter_keywords">กรุณาป้อนคำค้นหา</string>
+    <string name="search_result_summary">พบคำว่า \"%1$s\" ทั้งหมด %2$s หน้า</string>
+    <string name="found_n_pages">พบ %1$s หน้า</string>
+    <string name="n_volume_n_page">พระไตรปิฎก เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="search_result_not_found">ไม่พบคำว่า \"%1$s\"\nใน%2$s</string>
+    <string name="abbr_section1">วิ.(%1$s)</string>
+    <string name="abbr_section2">สุตต.(%1$s)</string>
+    <string name="abbr_section3">อภิ.(%1$s)</string>
+    <string name="not_found">ไม่พบข้อมูล</string>
+    <string name="seq_thai_numbers">๐๑๒๓๔๕๖๗๘๙</string>
+    <string name="regex_item_number">\\n\\s*\\[[๐๑๒๓๔๕๖๗๘๙]+?\\]|^\\s*\\[[๐๑๒๓๔๕๖๗๘๙]+?\\]</string>
+    <string name="select_item">เลือกข้อที่ต้องการ</string>
+    <string name="select_page">เลือกหน้าที่ต้องการ</string>
+    <string name="html_text_template">
+    <![CDATA[
+        <html>
+            <head>
+                <script>
+                    function scrollToElement(theElement) {
+                        var selectedPosX = 0;
+                        var selectedPosY = 0;
+                        while(theElement != null) {
+                            selectedPosX += theElement.offsetLeft;
+                            selectedPosY += theElement.offsetTop;
+                            theElement = theElement.offsetParent;
+                        }
+                        window.scrollTo(selectedPosX,selectedPosY);
+                    }
+                    function scrollToKeywords() {
+                        var keywords = document.getElementById(\"keywords\");
+                        if (keywords) {
+                            scrollToElement(keywords);
+                        }
+                    }
+                    function scrollToItem(number) {
+                        var item = document.getElementById(\"i_\" + number);
+                        if (item) {
+                            scrollToElement(item);
+                        }
+                    }
+                </script>
+            </head>
+            <p style=\"white-space: pre-wrap;\">%1$s</p>
+        </html>
+    ]]>
+    </string>
 </resources>

@@ -2,32 +2,30 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
-
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
     <TextView
+            android:layout_weight="0"
             android:id="@+id/txt_subtitle"
+            android:text="right"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             style="@style/subtitle"/>
-
     <SeekBar
+            android:layout_weight="0"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingTop="7dp"
             android:paddingBottom="7dp"
             android:id="@+id/seekbar"
             android:indeterminate="false"/>
-
     <android.support.v4.view.ViewPager
             android:id="@+id/viewpager"
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="0dp">
     </android.support.v4.view.ViewPager>
-
-
 </LinearLayout>

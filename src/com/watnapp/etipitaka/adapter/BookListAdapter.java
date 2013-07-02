@@ -84,9 +84,9 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
       viewHolder = (HeaderViewHolder) convertView.getTag();
     }
 
-    if (position >= 0 && position <= 7) {
+    if (getHeaderId(position) == 1) {
       viewHolder.text1.setText(mSections[0]);
-    } else if (position >= 8 && position <= 32) {
+    } else if (getHeaderId(position) == 2) {
       viewHolder.text1.setText(mSections[1]);
     } else {
       viewHolder.text1.setText(mSections[2]);

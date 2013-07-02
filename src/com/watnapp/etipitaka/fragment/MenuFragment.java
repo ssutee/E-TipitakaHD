@@ -5,16 +5,26 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockFragment;
+import com.watnapp.etipitaka.Constants;
+import com.watnapp.etipitaka.E_TipitakaApplication;
 import com.watnapp.etipitaka.R;
+import com.watnapp.etipitaka.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.model.History;
+import roboguice.inject.InjectView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,14 +33,55 @@ import java.util.ArrayList;
  * Time: 22:03
  */
 
-public class MenuFragment extends RoboSherlockFragment {
+public class MenuFragment extends RoboSherlockFragment implements HistoryFragment.OnHistorySelectedListener {
+  private static final String TAG = "MenuFragment";
   private TabHost mTabHost;
   private ViewPager  mViewPager;
   private TabsAdapter mTabsAdapter;
+  private E_TipitakaApplication application;
 
+
+  @InjectView(R.id.rdg_languages)
+  private RadioGroup radioGroup;
+
+  @InjectView(R.id.rbt_pali)
+  private RadioButton radioButtonPali;
+
+  @InjectView(R.id.rbt_thai)
+  private RadioButton radioButtonThai;
 
   public void setCurrentTab(int index) {
     mTabHost.setCurrentTab(index);
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    application = (E_TipitakaApplication) getActivity().getApplication();
+  }
+
+  @Override
+  public void onViewCreated(View view, Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+
+    radioButtonThai.setChecked(application.getLanguage() == BookDatabaseHelper.Language.THAI);
+    radioButtonPali.setChecked(application.getLanguage() == BookDatabaseHelper.Language.PALI);
+
+    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(RadioGroup group, int checkedId) {
+        switch (checkedId) {
+          case R.id.rbt_thai:
+            application.setLanguage(BookDatabaseHelper.Language.THAI);
+            getActivity().getContentResolver().notifyChange(Constants.LANGUAGE_CHANGE_URI, null);
+            break;
+          case R.id.rbt_pali:
+            application.setLanguage(BookDatabaseHelper.Language.PALI);
+            getActivity().getContentResolver().notifyChange(Constants.LANGUAGE_CHANGE_URI, null);
+            break;
+        }
+      }
+    });
   }
 
   @Override
@@ -39,17 +90,18 @@ public class MenuFragment extends RoboSherlockFragment {
     mTabHost.setup();
 
     mViewPager = (ViewPager)mTabHost.findViewById(R.id.pager);
+    mViewPager.setOffscreenPageLimit(4);
 
     mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 
     mTabsAdapter.addTab(mTabHost.newTabSpec("volume").setIndicator(getString(R.string.volume)),
         BookListFragment.class, null);
     mTabsAdapter.addTab(mTabHost.newTabSpec("search").setIndicator(getString(R.string.search)),
-        BookListFragment.class, null);
+        SearchFragment.class, null);
     mTabsAdapter.addTab(mTabHost.newTabSpec("history").setIndicator(getString(R.string.history)),
-        BookListFragment.class, null);
+        HistoryFragment.class, null);
     mTabsAdapter.addTab(mTabHost.newTabSpec("bookmark").setIndicator(getString(R.string.bookmark)),
-        BookListFragment.class, null);
+        BlankFragment.class, null);
 
     if (savedInstanceState != null) {
       mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
@@ -70,6 +122,13 @@ public class MenuFragment extends RoboSherlockFragment {
     mTabHost = null;
   }
 
+  @Override
+  public void onHistorySelected(History history) {
+    Log.d(TAG, history.getKeywords());
+    SearchFragment fragment = (SearchFragment) mTabsAdapter.getFragmentByTag("search");
+    fragment.loadHistory(history);
+  }
+
   /**
    * This is a helper class that implements the management of tabs and all
    * details of connecting a ViewPager with associated TabHost.  It relies on a
@@ -81,12 +140,13 @@ public class MenuFragment extends RoboSherlockFragment {
    * care of switch to the correct paged in the ViewPager whenever the selected
    * tab changes.
    */
-  public static class TabsAdapter extends FragmentPagerAdapter
+  public static class TabsAdapter extends FragmentStatePagerAdapter
       implements TabHost.OnTabChangeListener, ViewPager.OnPageChangeListener {
     private final Context mContext;
     private final TabHost mTabHost;
     private final ViewPager mViewPager;
     private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
+    private final HashMap<String, Fragment> mHash = new HashMap<String, Fragment>();
 
     static final class TabInfo {
       private final String tag;
@@ -144,7 +204,9 @@ public class MenuFragment extends RoboSherlockFragment {
     @Override
     public Fragment getItem(int position) {
       TabInfo info = mTabs.get(position);
-      return Fragment.instantiate(mContext, info.clss.getName(), info.args);
+      Fragment fragment = Fragment.instantiate(mContext, info.clss.getName(), info.args);
+      mHash.put(info.tag, fragment);
+      return fragment;
     }
 
     @Override
@@ -173,6 +235,15 @@ public class MenuFragment extends RoboSherlockFragment {
 
     @Override
     public void onPageScrollStateChanged(int state) {
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+      return POSITION_NONE;
+    }
+
+    public Fragment getFragmentByTag(String tab) {
+      return mHash.get(tab);
     }
   }
 }

@@ -18,13 +18,33 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"/>
 
+        <RadioGroup
+                android:id="@+id/rdg_languages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:gravity="center"
+                android:orientation="horizontal">
+            <RadioButton
+                    android:id="@+id/rbt_thai"
+                    android:text="@string/thai"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:checked="true"/>
+            <RadioButton
+                    android:id="@+id/rbt_pali"
+                    android:text="@string/pali"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"/>
+        </RadioGroup>
+
         <FrameLayout
                 android:id="@android:id/tabcontent"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="0"/>
 
-        <android.support.v4.view.ViewPager
+        <com.touchsi.widget.NonSwipeableViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

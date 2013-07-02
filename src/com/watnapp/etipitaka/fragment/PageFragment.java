@@ -1,13 +1,26 @@
 package com.watnapp.etipitaka.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import com.watnapp.etipitaka.Constants;
 import com.watnapp.etipitaka.R;
+import com.watnapp.etipitaka.Utils;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,10 +29,16 @@ import roboguice.inject.InjectView;
  * Time: 12:19
  */
 
-public class PageFragment extends RoboFragment {
+public class PageFragment extends RoboFragment implements View.OnTouchListener, Handler.Callback {
 
-  @InjectView(R.id.webView)
-  private WebView webView;
+  private static final int CLICK_ON_WEBVIEW = 1;
+  private static final int CLICK_ON_URL     = 2;
+  private static final String TAG = "PageFragment";
+
+  @InjectView(R.id.webview)
+  private WebView mWebView;
+
+  private Handler mHandler = new Handler(this);
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,10 +48,105 @@ public class PageFragment extends RoboFragment {
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    String text = getArguments().getString("content");
-    webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-    webView.loadDataWithBaseURL("http://etipitaka.com",
-        String.format("<p style=\"white-space: pre-wrap;\">%s</p>", text),
+    mWebView.getSettings().setDefaultFontSize(18);
+    mWebView.getSettings().setJavaScriptEnabled(true);
+    String text = getArguments().getString(Constants.CONTENT_KEY);
+    String keywords = getArguments().getString(Constants.KEYWORDS_KEY);
+    mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+    mWebView.setOnTouchListener(this);
+    mWebView.setWebViewClient(new WebViewClient() {
+      @Override
+      public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        mHandler.sendEmptyMessage(CLICK_ON_URL);
+        return false;
+      }
+    });
+    mWebView.setVerticalScrollBarEnabled(false);
+    mWebView.loadDataWithBaseURL("http://etipitaka.com",
+        getString(R.string.html_text_template,
+            highlightItemNumbers(highlightKeywords(text, keywords))),
         "text/html", "UTF-8", null);
+  }
+
+  private String highlightItemNumbers(String text) {
+    Matcher matcher = Pattern.compile(getString(R.string.regex_item_number)).matcher(text);
+    while (matcher.find()) {
+      String item = matcher.group().trim();
+      text = text.replace(item, String.format("<font color='#EE00EE'><b id=\"i_%s\">%s</b></font>",
+          Utils.convertToArabicNumber(getActivity(), item.replace("[","").replace("]", "")), item));
+    }
+    return text;
+  }
+
+  private String highlightKeywords(String text, String keywords) {
+    if(keywords.trim().length() > 0) {
+      keywords = keywords.replace('+', ' ');
+      String [] tokens = keywords.split("\\s+");
+      Arrays.sort(tokens, new StringLengthComparator());
+      Collections.reverse(Arrays.asList(tokens));
+      int count = 0;
+      for(String token: tokens) {
+        text = text.replace(token,
+            String.format("<font color='#0000ff'><b id=\"keywords\">-:*%d*:-</b></font>", count));
+        count++;
+      }
+      count = 0;
+      for(String token: tokens) {
+        text = text.replace(String.format("-:*%d*:-", count), token);
+        count++;
+      }
+    }
+    return text;
+  }
+
+  @Override
+  public boolean onTouch(View v, MotionEvent event) {
+    if (v.getId() == R.id.webview && event.getAction() == MotionEvent.ACTION_DOWN){
+      mHandler.sendEmptyMessageDelayed(CLICK_ON_WEBVIEW, 300);
+    }
+    return false;
+  }
+
+  @Override
+  public boolean handleMessage(Message msg) {
+    if (msg.what == CLICK_ON_URL){
+      mHandler.removeMessages(CLICK_ON_WEBVIEW);
+      return true;
+    }
+    if (msg.what == CLICK_ON_WEBVIEW){
+      return true;
+    }
+    return false;
+  }
+
+  public void scrollToKeywords() {
+    mWebView.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        mWebView.loadUrl("javascript:scrollToKeywords();");
+      }
+    }, 500);
+  }
+
+  public void scrollToItem(final int number) {
+    mWebView.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        Log.d(TAG, "scrollToItem = " + number);
+        mWebView.loadUrl(String.format("javascript:scrollToItem(\"%d\");", number));
+      }
+    }, 500);
+  }
+
+  private class StringLengthComparator implements Comparator<String> {
+    public int compare(String o1, String o2) {
+      if (o1.length() < o2.length()) {
+        return -1;
+      } else if (o1.length() > o2.length()) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
   }
 }
