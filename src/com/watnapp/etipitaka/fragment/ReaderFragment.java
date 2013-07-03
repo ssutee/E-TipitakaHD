@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,8 @@ import roboguice.inject.InjectView;
 
 public class ReaderFragment extends RoboSherlockFragment {
 
+  private static final String TAG = "ReaderFragment";
+
   private CursorPagerAdapter<PageFragment> mPagerAdapter;
 
   @InjectView(R.id.viewpager)
@@ -47,8 +50,6 @@ public class ReaderFragment extends RoboSherlockFragment {
   @Inject
   private HistoryItemDaoHelper mHistoryItemDaoHelper;
 
-  private OnOpenBookFinishListener onOpenBookFinishListener;
-
   private Handler mHandler = new Handler();
 
   private E_TipitakaApplication application;
@@ -57,8 +58,16 @@ public class ReaderFragment extends RoboSherlockFragment {
   private int mVolume;
   private int mPage;
 
-  public void setOnOpenBookFinishListener(OnOpenBookFinishListener onOpenBookFinishListener) {
-    this.onOpenBookFinishListener = onOpenBookFinishListener;
+
+  public static ReaderFragment newInstance(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
+    ReaderFragment fragment = new ReaderFragment();
+    Bundle args = new Bundle();
+    args.putInt(Constants.LANGUAGE_KEY, language.ordinal());
+    args.putInt(Constants.VOLUME_KEY, volume);
+    args.putInt(Constants.PAGE_KEY, page);
+    args.putString(Constants.KEYWORDS_KEY, keywords);
+    fragment.setArguments(args);
+    return fragment;
   }
 
   @Override
@@ -135,6 +144,19 @@ public class ReaderFragment extends RoboSherlockFragment {
 
   }
 
+  public PageFragment getPageFragment(int page) {
+    return (PageFragment) mPagerAdapter.getFragment(page-1);
+  }
+
+  public int getCurrentPage() {
+    return mViewPager.getCurrentItem() + 1;
+  }
+
+  public void setCurrentPage(int page, boolean smoothScroll) {
+    mViewPager.setCurrentItem(page - 1, smoothScroll);
+  }
+
+
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
     mKeywords = keywords;
     mVolume = volume;
@@ -151,13 +173,11 @@ public class ReaderFragment extends RoboSherlockFragment {
     updateSubtitle(volume, page);
 
     if (keywords != null && keywords.length() > 0) {
-      PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
-      fragment.scrollToKeywords();
+//      PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
+//      fragment.scrollToKeywords();
+      Log.d(TAG, "keywords = " + keywords);
     }
 
-    if (onOpenBookFinishListener != null) {
-      onOpenBookFinishListener.onOpenBookFinish(language, volume, page);
-    }
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page) {
@@ -200,7 +220,4 @@ public class ReaderFragment extends RoboSherlockFragment {
         });
   }
 
-  public interface OnOpenBookFinishListener {
-    public void onOpenBookFinish(BookDatabaseHelper.Language language, int volume, int page);
-  }
 }
