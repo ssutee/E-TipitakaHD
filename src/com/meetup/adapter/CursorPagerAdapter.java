@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
 import java.util.HashMap;
 
 public abstract class CursorPagerAdapter<F extends Fragment> extends FragmentStatePagerAdapter {
+  private static final String TAG = "CursorPagerAdapter";
   private final Class<F> fragmentClass;
   private final HashMap<Integer, Fragment> mHash = new HashMap<Integer, Fragment>();
   private Cursor cursor;
@@ -30,6 +32,7 @@ public abstract class CursorPagerAdapter<F extends Fragment> extends FragmentSta
     F frag;
     try {
       frag = fragmentClass.newInstance();
+      Log.d(TAG, "save fragment at " + position);
       mHash.put(position, frag);
     } catch (Exception ex) {
       throw new RuntimeException(ex);
@@ -69,6 +72,7 @@ public abstract class CursorPagerAdapter<F extends Fragment> extends FragmentSta
   }
 
   public Fragment getFragment(int position) {
+    Log.d(TAG, "position = " + position);
     return mHash.get(position);
   }
 }

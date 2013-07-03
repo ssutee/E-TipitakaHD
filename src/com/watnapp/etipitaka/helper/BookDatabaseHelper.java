@@ -62,19 +62,23 @@ public class BookDatabaseHelper {
       @Override
       public void run() {
         ArrayList<Integer> items = new ArrayList<Integer>();
+        ArrayList<Integer> sections = new ArrayList<Integer>();
         int pageId = getPageId(language, volume, page);
-        Cursor cursor = db.query("item", new String[] {"number"},
+        Cursor cursor = db.query("item", new String[] {"number", "section"},
             "page_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
           int number = cursor.getInt(0);
+          int section = cursor.getInt(1);
           if (!items.contains(number)) {
             items.add(number);
+            sections.add(section);
           }
           cursor.moveToNext();
         }
         cursor.close();
-        listener.onGetItemsFinish(items.toArray(new Integer[items.size()]));
+        listener.onGetItemsFinish(items.toArray(new Integer[items.size()]),
+            sections.toArray(new Integer[sections.size()]));
       }
     }).start();
   }
@@ -182,6 +186,31 @@ public class BookDatabaseHelper {
     return pageIds.toArray(new Integer[pageIds.size()]);
   }
 
+  public int getPageIdByItem(Language language, int volume, int item, int section) {
+    Cursor cursor = db.query(true, "item", new String[] {"page_id"},
+        "page_id IN " + getPagesTuple(language, volume) + " AND start = 1 AND number = ? AND section = ?",
+        new String[] { String.valueOf(item), String.valueOf(section) }, null, null, "page_id", null);
+    int pageId = -1;
+    if (cursor.getCount() > 0) {
+      cursor.moveToFirst();
+      pageId = cursor.getInt(0);
+    }
+    cursor.close();
+    return pageId;
+  }
+
+  public int getPageById(int pageId) {
+    Cursor cursor = db.query("page", new String[] {"number"}, "_id = ?",
+        new String[] { String.valueOf(pageId) }, null, null, null);
+    int page = -1;
+    if (cursor.getCount() > 0) {
+      cursor.moveToFirst();
+      page = cursor.getInt(0);
+    }
+    cursor.close();
+    return page;
+  }
+
   public Integer[] getPagesByItem(Language language, int volume, int item) {
     Integer[] pageIds = getPageIdsByItem(language, volume, item);
     ArrayList<Integer> pages = new ArrayList<Integer>();
@@ -258,7 +287,7 @@ public class BookDatabaseHelper {
   }
 
   public interface OnGetItemsListener {
-    public void onGetItemsFinish(Integer[] items);
+    public void onGetItemsFinish(Integer[] items, Integer[] sections);
   }
 
   public interface OnSearchListener {

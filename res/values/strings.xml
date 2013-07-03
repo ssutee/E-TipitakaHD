@@ -9,8 +9,8 @@
     <string name="pali">บาลี</string>
     <string name="thai_full_name"> พระไตรปิฎกไทย (ฉบับหลวง) </string>
     <string name="pali_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ) </string>
-    <string name="subtitle_template">เล่มที่ %1$s หน้าที่ %2$s ข้อที่ %3$s</string>
-    <string name="non_item_subtitle_template">เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s ข้อที่ %4$s</string>
+    <string name="non_item_subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s</string>
     <string name="go_to">ข้ามไปที่</string>
     <string name="go_to_page">หน้าที่</string>
     <string name="go_to_item">ข้อที่</string>

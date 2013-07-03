@@ -9,11 +9,11 @@ import android.net.Uri;
  * Time: 6:29
  */
 public class Constants {
-  public static final int MENU_ITEM_GOTO      = 1001;
-  public static final int MENU_ITEM_GOTO_PAGE = 1002;
-  public static final int MENU_ITEM_GOTO_ITEM = 1003;
-  public static final int MENU_ITEM_SEARCH    = 1004;
-  public static final int MENU_ITEM_COMPARE   = 1005;
+  public static final int MENU_ITEM_GOTO_PAGE = 1001;
+  public static final int MENU_ITEM_GOTO_ITEM = 1002;
+  public static final int MENU_ITEM_SEARCH    = 1003;
+  public static final int MENU_ITEM_COMPARE   = 1004;
+  public static final int MENU_ITEM_SAVE      = 1005;
 
   public static final int GOTO_PAGE_ID = 0;
   public static final int GOTO_ITEM_ID = 1;
@@ -24,6 +24,7 @@ public class Constants {
   public static final String LANGUAGE_KEY = "language";
   public static final String VOLUME_KEY = "volume";
   public static final String ITEM_KEY = "item";
+  public static final String SECTION_KEY = "section";
   public static final String KEYWORDS_KEY = "keywords";
   public static final String PAGE_KEY = "page";
   public static final String CONTENT_KEY = "content";

@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,8 @@ import roboguice.inject.InjectView;
 
 public class ReaderFragment extends RoboSherlockFragment {
 
+  private static final String TAG = "ReaderFragment";
+
   private CursorPagerAdapter<PageFragment> mPagerAdapter;
 
   @InjectView(R.id.viewpager)
@@ -47,8 +50,6 @@ public class ReaderFragment extends RoboSherlockFragment {
   @Inject
   private HistoryItemDaoHelper mHistoryItemDaoHelper;
 
-  private OnOpenBookFinishListener onOpenBookFinishListener;
-
   private Handler mHandler = new Handler();
 
   private E_TipitakaApplication application;
@@ -57,8 +58,16 @@ public class ReaderFragment extends RoboSherlockFragment {
   private int mVolume;
   private int mPage;
 
-  public void setOnOpenBookFinishListener(OnOpenBookFinishListener onOpenBookFinishListener) {
-    this.onOpenBookFinishListener = onOpenBookFinishListener;
+
+  public static ReaderFragment newInstance(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
+    ReaderFragment fragment = new ReaderFragment();
+    Bundle args = new Bundle();
+    args.putInt(Constants.LANGUAGE_KEY, language.getCode());
+    args.putInt(Constants.VOLUME_KEY, volume);
+    args.putInt(Constants.PAGE_KEY, page);
+    args.putString(Constants.KEYWORDS_KEY, keywords);
+    fragment.setArguments(args);
+    return fragment;
   }
 
   @Override
@@ -82,6 +91,9 @@ public class ReaderFragment extends RoboSherlockFragment {
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     outState.putString(Constants.KEYWORDS_KEY, mKeywords);
+    outState.putInt(Constants.VOLUME_KEY, mVolume);
+    outState.putInt(Constants.PAGE_KEY, mPage);
+    outState.putInt(Constants.LANGUAGE_KEY, mLanguage.getCode());
   }
 
   @Override
@@ -106,6 +118,25 @@ public class ReaderFragment extends RoboSherlockFragment {
     };
 
     mViewPager.setAdapter(mPagerAdapter);
+    mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+      @Override
+      public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+      }
+
+      @Override
+      public void onPageSelected(int position) {
+        mSeekBar.setProgress(position);
+        updateSubtitle(mVolume, position + 1);
+        if (application.getHistory() != null) {
+          mHistoryItemDaoHelper.insertOrUpdate(application.getHistory().getId(), mVolume,
+              position + 1, HistoryItem.Status.SKIMMED);
+        }
+      }
+
+      @Override
+      public void onPageScrollStateChanged(int state) {
+      }
+    });
 
     mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
@@ -135,6 +166,18 @@ public class ReaderFragment extends RoboSherlockFragment {
 
   }
 
+  public PageFragment getPageFragment(int page) {
+    return (PageFragment) mPagerAdapter.getFragment(page-1);
+  }
+
+  public int getCurrentPage() {
+    return mViewPager.getCurrentItem() + 1;
+  }
+
+  public void setCurrentPage(int page, boolean smoothScroll) {
+    mViewPager.setCurrentItem(page - 1, smoothScroll);
+  }
+
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
     mKeywords = keywords;
     mVolume = volume;
@@ -146,17 +189,13 @@ public class ReaderFragment extends RoboSherlockFragment {
       mViewPager.setCurrentItem(page-1, false);
       mSeekBar.setMax(cursor.getCount() - 1);
       mSeekBar.setProgress(page - 1);
-    }
-
-    updateSubtitle(volume, page);
-
-    if (keywords != null && keywords.length() > 0) {
-      PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
-      fragment.scrollToKeywords();
-    }
-
-    if (onOpenBookFinishListener != null) {
-      onOpenBookFinishListener.onOpenBookFinish(language, volume, page);
+      if (keywords != null && keywords.length() > 0) {
+        PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
+        if (fragment != null) {
+          fragment.scrollToKeywords();
+        }
+      }
+      updateSubtitle(volume, page);
     }
   }
 
@@ -170,6 +209,8 @@ public class ReaderFragment extends RoboSherlockFragment {
 
   private void updateNonItemSubtitle(int volume, int page) {
     mTextSubtitle.setText(getString(R.string.non_item_subtitle_template,
+        getString(mLanguage == BookDatabaseHelper.Language.THAI
+            ? R.string.thai_full_name : R.string.pali_full_name),
         Utils.convertToThaiNumber(getActivity(), volume),
         Utils.convertToThaiNumber(getActivity(), page)));
   }
@@ -179,7 +220,7 @@ public class ReaderFragment extends RoboSherlockFragment {
     mDatabaseHelper.getItemsAtPage(mLanguage, volume, page,
         new BookDatabaseHelper.OnGetItemsListener() {
           @Override
-          public void onGetItemsFinish(final Integer[] items) {
+          public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
             final String thaiItem;
             if (items.length > 1) {
               thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]) + "-"
@@ -192,6 +233,8 @@ public class ReaderFragment extends RoboSherlockFragment {
               @Override
               public void run() {
                 mTextSubtitle.setText(getString(R.string.subtitle_template,
+                    getString(mLanguage == BookDatabaseHelper.Language.THAI
+                        ? R.string.thai_full_name : R.string.pali_full_name),
                     Utils.convertToThaiNumber(getActivity(), volume),
                     Utils.convertToThaiNumber(getActivity(), page), thaiItem));
               }
@@ -200,7 +243,4 @@ public class ReaderFragment extends RoboSherlockFragment {
         });
   }
 
-  public interface OnOpenBookFinishListener {
-    public void onOpenBookFinish(BookDatabaseHelper.Language language, int volume, int page);
-  }
 }

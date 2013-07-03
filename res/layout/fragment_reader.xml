@@ -10,8 +10,8 @@
             android:text="right"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
             android:paddingLeft="10dp"
             style="@style/subtitle"/>
     <SeekBar
