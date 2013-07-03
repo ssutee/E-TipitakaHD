@@ -13,7 +13,7 @@
             android:name=".E_TipitakaApplication">
         <activity
                 android:name=".activity.MainActivity"
-                android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen"
+                android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
                 android:label="E-Tipitaka"
                 android:uiOptions="splitActionBarWhenNarrow">
             <intent-filter>

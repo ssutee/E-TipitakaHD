@@ -5,7 +5,7 @@
         <item name="android:background">#BBBBBB</item>
         <item name="android:textColor">#EEEEEE</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:singleLine">true</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:lines">2</item>
     </style>
 </resources>

@@ -62,7 +62,7 @@ public class ReaderFragment extends RoboSherlockFragment {
   public static ReaderFragment newInstance(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
     ReaderFragment fragment = new ReaderFragment();
     Bundle args = new Bundle();
-    args.putInt(Constants.LANGUAGE_KEY, language.ordinal());
+    args.putInt(Constants.LANGUAGE_KEY, language.getCode());
     args.putInt(Constants.VOLUME_KEY, volume);
     args.putInt(Constants.PAGE_KEY, page);
     args.putString(Constants.KEYWORDS_KEY, keywords);
@@ -91,6 +91,9 @@ public class ReaderFragment extends RoboSherlockFragment {
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     outState.putString(Constants.KEYWORDS_KEY, mKeywords);
+    outState.putInt(Constants.VOLUME_KEY, mVolume);
+    outState.putInt(Constants.PAGE_KEY, mPage);
+    outState.putInt(Constants.LANGUAGE_KEY, mLanguage.getCode());
   }
 
   @Override
@@ -115,6 +118,25 @@ public class ReaderFragment extends RoboSherlockFragment {
     };
 
     mViewPager.setAdapter(mPagerAdapter);
+    mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+      @Override
+      public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+      }
+
+      @Override
+      public void onPageSelected(int position) {
+        mSeekBar.setProgress(position);
+        updateSubtitle(mVolume, position + 1);
+        if (application.getHistory() != null) {
+          mHistoryItemDaoHelper.insertOrUpdate(application.getHistory().getId(), mVolume,
+              position + 1, HistoryItem.Status.SKIMMED);
+        }
+      }
+
+      @Override
+      public void onPageScrollStateChanged(int state) {
+      }
+    });
 
     mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
@@ -156,7 +178,6 @@ public class ReaderFragment extends RoboSherlockFragment {
     mViewPager.setCurrentItem(page - 1, smoothScroll);
   }
 
-
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
     mKeywords = keywords;
     mVolume = volume;
@@ -168,16 +189,14 @@ public class ReaderFragment extends RoboSherlockFragment {
       mViewPager.setCurrentItem(page-1, false);
       mSeekBar.setMax(cursor.getCount() - 1);
       mSeekBar.setProgress(page - 1);
+      if (keywords != null && keywords.length() > 0) {
+        PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
+        if (fragment != null) {
+          fragment.scrollToKeywords();
+        }
+      }
+      updateSubtitle(volume, page);
     }
-
-    updateSubtitle(volume, page);
-
-    if (keywords != null && keywords.length() > 0) {
-//      PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
-//      fragment.scrollToKeywords();
-      Log.d(TAG, "keywords = " + keywords);
-    }
-
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page) {
@@ -190,6 +209,8 @@ public class ReaderFragment extends RoboSherlockFragment {
 
   private void updateNonItemSubtitle(int volume, int page) {
     mTextSubtitle.setText(getString(R.string.non_item_subtitle_template,
+        getString(mLanguage == BookDatabaseHelper.Language.THAI
+            ? R.string.thai_full_name : R.string.pali_full_name),
         Utils.convertToThaiNumber(getActivity(), volume),
         Utils.convertToThaiNumber(getActivity(), page)));
   }
@@ -199,7 +220,7 @@ public class ReaderFragment extends RoboSherlockFragment {
     mDatabaseHelper.getItemsAtPage(mLanguage, volume, page,
         new BookDatabaseHelper.OnGetItemsListener() {
           @Override
-          public void onGetItemsFinish(final Integer[] items) {
+          public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
             final String thaiItem;
             if (items.length > 1) {
               thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]) + "-"
@@ -212,6 +233,8 @@ public class ReaderFragment extends RoboSherlockFragment {
               @Override
               public void run() {
                 mTextSubtitle.setText(getString(R.string.subtitle_template,
+                    getString(mLanguage == BookDatabaseHelper.Language.THAI
+                        ? R.string.thai_full_name : R.string.pali_full_name),
                     Utils.convertToThaiNumber(getActivity(), volume),
                     Utils.convertToThaiNumber(getActivity(), page), thaiItem));
               }

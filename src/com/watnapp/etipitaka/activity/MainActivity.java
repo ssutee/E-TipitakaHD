@@ -1,8 +1,10 @@
 package com.watnapp.etipitaka.activity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
@@ -75,17 +77,37 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     super.onCreate(savedInstanceState);
 
     application = (E_TipitakaApplication) getApplication();
-
     mDatabaseHelper.openDatabase();
 
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
     setupSlidingMenu();
+    initReader();
+  }
 
+  @Override
+  protected void onDestroy() {
+    mDatabaseHelper.closeDatabase();
+    SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
+    editor.putInt(Constants.VOLUME_KEY, currentVolume);
+    editor.putInt(Constants.PAGE_KEY, getReaderFragment().getCurrentPage());
+    editor.commit();
+    super.onDestroy();
+  }
+
+  private void initReader() {
+    SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+    BookDatabaseHelper.Language language = BookDatabaseHelper.
+        Language.values()[prefs.getInt(Constants.LANGUAGE_KEY, BookDatabaseHelper.Language.THAI.getCode())];
+    application.setLanguage(language);
+    currentVolume = prefs.getInt(Constants.VOLUME_KEY, 1);
+    int page = prefs.getInt(Constants.PAGE_KEY, 1);
+    currentKeywords = "";
     getSupportFragmentManager()
         .beginTransaction()
         .add(R.id.reader_fragment, ReaderFragment.newInstance(
-            BookDatabaseHelper.Language.THAI, 1, 1, READER_FRAG_TAG), "")
+            BookDatabaseHelper.Language.THAI, currentVolume, page, ""), READER_FRAG_TAG)
         .commit();
   }
 
@@ -109,19 +131,13 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   }
 
   @Override
-  protected void onDestroy() {
-    mDatabaseHelper.closeDatabase();
-    super.onDestroy();
-  }
-
-  @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     menu.add(Menu.NONE, Constants.MENU_ITEM_SEARCH, Menu.NONE,
         R.string.search)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
         .setIcon(android.R.drawable.ic_menu_search);
 
-    menu.add(Menu.NONE, Constants.MENU_ITEM_SEARCH, Menu.NONE,
+    menu.add(Menu.NONE, Constants.MENU_ITEM_SAVE, Menu.NONE,
         R.string.save)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
         .setIcon(android.R.drawable.ic_menu_save);
@@ -168,7 +184,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     return super.onOptionsItemSelected(item);
   }
 
-  private void compare(final Integer[] items) {
+  private void compare(final Integer[] items, final Integer[] sections) {
     CharSequence[] choices = new CharSequence[items.length];
     for (int i=0; i < items.length; ++i) {
       choices[i] = String.format("%s %s", getString(R.string.go_to_item),
@@ -181,9 +197,10 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       @Override
       public void onClick(DialogInterface dialog, int which) {
         Intent intent = new Intent(MainActivity.this, ComparisonActivity.class);
-        intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().ordinal());
+        intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
         intent.putExtra(Constants.VOLUME_KEY, currentVolume);
         intent.putExtra(Constants.ITEM_KEY, items[which]);
+        intent.putExtra(Constants.SECTION_KEY, sections[which]);
         startActivityForResult(intent, COMPARE_REQ);
       }
     });
@@ -198,16 +215,16 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     int page = getReaderFragment().getCurrentPage();
     mDatabaseHelper.getItemsAtPage(application.getLanguage(), currentVolume, page,
         new BookDatabaseHelper.OnGetItemsListener() {
-      @Override
-      public void onGetItemsFinish(final Integer[] items) {
-        mHandler.post(new Runnable() {
           @Override
-          public void run() {
-            compare(items);
+          public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
+            mHandler.post(new Runnable() {
+              @Override
+              public void run() {
+                compare(items, sections);
+              }
+            });
           }
         });
-      }
-    });
   }
 
   @Override
@@ -267,10 +284,12 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   private void gotoItem(final int item) {
     final Integer[] pages = mDatabaseHelper.getPagesByItem(application.getLanguage(), currentVolume, item);
-    final PageFragment fragment = getReaderFragment().getPageFragment(pages[0]);
     if (pages.length == 1) {
       getReaderFragment().setCurrentPage(pages[0], true);
-      fragment.scrollToItem(item);
+      PageFragment fragment = getReaderFragment().getPageFragment(pages[0]);
+      if (fragment != null) {
+        fragment.scrollToItem(item);
+      }
     } else if (pages.length > 1) {
       String[] choices = new String[pages.length];
       for (int i=0; i < pages.length; ++i) {
@@ -281,7 +300,10 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
             @Override
             public void onClick(DialogInterface dialog, int which) {
               getReaderFragment().setCurrentPage(pages[which], true);
-              fragment.scrollToItem(item);
+              PageFragment fragment = getReaderFragment().getPageFragment(pages[0]);
+              if (fragment != null) {
+                fragment.scrollToItem(item);
+              }
             }
           })
           .create().show();
