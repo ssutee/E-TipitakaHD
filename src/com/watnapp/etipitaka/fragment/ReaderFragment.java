@@ -1,5 +1,7 @@
 package com.watnapp.etipitaka.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockFragment;
@@ -18,8 +24,10 @@ import com.watnapp.etipitaka.E_TipitakaApplication;
 import com.watnapp.etipitaka.R;
 import com.watnapp.etipitaka.Utils;
 import com.watnapp.etipitaka.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.model.HistoryItem;
 import com.watnapp.etipitaka.model.HistoryItemDaoHelper;
+import com.watnapp.etipitaka.widget.MyWebView;
 import roboguice.inject.InjectView;
 
 /**
@@ -29,7 +37,7 @@ import roboguice.inject.InjectView;
  * Time: 21:58
  */
 
-public class ReaderFragment extends RoboSherlockFragment {
+public class ReaderFragment extends RoboSherlockFragment implements MyWebView.OnScrollChangedListener {
 
   private static final String TAG = "ReaderFragment";
 
@@ -44,6 +52,15 @@ public class ReaderFragment extends RoboSherlockFragment {
   @InjectView(R.id.seekbar)
   private SeekBar mSeekBar;
 
+  @InjectView(R.id.layout_buttons)
+  private View mButtons;
+
+  @InjectView(R.id.btn_compare)
+  private ImageView mCompareButton;
+
+  @InjectView(R.id.btn_return)
+  private ImageView returnButton;
+
   @Inject
   private BookDatabaseHelper mDatabaseHelper;
 
@@ -57,15 +74,39 @@ public class ReaderFragment extends RoboSherlockFragment {
   private BookDatabaseHelper.Language mLanguage;
   private int mVolume;
   private int mPage;
+  private boolean mShowButtons = false;
 
+  private boolean mShowingSeekBar = false;
+  private boolean mHidingSeekBar = false;
 
-  public static ReaderFragment newInstance(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
+  private boolean mShowingButtons = false;
+  private boolean mHidingButtons = false;
+
+  public interface OnMenuButtonClickListener {
+    public void onCompareButtonClick(Language language, int volume, int page);
+    public void onReturnButtonClick(Language language, int volume, int page);
+  }
+
+  private OnMenuButtonClickListener onMenuButtonClickListener;
+
+  public void setOnMenuButtonClickListener(OnMenuButtonClickListener onMenuButtonClickListener) {
+    this.onMenuButtonClickListener = onMenuButtonClickListener;
+  }
+
+  public static ReaderFragment newInstance(Language language, int volume, int page,
+                                           String keywords) {
+    return ReaderFragment.newInstance(language, volume, page, keywords, false);
+  }
+
+  public static ReaderFragment newInstance(Language language, int volume, int page,
+                                           String keywords, boolean compareButton) {
     ReaderFragment fragment = new ReaderFragment();
     Bundle args = new Bundle();
     args.putInt(Constants.LANGUAGE_KEY, language.getCode());
     args.putInt(Constants.VOLUME_KEY, volume);
     args.putInt(Constants.PAGE_KEY, page);
     args.putString(Constants.KEYWORDS_KEY, keywords);
+    args.putBoolean(Constants.BUTTON_KEY, compareButton);
     fragment.setArguments(args);
     return fragment;
   }
@@ -84,6 +125,7 @@ public class ReaderFragment extends RoboSherlockFragment {
     mVolume = savedInstanceState.getInt(Constants.VOLUME_KEY);
     mPage = savedInstanceState.getInt(Constants.PAGE_KEY);
     mLanguage = BookDatabaseHelper.Language.values()[savedInstanceState.getInt(Constants.LANGUAGE_KEY)];
+    mShowButtons = savedInstanceState.getBoolean(Constants.BUTTON_KEY);
 
   }
 
@@ -104,6 +146,10 @@ public class ReaderFragment extends RoboSherlockFragment {
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+
+    if (!mShowButtons) {
+      mButtons.setVisibility(View.GONE);
+    }
 
     mPagerAdapter = new CursorPagerAdapter<PageFragment>(getChildFragmentManager(),
         PageFragment.class, null) {
@@ -127,9 +173,18 @@ public class ReaderFragment extends RoboSherlockFragment {
       public void onPageSelected(int position) {
         mSeekBar.setProgress(position);
         updateSubtitle(mVolume, position + 1);
+        mHidingSeekBar = mShowingSeekBar = false;
+        mHidingButtons = mShowingButtons = false;
+        hideSeekBar();
         if (application.getHistory() != null) {
           mHistoryItemDaoHelper.insertOrUpdate(application.getHistory().getId(), mVolume,
               position + 1, HistoryItem.Status.SKIMMED);
+        }
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        PageFragment fragment = getPageFragment(position+1);
+        int fontSize = prefs.getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
+        if (fragment != null && fontSize != fragment.getFontSize()) {
+          fragment.setFontSize(fontSize);
         }
       }
 
@@ -162,8 +217,26 @@ public class ReaderFragment extends RoboSherlockFragment {
       }
     });
 
+    mCompareButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        doCompare(v);
+      }
+    });
+
+    returnButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        doReturn(v);
+      }
+    });
+
     openBook(mLanguage, mVolume, mPage, mKeywords);
 
+  }
+
+  public PageFragment getCurrentPageFragment() {
+    return getPageFragment(getCurrentPage());
   }
 
   public PageFragment getPageFragment(int page) {
@@ -225,8 +298,11 @@ public class ReaderFragment extends RoboSherlockFragment {
             if (items.length > 1) {
               thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]) + "-"
                   + Utils.convertToThaiNumber(getActivity(), items[items.length - 1]);
-            } else {
+            } else if (items.length == 1) {
               thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]);
+            } else {
+              Log.e(TAG, mLanguage + ":" + volume + ":" + page);
+              thaiItem = Utils.convertToThaiNumber(getActivity(), 0);
             }
 
             mHandler.post(new Runnable() {
@@ -243,4 +319,137 @@ public class ReaderFragment extends RoboSherlockFragment {
         });
   }
 
+  @Override
+  public void onScrollUp(View v) {
+    showSeekBar();
+    hideButtons();
+  }
+
+  @Override
+  public void onScrollDown(View v) {
+    hideSeekBar();
+    showButtons();
+  }
+
+  private void showButtons() {
+    if (!mShowButtons || mButtons.getVisibility() == View.VISIBLE || mShowingButtons) {
+      return;
+    }
+
+    mShowingButtons = true;
+    TranslateAnimation animation = new TranslateAnimation(0, 0, mButtons.getHeight(), 0);
+    animation.setDuration(100);
+    animation.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+      }
+
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        mButtons.setVisibility(View.VISIBLE);
+        mShowingButtons = false;
+      }
+
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+      }
+    });
+    mButtons.setVisibility(View.VISIBLE);
+    mButtons.startAnimation(animation);
+  }
+
+  private void hideButtons() {
+    if (!mShowButtons || mButtons.getVisibility() == View.GONE || mHidingButtons) {
+      return;
+    }
+
+    mHidingButtons = true;
+    TranslateAnimation animation = new TranslateAnimation(0, 0, 0, mButtons.getHeight());
+    animation.setDuration(100);
+    animation.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+      }
+
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        mButtons.setVisibility(View.GONE);
+        mHidingButtons = false;
+      }
+
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+      }
+    });
+    mButtons.startAnimation(animation);
+  }
+
+  private void showSeekBar() {
+    if (mSeekBar.getVisibility() == View.VISIBLE || mShowingSeekBar) {
+      return;
+    }
+
+    mShowingSeekBar = true;
+    TranslateAnimation animation = new TranslateAnimation(0, 0, -mSeekBar.getHeight(), 0);
+    animation.setDuration(100);
+    animation.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+      }
+
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        mSeekBar.setVisibility(View.VISIBLE);
+        mShowingSeekBar = false;
+      }
+
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+      }
+    });
+    mSeekBar.setVisibility(View.VISIBLE);
+    mSeekBar.startAnimation(animation);
+  }
+
+  private void hideSeekBar() {
+    if (mSeekBar.getVisibility() == View.GONE || mHidingSeekBar) {
+      return;
+    }
+
+    mHidingSeekBar = true;
+    TranslateAnimation animation = new TranslateAnimation(0, 0, 0, -mSeekBar.getHeight());
+    animation.setDuration(100);
+    animation.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+      }
+
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        mSeekBar.setVisibility(View.GONE);
+        mHidingSeekBar = false;
+      }
+
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+      }
+    });
+    mSeekBar.startAnimation(animation);
+  }
+
+  public void doCompare(View view) {
+    try {
+      ((OnMenuButtonClickListener)getActivity())
+          .onCompareButtonClick(mLanguage, mVolume, mViewPager.getCurrentItem() + 1);
+    } catch (ClassCastException e) {
+    }
+  }
+
+  public void doReturn(View view) {
+    try {
+      ((OnMenuButtonClickListener)getActivity())
+          .onReturnButtonClick(mLanguage, mVolume, mViewPager.getCurrentItem() + 1);
+    } catch (ClassCastException e) {
+    }
+  }
 }

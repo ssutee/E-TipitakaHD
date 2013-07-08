@@ -1,5 +1,8 @@
 package com.watnapp.etipitaka.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +16,7 @@ import android.webkit.WebViewClient;
 import com.watnapp.etipitaka.Constants;
 import com.watnapp.etipitaka.R;
 import com.watnapp.etipitaka.Utils;
+import com.watnapp.etipitaka.widget.MyWebView;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
 
@@ -34,9 +38,10 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
   private static final int CLICK_ON_WEBVIEW = 1;
   private static final int CLICK_ON_URL     = 2;
   private static final String TAG = "PageFragment";
+  private int mFontSize = Constants.DEFAULT_FONT_SIZE;
 
   @InjectView(R.id.webview)
-  private WebView mWebView;
+  private MyWebView mWebView;
 
   private Handler mHandler = new Handler(this);
 
@@ -48,7 +53,6 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    mWebView.getSettings().setDefaultFontSize(18);
     mWebView.getSettings().setJavaScriptEnabled(true);
     String text = getArguments().getString(Constants.CONTENT_KEY);
     String keywords = getArguments().getString(Constants.KEYWORDS_KEY);
@@ -60,12 +64,35 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
         mHandler.sendEmptyMessage(CLICK_ON_URL);
         return false;
       }
+
+      @Override
+      public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+      }
     });
     mWebView.setVerticalScrollBarEnabled(false);
+    SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+    int fontSize = prefs.getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     mWebView.loadDataWithBaseURL("http://etipitaka.com",
         getString(R.string.html_text_template,
-            highlightItemNumbers(highlightKeywords(text, keywords))),
+            highlightItemNumbers(highlightKeywords(text, keywords)),
+            String.format("%dpt", fontSize),
+            getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old)),
         "text/html", "UTF-8", null);
+    mWebView.setOnScrollChangedListener((MyWebView.OnScrollChangedListener) getParentFragment());
+  }
+
+  public void setFontSize(int size) {
+    mFontSize = size;
+    SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(Constants.FONT_SIZE_KEY, size);
+    editor.commit();
+    mWebView.loadUrl(String.format("javascript:(document.body.style.fontSize ='%dpt');", size));
+  }
+
+  public int getFontSize() {
+    return mFontSize;
   }
 
   private String highlightItemNumbers(String text) {
@@ -126,16 +153,29 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
         mWebView.loadUrl("javascript:scrollToKeywords();");
       }
     }, 500);
+
+    mWebView.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        mWebView.getOnScrollChangedListener().onScrollDown(mWebView);
+      }
+    }, 800);
   }
 
   public void scrollToItem(final int number) {
     mWebView.postDelayed(new Runnable() {
       @Override
       public void run() {
-        Log.d(TAG, "scrollToItem = " + number);
         mWebView.loadUrl(String.format("javascript:scrollToItem(\"%d\");", number));
       }
     }, 500);
+
+    mWebView.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        mWebView.getOnScrollChangedListener().onScrollDown(mWebView);
+      }
+    }, 800);
   }
 
   private class StringLengthComparator implements Comparator<String> {

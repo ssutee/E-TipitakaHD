@@ -1,14 +1,19 @@
 package com.watnapp.etipitaka.activity;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.Constants;
 import com.watnapp.etipitaka.R;
+import com.watnapp.etipitaka.Utils;
 import com.watnapp.etipitaka.fragment.ReaderFragment;
 import com.watnapp.etipitaka.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.helper.BookDatabaseHelper.Language;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectExtra;
 
@@ -20,12 +25,13 @@ import roboguice.inject.InjectExtra;
  */
 
 @ContentView(R.layout.activity_comparison)
-public class ComparisonActivity extends RoboSherlockFragmentActivity {
+public class ComparisonActivity extends RoboSherlockFragmentActivity
+    implements ReaderFragment.OnMenuButtonClickListener {
 
   protected static final String TAG = "ComparisonActivity";
 
   @InjectExtra(Constants.LANGUAGE_KEY)
-  private int mLanguage;
+  private int mLanguageCode;
 
   @InjectExtra(Constants.VOLUME_KEY)
   private int mVolume;
@@ -39,6 +45,12 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity {
   @Inject
   private BookDatabaseHelper mBookDatabaseHelper;
 
+  private Handler mHandler = new Handler();
+  private BookDatabaseHelper.Language mLanguage1;
+  private BookDatabaseHelper.Language mLanguage2;
+  private ReaderFragment mLeftFragment;
+  private ReaderFragment mRightFragment;
+
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
@@ -47,23 +59,77 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity {
     int page2 = mBookDatabaseHelper.getPageById(
         mBookDatabaseHelper.getPageIdByItem(BookDatabaseHelper.Language.PALI, mVolume, mItem, mSection));
 
-    BookDatabaseHelper.Language language1 = BookDatabaseHelper.Language.THAI;
-    BookDatabaseHelper.Language language2 = BookDatabaseHelper.Language.PALI;
-    if (mLanguage == BookDatabaseHelper.Language.PALI.getCode()) {
+    mLanguage1 = BookDatabaseHelper.Language.THAI;
+    mLanguage2 = BookDatabaseHelper.Language.PALI;
+
+    if (mLanguageCode == BookDatabaseHelper.Language.PALI.getCode()) {
       int tmp = page2;
       page2 = page1;
       page1 = tmp;
-      language1 = BookDatabaseHelper.Language.PALI;
-      language2 = BookDatabaseHelper.Language.THAI;
+      mLanguage1 = BookDatabaseHelper.Language.PALI;
+      mLanguage2 = BookDatabaseHelper.Language.THAI;
     }
 
+    mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, "", true);
     getSupportFragmentManager().beginTransaction()
         .add(R.id.left_reader_fragment,
-            ReaderFragment.newInstance(language1, mVolume, page1, ""), "left").commit();
+            mLeftFragment, "left").commit();
 
+    mRightFragment = ReaderFragment.newInstance(mLanguage2, mVolume, page2, "", true);
     getSupportFragmentManager().beginTransaction()
         .add(R.id.right_reader_fragment,
-            ReaderFragment.newInstance(language2, mVolume, page2, ""), "right").commit();
+            mRightFragment, "right").commit();
 
+    mHandler.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        mLeftFragment.getPageFragment(mLeftFragment.getCurrentPage()).scrollToItem(mItem);
+        mRightFragment.getPageFragment(mRightFragment.getCurrentPage()).scrollToItem(mItem);
+      }
+    }, 500);
+
+  }
+
+  @Override
+  public void onCompareButtonClick(final Language language, final int volume, int page) {
+    mBookDatabaseHelper.getItemsAtPage(language, volume, page, new BookDatabaseHelper.OnGetItemsListener() {
+      @Override
+      public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
+        mHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            String[] choices = new String[items.length];
+            for (int i=0; i<items.length; ++i) {
+              choices[i] = getString(R.string.go_to_item) + " " +
+                  Utils.convertToThaiNumber(ComparisonActivity.this, items[i]);
+            }
+            new AlertDialog.Builder(ComparisonActivity.this).setTitle(R.string.select_item)
+                .setItems(choices, new DialogInterface.OnClickListener() {
+                  @Override
+                  public void onClick(DialogInterface dialog, final int which) {
+                    Language targetLanguage = (language.getCode() == mLanguageCode)
+                        ? mLanguage2 : mLanguage1;
+                    ReaderFragment targetFragment = (language.getCode() == mLanguageCode)
+                        ? mRightFragment : mLeftFragment;
+                    int pageId = mBookDatabaseHelper
+                        .getPageIdByItem(targetLanguage, volume, items[which], sections[which]);
+                    targetFragment.openBook(targetLanguage, volume, mBookDatabaseHelper.getPageById(pageId));
+                    targetFragment.getCurrentPageFragment().scrollToItem(items[which]);
+                  }
+                }).create().show();
+          }
+        });
+      }
+    });
+  }
+
+  @Override
+  public void onReturnButtonClick(Language language, int volume, int page) {
+    Intent data = new Intent();
+    data.putExtra(Constants.LANGUAGE_KEY, language.getCode());
+    data.putExtra(Constants.VOLUME_KEY, volume);
+    data.putExtra(Constants.PAGE_KEY, page);
+    setResult(RESULT_OK, data);
+    finish();
   }
 }

@@ -44,6 +44,7 @@ public class BookDatabaseHelper {
   }
 
   private int getPageId(Language language, int volume, int page) {
+    openDatabase();
     int pageId = -1;
     Cursor cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ? AND number = ?",
         new String[] {String.valueOf(language.getCode()), String.valueOf(volume), String.valueOf(page)},
@@ -58,6 +59,7 @@ public class BookDatabaseHelper {
 
   public void getItemsAtPage(final Language language, final int volume, final int page,
                              final OnGetItemsListener listener) {
+    openDatabase();
     new Thread(new Runnable() {
       @Override
       public void run() {
@@ -84,6 +86,7 @@ public class BookDatabaseHelper {
   }
 
   public Cursor read(Language language, int volume, int page) {
+    openDatabase();
     Cursor cursor = db.query("page", null, "language = ? AND volume = ?",
         new String[] {String.valueOf(language.getCode()), String.valueOf(volume)}, null, null, null);
     cursor.moveToFirst();
@@ -102,6 +105,7 @@ public class BookDatabaseHelper {
   }
 
   public int getMaximumPageNumber(Language language, int volume) {
+    openDatabase();
     Cursor cursor = db.query("page", new String[] {"number"}, "language = ? AND volume = ?",
         new String[] { String.valueOf(language.getCode()), String.valueOf(volume)},
         null, null, "number");
@@ -112,6 +116,7 @@ public class BookDatabaseHelper {
   }
 
   private int getFirstPageId(Language language, int volume) {
+    openDatabase();
     Cursor cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
         new String[] { String.valueOf(language.getCode()), String.valueOf(volume)},
         null, null, null);
@@ -122,6 +127,7 @@ public class BookDatabaseHelper {
   }
 
   private int getLastPageId(Language language, int volume) {
+    openDatabase();
     Cursor cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
         new String[] { String.valueOf(language.getCode()), String.valueOf(volume)},
         null, null, null);
@@ -132,6 +138,7 @@ public class BookDatabaseHelper {
   }
 
   public int getMinimumItemNumber(Language language, int volume) {
+    openDatabase();
     int pageId = getFirstPageId(language, volume);
     Cursor cursor = db.query("item", new String[] {"number"}, "page_id = ?",
         new String[] {String.valueOf(pageId)},
@@ -143,6 +150,7 @@ public class BookDatabaseHelper {
   }
 
   public int getMaximumItemNumber(Language language, int volume) {
+    openDatabase();
     int pageId = getLastPageId(language, volume);
     Cursor cursor = db.query("item", new String[] {"number"}, "page_id = ?",
         new String[] {String.valueOf(pageId)},
@@ -154,6 +162,7 @@ public class BookDatabaseHelper {
   }
 
   private String getPagesTuple(Language language, int volume) {
+    openDatabase();
     Cursor cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
         new String[] { String.valueOf(language.getCode()), String.valueOf(volume)},
         null, null, null);
@@ -173,6 +182,7 @@ public class BookDatabaseHelper {
   }
 
   private Integer[] getPageIdsByItem(Language language, int volume, int item) {
+    openDatabase();
     Cursor cursor = db.query(true, "item", new String[] {"page_id"},
         "page_id IN " + getPagesTuple(language, volume) + " AND start = 1 AND number = ?",
         new String[] { String.valueOf(item) }, null, null, "page_id", null);
@@ -187,6 +197,7 @@ public class BookDatabaseHelper {
   }
 
   public int getPageIdByItem(Language language, int volume, int item, int section) {
+    openDatabase();
     Cursor cursor = db.query(true, "item", new String[] {"page_id"},
         "page_id IN " + getPagesTuple(language, volume) + " AND start = 1 AND number = ? AND section = ?",
         new String[] { String.valueOf(item), String.valueOf(section) }, null, null, "page_id", null);
@@ -200,6 +211,7 @@ public class BookDatabaseHelper {
   }
 
   public int getPageById(int pageId) {
+    openDatabase();
     Cursor cursor = db.query("page", new String[] {"number"}, "_id = ?",
         new String[] { String.valueOf(pageId) }, null, null, null);
     int page = -1;
@@ -212,6 +224,7 @@ public class BookDatabaseHelper {
   }
 
   public Integer[] getPagesByItem(Language language, int volume, int item) {
+    openDatabase();
     Integer[] pageIds = getPageIdsByItem(language, volume, item);
     ArrayList<Integer> pages = new ArrayList<Integer>();
     for (int pageId : pageIds) {
@@ -226,6 +239,7 @@ public class BookDatabaseHelper {
 
   public void search(final Language language, final String keywords, final OnSearchListener listener,
                      final Integer[] volumes) {
+    openDatabase();
     new Thread(new Runnable() {
       @Override
       public void run() {

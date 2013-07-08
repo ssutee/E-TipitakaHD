@@ -37,10 +37,63 @@
     <string name="regex_item_number">\\n\\s*\\[[๐๑๒๓๔๕๖๗๘๙]+?\\]|^\\s*\\[[๐๑๒๓๔๕๖๗๘๙]+?\\]</string>
     <string name="select_item">เลือกข้อที่ต้องการ</string>
     <string name="select_page">เลือกหน้าที่ต้องการ</string>
+    <string name="font_family_new">
+    <![CDATA[
+        <style type=\"text/css\">
+        \@font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK\') format(\'svg\');
+            font-weight: normal; font-style: normal;
+        }
+        \@font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-Bold\') format(\'svg\');
+            font-weight: bold;
+        }
+        \@font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-Italic\') format(\'svg\');
+            font-style: italic, oblique;
+        }
+        \@font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-BoldItalic\') format(\'svg\');
+            font-weight: bold; font-style: italic, oblique;
+        }
+        </style>
+    ]]>
+    </string>
+    <string name="font_family_old">
+    <![CDATA[
+        <style type=\"text/css\">
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.ttf\') format(\'truetype\');
+            font-weight: normal; font-style: normal;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabunBold.ttf\') format(\'truetype\');
+            font-weight: bold;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabunItalic.ttf\') format(\'truetype\');
+            font-style: italic, oblique;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabunBoldItalic.ttf\') format(\'truetype\');
+            font-weight: bold; font-style: italic, oblique;
+        }
+        </style>
+    ]]>
+    </string>
     <string name="html_text_template">
     <![CDATA[
         <html>
             <head>
+                %3$s
                 <script>
                     function scrollToElement(theElement) {
                         var selectedPosX = 0;
@@ -66,8 +119,14 @@
                     }
                 </script>
             </head>
-            <p style=\"white-space: pre-wrap;\">%1$s</p>
+            <body style=\"font-size:%2$s; font-family:\'TH SarabunPSK\'\">
+                <p style=\"white-space: pre-wrap;\">%1$s</p>
+            </body>
         </html>
     ]]>
     </string>
+    <string name="font_size">ขนาดอักษร</string>
+    <string name="increase_font_size">เพิ่มขนาดอักษร</string>
+    <string name="decrease_font_size">ลดขนาดอักษร</string>
+    <string name="preferences">ตั้งค่า</string>
 </resources>

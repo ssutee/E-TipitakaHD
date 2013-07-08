@@ -5,28 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ListAdapter;
-import android.widget.SeekBar;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
 import com.google.inject.Inject;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.meetup.adapter.CursorPagerAdapter;
 import com.watnapp.etipitaka.Constants;
 import com.watnapp.etipitaka.E_TipitakaApplication;
 import com.watnapp.etipitaka.Utils;
@@ -35,11 +22,10 @@ import com.watnapp.etipitaka.fragment.PageFragment;
 import com.watnapp.etipitaka.fragment.ReaderFragment;
 import com.watnapp.etipitaka.fragment.TextEntryDialogFragment;
 import com.watnapp.etipitaka.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.R;
-import com.watnapp.etipitaka.model.HistoryItem;
 import com.watnapp.etipitaka.model.HistoryItemDaoHelper;
 import roboguice.inject.ContentView;
-import roboguice.inject.InjectView;
 
 /**
  * Created with IntelliJ IDEA.
@@ -98,8 +84,9 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   private void initReader() {
     SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-    BookDatabaseHelper.Language language = BookDatabaseHelper.
-        Language.values()[prefs.getInt(Constants.LANGUAGE_KEY, BookDatabaseHelper.Language.THAI.getCode())];
+    Language language =
+        prefs.getInt(Constants.LANGUAGE_KEY,
+            Language.THAI.getCode()) == Language.THAI.getCode() ? Language.THAI : Language.PALI;
     application.setLanguage(language);
     currentVolume = prefs.getInt(Constants.VOLUME_KEY, 1);
     int page = prefs.getInt(Constants.PAGE_KEY, 1);
@@ -107,13 +94,14 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     getSupportFragmentManager()
         .beginTransaction()
         .add(R.id.reader_fragment, ReaderFragment.newInstance(
-            BookDatabaseHelper.Language.THAI, currentVolume, page, ""), READER_FRAG_TAG)
+            language, currentVolume, page, ""), READER_FRAG_TAG)
         .commit();
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
     currentKeywords = keywords;
     currentVolume = volume;
+    application.setLanguage(language);
 
     getReaderFragment().openBook(language, volume, page, keywords);
 
@@ -158,6 +146,17 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     gotoMenu.getItem().setIcon(R.drawable.ic_menu_goto)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
+    SubMenu preferencesMenu = menu.addSubMenu(R.string.preferences);
+    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_INCREASE_FONT_SIZE,
+        Menu.NONE, R.string.increase_font_size)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_DECREASE_FONT_SIZE,
+        Menu.NONE, R.string.decrease_font_size)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    preferencesMenu.setIcon(android.R.drawable.ic_menu_preferences);
+    preferencesMenu.getItem().setIcon(android.R.drawable.ic_menu_preferences)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
     return super.onCreateOptionsMenu(menu);
   }
 
@@ -180,8 +179,28 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_COMPARE:
         compare();
         return true;
+      case Constants.MENU_ITEM_INCREASE_FONT_SIZE:
+        increaseFontSize();
+        return true;
+      case Constants.MENU_ITEM_DECREASE_FONT_SIZE:
+        decreaseFontSize();
+        return true;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void increaseFontSize() {
+    int size = getPreferences(Context.MODE_PRIVATE)
+        .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
+    size += 2;
+    getReaderFragment().getCurrentPageFragment().setFontSize(size);
+  }
+
+  private void decreaseFontSize() {
+    int size = getPreferences(Context.MODE_PRIVATE)
+        .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
+    size -= 2;
+    getReaderFragment().getCurrentPageFragment().setFontSize(size);
   }
 
   private void compare(final Integer[] items, final Integer[] sections) {
@@ -312,6 +331,19 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   @Override
   public void onTextEntryDialogNegativeButtonClick() {
+  }
 
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == COMPARE_REQ && resultCode == RESULT_OK) {
+      Language language = Language.PALI;
+      if (data.getIntExtra(Constants.LANGUAGE_KEY, Language.THAI.getCode()) == Language.THAI.getCode()) {
+        language = Language.THAI;
+      }
+      openBook(language, data.getIntExtra(Constants.VOLUME_KEY, currentVolume),
+          data.getIntExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage()),
+          currentKeywords);
+    }
+    super.onActivityResult(requestCode, resultCode, data);
   }
 }

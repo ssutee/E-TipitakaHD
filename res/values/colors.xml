@@ -6,4 +6,5 @@
     <drawable name="read_color">#00BFE5</drawable>
     <drawable name="skimmed_color">#7FCAE6</drawable>
     <drawable name="transparent">#00FFFFFF</drawable>
+    <color name="alpha_gray">#DFE7E7E7</color>
 </resources>
