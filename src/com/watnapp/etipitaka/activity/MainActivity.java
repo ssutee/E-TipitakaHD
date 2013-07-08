@@ -192,14 +192,14 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   private void increaseFontSize() {
     int size = getPreferences(Context.MODE_PRIVATE)
         .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
-    size += 2;
+    size += Constants.FONT_SIZE_STEP;
     getReaderFragment().getCurrentPageFragment().setFontSize(size);
   }
 
   private void decreaseFontSize() {
     int size = getPreferences(Context.MODE_PRIVATE)
         .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
-    size -= 2;
+    size -= Constants.FONT_SIZE_STEP;
     getReaderFragment().getCurrentPageFragment().setFontSize(size);
   }
 

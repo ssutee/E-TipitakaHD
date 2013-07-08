@@ -35,4 +35,5 @@ public class Constants {
   public static final String FONT_SIZE_KEY = "font_size";
 
   public static final int DEFAULT_FONT_SIZE = 20;
+  public static final int FONT_SIZE_STEP = 2;
 }
