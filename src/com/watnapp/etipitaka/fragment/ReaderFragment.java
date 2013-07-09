@@ -180,7 +180,8 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
           mHistoryItemDaoHelper.insertOrUpdate(application.getHistory().getId(), mVolume,
               position + 1, HistoryItem.Status.SKIMMED);
         }
-        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences prefs = getActivity()
+            .getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE);
         PageFragment fragment = getPageFragment(position+1);
         int fontSize = prefs.getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
         if (fragment != null && fontSize != fragment.getFontSize()) {
@@ -272,6 +273,14 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     }
   }
 
+  public void openBook(BookDatabaseHelper.Language language, int volume, int page, int item) {
+    openBook(language, volume, page, "");
+    PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
+    if (fragment != null) {
+      fragment.scrollToItem(item);
+    }
+  }
+
   public void openBook(BookDatabaseHelper.Language language, int volume, int page) {
     openBook(language, volume, page, "");
   }
@@ -301,18 +310,12 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
             } else if (items.length == 1) {
               thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]);
             } else {
-              Log.e(TAG, mLanguage + ":" + volume + ":" + page);
               thaiItem = Utils.convertToThaiNumber(getActivity(), 0);
             }
-
             mHandler.post(new Runnable() {
               @Override
               public void run() {
-                mTextSubtitle.setText(getString(R.string.subtitle_template,
-                    getString(mLanguage == BookDatabaseHelper.Language.THAI
-                        ? R.string.thai_full_name : R.string.pali_full_name),
-                    Utils.convertToThaiNumber(getActivity(), volume),
-                    Utils.convertToThaiNumber(getActivity(), page), thaiItem));
+                mTextSubtitle.setText(Utils.getSubtitle(getActivity(), mLanguage, volume, page, thaiItem));
               }
             });
           }

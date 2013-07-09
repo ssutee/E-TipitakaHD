@@ -10,6 +10,7 @@
     <string name="thai_full_name"> พระไตรปิฎกไทย (ฉบับหลวง) </string>
     <string name="pali_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ) </string>
     <string name="subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s ข้อที่ %4$s</string>
+    <string name="favorite_template">เล่มที่ %1$s หน้าที่ %2$s ข้อที่ %3$s</string>
     <string name="non_item_subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s</string>
     <string name="go_to">ข้ามไปที่</string>
     <string name="go_to_page">หน้าที่</string>
@@ -129,4 +130,14 @@
     <string name="increase_font_size">เพิ่มขนาดอักษร</string>
     <string name="decrease_font_size">ลดขนาดอักษร</string>
     <string name="preferences">ตั้งค่า</string>
+    <string name="enter_note">ป้อนข้อความที่ต้องการบันทึก</string>
+    <string name="save_complete">บันทึกเสร็จ</string>
+    <string name="favorite">บันทึก</string>
+    <string name="view_note">อ่านบันทึก</string>
+    <string name="edit">แก้ไข</string>
+    <string name="delete">ลบ</string>
+    <string name="edit_note">แก้ไขบันทึก</string>
+    <string name="open_note">เปิดบันทึก</string>
+    <string name="confirm_delete_favorite">คุณต้องการลบการจดจำนี้หรือไม่?</string>
+    <string name="cancel">ยกเลิก</string>
 </resources>

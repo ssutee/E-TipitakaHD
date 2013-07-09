@@ -100,8 +100,8 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
         SearchFragment.class, null);
     mTabsAdapter.addTab(mTabHost.newTabSpec("history").setIndicator(getString(R.string.history)),
         HistoryFragment.class, null);
-    mTabsAdapter.addTab(mTabHost.newTabSpec("bookmark").setIndicator(getString(R.string.bookmark)),
-        BlankFragment.class, null);
+    mTabsAdapter.addTab(mTabHost.newTabSpec("favorite").setIndicator(getString(R.string.favorite)),
+        FavoriteFragment.class, null);
 
     if (savedInstanceState != null) {
       mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));

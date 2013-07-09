@@ -1,7 +1,8 @@
 package com.watnapp.etipitaka;
 
 import android.content.Context;
-
+import com.watnapp.etipitaka.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.helper.BookDatabaseHelper.Language;
 /**
  * Created with IntelliJ IDEA.
  * User: sutee
@@ -29,5 +30,13 @@ public class Utils {
       result = result.replaceAll(thaiNumbers[i], String.valueOf(i));
     }
     return result;
+  }
+
+  public static String getSubtitle(Context context, Language language, int volume, int page, String item) {
+    return context.getString(R.string.subtitle_template,
+        context.getString(language == Language.THAI
+            ? R.string.thai_full_name : R.string.pali_full_name),
+        Utils.convertToThaiNumber(context, volume),
+        Utils.convertToThaiNumber(context, page), item);
   }
 }

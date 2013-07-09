@@ -21,19 +21,39 @@ import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockDialogF
 
 public class TextEntryDialogFragment extends RoboSherlockDialogFragment {
 
+  public enum InputMode {
+    DIGIT, TEXT
+  }
+
   public interface TextEntryDialogButtonClickListener {
     public void onTextEntryDialogPositiveButtonClick(String text, int id);
     public void onTextEntryDialogNegativeButtonClick();
   }
 
-  public static TextEntryDialogFragment newInstance(int title, String message, int id) {
+  public static TextEntryDialogFragment newInstance(int title, String message, int id, int lines,
+                                                    InputMode mode, String note) {
     TextEntryDialogFragment frag = new TextEntryDialogFragment();
     Bundle args = new Bundle();
     args.putInt("title", title);
     args.putString("message", message);
     args.putInt("id", id);
+    args.putInt("lines", lines);
+    args.putInt("mode", mode.ordinal());
+    args.putString("note", note);
     frag.setArguments(args);
     return frag;
+  }
+
+  public static TextEntryDialogFragment newInstance(int title, String message, int id, int lines, InputMode mode) {
+    return TextEntryDialogFragment.newInstance(title, message, id, 1, mode, "");
+  }
+
+  public static TextEntryDialogFragment newInstance(int title, String message, int id, int lines) {
+    return TextEntryDialogFragment.newInstance(title, message, id, 1, InputMode.DIGIT);
+  }
+
+  public static TextEntryDialogFragment newInstance(int title, String message, int id) {
+    return TextEntryDialogFragment.newInstance(title, message, id, 1);
   }
 
   @Override
@@ -42,24 +62,45 @@ public class TextEntryDialogFragment extends RoboSherlockDialogFragment {
     String message = getArguments().getString("message");
     final int id = getArguments().getInt("id");
     final EditText input = new EditText(getActivity());
-    input.setKeyListener(new DigitsKeyListener());
+    int lines = getArguments().getInt("lines");
+    if (lines > 1) {
+      input.setSingleLine(false);
+      input.setLines(lines);
+    }
+    int mode = getArguments().getInt("mode");
+    if (mode == InputMode.DIGIT.ordinal()) {
+      input.setKeyListener(new DigitsKeyListener());
+    }
+    input.setText(getArguments().getString("note"));
 
     return new AlertDialog.Builder(getActivity())
         .setView(input)
-        .setTitle(title)
+        .setTitle(title==0 ? null : getActivity().getString(title))
         .setMessage(message)
         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            ((TextEntryDialogButtonClickListener)getActivity())
-                .onTextEntryDialogPositiveButtonClick(input.getText().toString(), id);
+            try {
+              ((TextEntryDialogButtonClickListener)getActivity())
+                  .onTextEntryDialogPositiveButtonClick(input.getText().toString(), id);
+              if (getParentFragment() != null) {
+                ((TextEntryDialogButtonClickListener)getParentFragment())
+                    .onTextEntryDialogPositiveButtonClick(input.getText().toString(), id);
+              }
+            } catch (ClassCastException e) {}
           }
         })
         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            ((TextEntryDialogButtonClickListener)getActivity())
-                .onTextEntryDialogNegativeButtonClick();
+            try {
+              ((TextEntryDialogButtonClickListener)getActivity())
+                  .onTextEntryDialogNegativeButtonClick();
+              if (getParentFragment() != null) {
+                ((TextEntryDialogButtonClickListener)getParentFragment())
+                    .onTextEntryDialogNegativeButtonClick();
+              }
+            } catch (ClassCastException e) {}
           }
         })
         .create();

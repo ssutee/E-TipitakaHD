@@ -21,7 +21,8 @@
             {"name": "note", "type": "text"},
             {"name": "language", "type": "integer"},
             {"name": "volume", "type": "integer"},
-            {"name": "page", "type": "integer"}
+            {"name": "page", "type": "integer"},
+            {"name": "item", "type": "integer"}
         ]
     },
     "history_item": {

@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
@@ -24,6 +26,8 @@ import com.watnapp.etipitaka.fragment.TextEntryDialogFragment;
 import com.watnapp.etipitaka.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.R;
+import com.watnapp.etipitaka.model.Favorite;
+import com.watnapp.etipitaka.model.FavoriteDaoHelper;
 import com.watnapp.etipitaka.model.HistoryItemDaoHelper;
 import roboguice.inject.ContentView;
 
@@ -52,11 +56,14 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   @Inject
   private HistoryItemDaoHelper mHistoryItemDaoHelper;
 
+  @Inject
+  private FavoriteDaoHelper mFavoriteDaoHelper;
+
   private SlidingMenu mSlidingMenu;
   private MenuFragment mMenuFragment;
   private E_TipitakaApplication application;
   private Handler mHandler = new Handler();
-  private int currentVolume;
+  private int currentVolume, mSelectedPage, mSelectedItem;
   private String currentKeywords;
 
   public void onCreate(Bundle savedInstanceState) {
@@ -98,16 +105,25 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         .commit();
   }
 
-  public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
+  public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords, int item) {
     currentKeywords = keywords;
     currentVolume = volume;
     application.setLanguage(language);
 
-    getReaderFragment().openBook(language, volume, page, keywords);
+    if (item == 0) {
+      getReaderFragment().openBook(language, volume, page, keywords);
+    } else {
+      getReaderFragment().openBook(language, volume, page, item);
+    }
 
     mSlidingMenu.showContent();
     getSupportActionBar().setTitle(application.getLanguage() == BookDatabaseHelper.Language.THAI
         ? R.string.thai_full_name : R.string.pali_full_name);
+  }
+
+
+  public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
+    openBook(language, volume, page, keywords, 0);
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page) {
@@ -185,19 +201,76 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_DECREASE_FONT_SIZE:
         decreaseFontSize();
         return true;
+      case Constants.MENU_ITEM_SAVE:
+        takeNote();
+        return true;
     }
     return super.onOptionsItemSelected(item);
   }
 
+  private void takeNote() {
+    mSelectedPage = getReaderFragment().getCurrentPage();
+    mDatabaseHelper.getItemsAtPage(application.getLanguage(), currentVolume, mSelectedPage,
+        new BookDatabaseHelper.OnGetItemsListener() {
+          @Override
+          public void onGetItemsFinish(final Integer[] items, Integer[] sections) {
+            final String[] choices = new String[items.length];
+            for (int i = 0; i < items.length; ++i) {
+              choices[i] = getString(R.string.go_to_item) + " "
+                  + Utils.convertToThaiNumber(MainActivity.this, items[i]);
+            }
+            if (items.length > 1) {
+              mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                  new AlertDialog.Builder(MainActivity.this).setTitle(R.string.select_item)
+                      .setItems(choices, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                          mSelectedItem = items[which];
+                          String message = Utils.getSubtitle(MainActivity.this,
+                              application.getLanguage(), currentVolume, mSelectedPage,
+                              Utils.convertToThaiNumber(MainActivity.this, mSelectedItem));
+                          TextEntryDialogFragment.newInstance(R.string.enter_note, message,
+                              Constants.TAKE_NOTE_ID, 5, TextEntryDialogFragment.InputMode.TEXT)
+                              .show(getSupportFragmentManager(), "take_note_dialog");
+                        }
+                      }).create().show();
+                }
+              });
+            } else if (items.length == 1) {
+              mSelectedItem = items[0];
+              String message = Utils.getSubtitle(MainActivity.this,
+                  application.getLanguage(), currentVolume, mSelectedPage,
+                  Utils.convertToThaiNumber(MainActivity.this, mSelectedItem));
+              TextEntryDialogFragment.newInstance(R.string.enter_note, message,
+                  Constants.TAKE_NOTE_ID, 5, TextEntryDialogFragment.InputMode.TEXT)
+                  .show(getSupportFragmentManager(), "take_note_dialog");
+            }
+          }
+        });
+  }
+
+  private void takeNote(Language language, int volume, int page, int item, String text) {
+    Favorite favorite = new Favorite();
+    favorite.setLanguage(language);
+    favorite.setVolume(volume);
+    favorite.setPage(page);
+    favorite.setItem(item);
+    favorite.setNote(text);
+    mFavoriteDaoHelper.insert(favorite);
+    Toast.makeText(this, R.string.save_complete, Toast.LENGTH_SHORT).show();
+  }
+
   private void increaseFontSize() {
-    int size = getPreferences(Context.MODE_PRIVATE)
+    int size = getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE)
         .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     size += Constants.FONT_SIZE_STEP;
     getReaderFragment().getCurrentPageFragment().setFontSize(size);
   }
 
   private void decreaseFontSize() {
-    int size = getPreferences(Context.MODE_PRIVATE)
+    int size = getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE)
         .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     size -= Constants.FONT_SIZE_STEP;
     getReaderFragment().getCurrentPageFragment().setFontSize(size);
@@ -277,7 +350,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
     TextEntryDialogFragment.newInstance(R.string.goto_page_title,
         getString(R.string.goto_page_message, minPage, maxPage), Constants.GOTO_PAGE_ID)
-        .show(getSupportFragmentManager(), "dialog");
+        .show(getSupportFragmentManager(), "goto_page_dialog");
   }
 
   private void showGotoItemDialog() {
@@ -286,7 +359,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
     TextEntryDialogFragment.newInstance(R.string.goto_item_title,
         getString(R.string.goto_item_message, minItem, maxItem), Constants.GOTO_ITEM_ID)
-        .show(getSupportFragmentManager(), "dialog");
+        .show(getSupportFragmentManager(), "goto_item_dialog");
   }
 
   @Override
@@ -298,7 +371,14 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.GOTO_ITEM_ID:
         gotoItem(Integer.parseInt(text));
         break;
+      case Constants.TAKE_NOTE_ID:
+        takeNote(application.getLanguage(), currentVolume, mSelectedPage, mSelectedItem, text);
+        break;
     }
+  }
+
+  @Override
+  public void onTextEntryDialogNegativeButtonClick() {
   }
 
   private void gotoItem(final int item) {
@@ -327,10 +407,6 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
           })
           .create().show();
     }
-  }
-
-  @Override
-  public void onTextEntryDialogNegativeButtonClick() {
   }
 
   @Override

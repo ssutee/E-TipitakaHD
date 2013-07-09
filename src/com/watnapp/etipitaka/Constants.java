@@ -19,8 +19,12 @@ public class Constants {
 
   public static final int GOTO_PAGE_ID = 0;
   public static final int GOTO_ITEM_ID = 1;
+  public static final int TAKE_NOTE_ID = 2;
+  public static final int OPEN_NOTE_ID = 3;
 
   public static final int HISTORY_LOADER = 0;
+  public static final int FAVORITE_LOADER = 1;
+
   public static final Uri LANGUAGE_CHANGE_URI = Uri.parse("content://etipitaka.com/language_change");
 
   public static final String LANGUAGE_KEY = "language";
@@ -36,4 +40,10 @@ public class Constants {
 
   public static final int DEFAULT_FONT_SIZE = 20;
   public static final int FONT_SIZE_STEP = 2;
+  public static final String SETTING_PREFERENCES = "setting_preferences";
+
+  public static final int MENU_ITEM_OPEN = 1008;
+  public static final int MENU_ITEM_EDIT = 1009;
+  public static final int MENU_ITEM_DELETE = 1010;
+
 }

@@ -71,7 +71,8 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
       }
     });
     mWebView.setVerticalScrollBarEnabled(false);
-    SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences prefs = getActivity()
+        .getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE);
     int fontSize = prefs.getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     mWebView.loadDataWithBaseURL("http://etipitaka.com",
         getString(R.string.html_text_template,
@@ -84,7 +85,8 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
 
   public void setFontSize(int size) {
     mFontSize = size;
-    SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences prefs = getActivity()
+        .getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(Constants.FONT_SIZE_KEY, size);
     editor.commit();

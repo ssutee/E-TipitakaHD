@@ -11,6 +11,7 @@ public final class FavoriteTable {
         public static final String LANGUAGE = "language_column";
         public static final String VOLUME = "volume_column";
         public static final String PAGE = "page_column";
+        public static final String ITEM = "item_column";
     }
 
 
@@ -22,7 +23,8 @@ public final class FavoriteTable {
         sb.append(FavoriteColumns.NOTE + " TEXT, ");
         sb.append(FavoriteColumns.LANGUAGE + " INTEGER, ");
         sb.append(FavoriteColumns.VOLUME + " INTEGER, ");
-        sb.append(FavoriteColumns.PAGE + " INTEGER");
+        sb.append(FavoriteColumns.PAGE + " INTEGER, ");
+        sb.append(FavoriteColumns.ITEM + " INTEGER");
         sb.append(");");
         db.execSQL(sb.toString());
     }

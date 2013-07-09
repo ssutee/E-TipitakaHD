@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.util.Log;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.watnapp.etipitaka.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -322,6 +323,10 @@ public class BookDatabaseHelper {
 
     public int getCode() {
       return code;
+    }
+
+    public String getFullName(Context context) {
+      return context.getString(code == 0 ? R.string.thai_full_name : R.string.pali_full_name);
     }
   }
 
