@@ -97,5 +97,4 @@ public class Favorite extends ModelBase {
     return favorite;
   }
 
-
 }

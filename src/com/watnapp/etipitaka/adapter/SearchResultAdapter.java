@@ -120,7 +120,7 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
       viewHolder = new HeaderViewHolder();
       viewHolder.text1 = (TextView) convertView.findViewById(android.R.id.text1);
       viewHolder.text1.setTextSize(15);
-      viewHolder.text1.setSingleLine(false);
+      viewHolder.text1.setSingleLine(true);
       convertView.setTag(viewHolder);
     } else {
       viewHolder = (HeaderViewHolder) convertView.getTag();
@@ -132,11 +132,13 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
           viewHolder.text1.setText(mContext.getString(
               R.string.search_result_summary,
               getKeywords(), Utils.convertToThaiNumber(mContext, getCursor().getCount() - 3)));
+          viewHolder.text1.setSingleLine(false);
         } else {
           viewHolder.text1.setText(mContext.getString(R.string.search_result_not_found,
               getKeywords(), mContext.getString(getLanguage() == BookDatabaseHelper.Language.THAI
               ? R.string.thai_full_name : R.string.pali_full_name)));
         }
+        viewHolder.text1.setSingleLine(false);
         break;
       case ID_SECTION_1:
         viewHolder.text1.setText(mSections[0]);

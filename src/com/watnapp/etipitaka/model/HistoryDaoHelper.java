@@ -4,7 +4,11 @@ import android.content.Context;
 import android.util.SparseBooleanArray;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.helper.BookDatabaseHelper;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import roboguice.inject.ContextSingleton;
+import com.watnapp.etipitaka.model.HistoryTable.HistoryColumns;
 
 import java.util.List;
 
@@ -49,5 +53,29 @@ public class HistoryDaoHelper extends DaoHelper {
   public boolean contains(String keywords, BookDatabaseHelper.Language language,
                           SparseBooleanArray selectedSections) {
     return get(keywords, language, selectedSections) != null;
+  }
+
+  public JSONArray dumpJSONArray() {
+    HistoryItemDaoHelper historyItemDaoHelper = new HistoryItemDaoHelper(mContext);
+    JSONArray jsonArray = new JSONArray();
+    for (History history : mDao.get(null, null)) {
+      JSONObject jsonObject = new JSONObject();
+      try {
+        jsonObject.put(HistoryColumns.CONTENT, history.getContent());
+        jsonObject.put(HistoryColumns.KEYWORDS, history.getKeywords());
+        jsonObject.put(HistoryColumns.LANGUAGE, history.getLanguage().ordinal());
+        jsonObject.put(HistoryColumns.RESULT1, history.getResult1());
+        jsonObject.put(HistoryColumns.RESULT2, history.getResult2());
+        jsonObject.put(HistoryColumns.RESULT3, history.getResult3());
+        jsonObject.put(HistoryColumns.SECTION1, history.isSection1());
+        jsonObject.put(HistoryColumns.SECTION2, history.isSection2());
+        jsonObject.put(HistoryColumns.SECTION3, history.isSection3());
+        jsonObject.put(HistoryItemTable.TABLE_NAME, historyItemDaoHelper.dumpJSONArray(history.getId()));
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+      jsonArray.put(jsonObject);
+    }
+    return jsonArray;
   }
 }

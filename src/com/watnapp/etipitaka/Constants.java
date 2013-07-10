@@ -16,6 +16,10 @@ public class Constants {
   public static final int MENU_ITEM_SAVE      = 1005;
   public static final int MENU_ITEM_INCREASE_FONT_SIZE = 1006;
   public static final int MENU_ITEM_DECREASE_FONT_SIZE = 1007;
+  public static final int MENU_ITEM_OPEN = 1008;
+  public static final int MENU_ITEM_DELETE = 1009;
+  public static final int MENU_ITEM_IMPORT_DATA = 1010;
+  public static final int MENU_ITEM_EXPORT_DATA = 1011;
 
   public static final int GOTO_PAGE_ID = 0;
   public static final int GOTO_ITEM_ID = 1;
@@ -37,13 +41,15 @@ public class Constants {
   public static final String NUMBER_KEY = "number";
   public static final String BUTTON_KEY = "button";
   public static final String FONT_SIZE_KEY = "font_size";
+  public static final String TITLE_KEY = "title";
+  public static final String SELECT_MODE_KEY = "select_mode";
+  public static final String PATH_KEY = "path";
 
   public static final int DEFAULT_FONT_SIZE = 20;
   public static final int FONT_SIZE_STEP = 2;
+
+  public static final int SELECT_MODE_FILE = 1;
+  public static final int SELECT_MODE_FOLDER = 2;
+
   public static final String SETTING_PREFERENCES = "setting_preferences";
-
-  public static final int MENU_ITEM_OPEN = 1008;
-  public static final int MENU_ITEM_EDIT = 1009;
-  public static final int MENU_ITEM_DELETE = 1010;
-
 }

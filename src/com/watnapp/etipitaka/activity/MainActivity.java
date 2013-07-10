@@ -1,6 +1,7 @@
 package com.watnapp.etipitaka.activity;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,10 +27,15 @@ import com.watnapp.etipitaka.fragment.TextEntryDialogFragment;
 import com.watnapp.etipitaka.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.R;
-import com.watnapp.etipitaka.model.Favorite;
-import com.watnapp.etipitaka.model.FavoriteDaoHelper;
-import com.watnapp.etipitaka.model.HistoryItemDaoHelper;
+import com.watnapp.etipitaka.model.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 import roboguice.inject.ContentView;
+
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,6 +52,8 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   private static final String READER_FRAG_TAG = "reader";
 
   private static final int COMPARE_REQ = 0;
+  private static final int EXPORT_REQ = 1;
+  private static final int IMPORT_REQ = 2;
 
   @Inject
   private BookDatabaseHelper mDatabaseHelper;
@@ -58,6 +66,9 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   @Inject
   private FavoriteDaoHelper mFavoriteDaoHelper;
+
+  @Inject
+  private HistoryDaoHelper mHistoryDaoHelper;
 
   private SlidingMenu mSlidingMenu;
   private MenuFragment mMenuFragment;
@@ -169,6 +180,13 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_DECREASE_FONT_SIZE,
         Menu.NONE, R.string.decrease_font_size)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_IMPORT_DATA,
+        Menu.NONE, R.string.import_data)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_EXPORT_DATA,
+        Menu.NONE, R.string.export_data)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
     preferencesMenu.setIcon(android.R.drawable.ic_menu_preferences);
     preferencesMenu.getItem().setIcon(android.R.drawable.ic_menu_preferences)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -204,8 +222,28 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_SAVE:
         takeNote();
         return true;
+      case Constants.MENU_ITEM_EXPORT_DATA:
+        exportData();
+        return true;
+      case Constants.MENU_ITEM_IMPORT_DATA:
+        importData();
+        return true;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void exportData() {
+    Intent intent = new Intent(this, FileExplorerActivity.class);
+    intent.putExtra(Constants.TITLE_KEY, getString(R.string.export_title));
+    intent.putExtra(Constants.SELECT_MODE_KEY, Constants.SELECT_MODE_FOLDER);
+    startActivityForResult(intent, EXPORT_REQ);
+  }
+
+  private void importData() {
+    Intent intent = new Intent(this, FileExplorerActivity.class);
+    intent.putExtra(Constants.TITLE_KEY, getString(R.string.import_title));
+    intent.putExtra(Constants.SELECT_MODE_KEY, Constants.SELECT_MODE_FILE);
+    startActivityForResult(intent, IMPORT_REQ);
   }
 
   private void takeNote() {
@@ -419,7 +457,90 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       openBook(language, data.getIntExtra(Constants.VOLUME_KEY, currentVolume),
           data.getIntExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage()),
           currentKeywords);
+    } else if (requestCode == EXPORT_REQ && resultCode == RESULT_OK) {
+      Log.d(TAG, data.getStringExtra(Constants.PATH_KEY));
+      exportData(data.getStringExtra(Constants.PATH_KEY));
+    } else if (requestCode == IMPORT_REQ && requestCode == RESULT_OK) {
+      importData(data.getStringExtra(Constants.PATH_KEY));
     }
     super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  private void importData(final String path) {
+    if (!(new File(path).exists())) {
+      Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+      return;
+    }
+    try {
+      BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
+      StringBuffer sb = new StringBuffer();
+      String line = null;
+      while((line = br.readLine()) != null) {
+        sb.append(line);
+      }
+      br.close();
+      JSONObject jsonObject = new JSONObject(sb.toString());
+
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void exportData(final String path) {
+    final ProgressDialog dialog = new ProgressDialog(this);
+    dialog.setIndeterminate(false);
+    dialog.setCancelable(false);
+    dialog.setTitle(null);
+    dialog.setMessage(getString(R.string.exporting_data));
+    dialog.show();
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        JSONObject jsonObject = new JSONObject();
+        Date now = new Date();
+        try {
+          jsonObject.put(FavoriteTable.TABLE_NAME, mFavoriteDaoHelper.dumpJSONArray());
+          jsonObject.put(HistoryTable.TABLE_NAME, mHistoryDaoHelper.dumpJSONArray());
+          (new File(path)).mkdirs();
+          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+          String filename = String.format("edata-%s", dateFormat.format(now));
+          String expectedFilename = filename;
+          int count = 0;
+          while ((new File(path, expectedFilename+".js")).exists()) {
+            count += 1;
+            expectedFilename = filename + "_" + count;
+          }
+          try {
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(new File(path, expectedFilename+".js"))));
+            bw.write(jsonObject.toString());
+            bw.flush();
+            bw.close();
+            mHandler.post(new Runnable() {
+              @Override
+              public void run() {
+                Toast.makeText(MainActivity.this, R.string.export_complete, Toast.LENGTH_SHORT).show();
+              }
+            });
+          } catch (FileNotFoundException e) {
+            e.printStackTrace();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+        mHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            dialog.dismiss();
+          }
+        });
+      }
+    }).start();
   }
 }

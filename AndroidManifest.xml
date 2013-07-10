@@ -25,6 +25,12 @@
                 android:name=".activity.ComparisonActivity"
                 android:screenOrientation="landscape"
                 android:theme="@style/Theme.Sherlock.Light.NoActionBar"/>
+        <activity
+                android:name=".activity.FileExplorerActivity"
+                android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
+                android:windowSoftInputMode="stateHidden"
+                android:theme="@style/Theme.Sherlock.Light.NoActionBar"/>
+
         <provider
                 android:name=".model.DatabaseProvider"
                 android:authorities="com.watnapp.etipitaka.model.contentprovider"
