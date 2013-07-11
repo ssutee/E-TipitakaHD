@@ -19,3 +19,5 @@ project.properties
 .idea
 
 .DS_Store
+
+*.iml
