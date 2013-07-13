@@ -55,6 +55,42 @@ public class HistoryDaoHelper extends DaoHelper {
     return get(keywords, language, selectedSections) != null;
   }
 
+  public void restoreJSONArray(JSONArray jsonArray) {
+    HistoryItemDaoHelper historyItemDaoHelper = new HistoryItemDaoHelper(mContext);
+    for (int i=0; i<jsonArray.length(); ++i) {
+      try {
+        JSONObject jsonObject = jsonArray.getJSONObject(i);
+        SparseBooleanArray selectedSections = new SparseBooleanArray(3);
+        selectedSections.put(0, jsonObject.getBoolean(HistoryColumns.SECTION1));
+        selectedSections.put(1, jsonObject.getBoolean(HistoryColumns.SECTION2));
+        selectedSections.put(1, jsonObject.getBoolean(HistoryColumns.SECTION3));
+        String keywords = jsonObject.getString(HistoryColumns.KEYWORDS);
+        BookDatabaseHelper.Language language = BookDatabaseHelper
+            .Language.values()[jsonObject.getInt(HistoryColumns.LANGUAGE)];
+        if (!contains(keywords, language, selectedSections)) {
+          int result1 = jsonObject.getInt(HistoryColumns.RESULT1);
+          int result2 = jsonObject.getInt(HistoryColumns.RESULT2);
+          int result3 = jsonObject.getInt(HistoryColumns.RESULT3);
+          String content = jsonObject.getString(HistoryColumns.CONTENT);
+          History history = new History();
+          history.setLanguage(language);
+          history.setContent(content);
+          history.setKeywords(keywords);
+          history.setResult1(result1);
+          history.setResult2(result2);
+          history.setResult3(result3);
+          history.setSection1(selectedSections.get(0));
+          history.setSection2(selectedSections.get(1));
+          history.setSection3(selectedSections.get(2));
+          int historyId = insert(history);
+          historyItemDaoHelper.restoreJSONArray(historyId,
+              jsonObject.getJSONArray(HistoryItemTable.TABLE_NAME));
+        }
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+    }
+  }
   public JSONArray dumpJSONArray() {
     HistoryItemDaoHelper historyItemDaoHelper = new HistoryItemDaoHelper(mContext);
     JSONArray jsonArray = new JSONArray();

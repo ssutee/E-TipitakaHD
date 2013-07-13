@@ -78,4 +78,8 @@ public class HistoryItemDaoHelper extends DaoHelper {
     }
     return jsonArray;
   }
+
+  public void restoreJSONArray(int historyId, JSONArray jsonArray) {
+
+  }
 }

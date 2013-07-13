@@ -474,12 +474,16 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     try {
       BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
       StringBuffer sb = new StringBuffer();
-      String line = null;
+      String line;
       while((line = br.readLine()) != null) {
         sb.append(line);
       }
       br.close();
       JSONObject jsonObject = new JSONObject(sb.toString());
+      Log.d(TAG, jsonObject.toString());
+
+      mFavoriteDaoHelper.restoreJSONArray(jsonObject.getJSONArray(FavoriteTable.TABLE_NAME));
+      mHistoryDaoHelper.restoreJSONArray(jsonObject.getJSONArray(HistoryTable.TABLE_NAME));
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();
