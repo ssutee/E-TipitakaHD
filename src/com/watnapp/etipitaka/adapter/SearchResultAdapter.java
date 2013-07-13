@@ -101,14 +101,14 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
       HistoryItem.Status status = getStatus(cursor.getInt(cursor.getColumnIndex("volume")),
           cursor.getInt(cursor.getColumnIndex("number")));
       if (status == HistoryItem.Status.READ) {
-        view.setBackground(mContext.getResources().getDrawable(R.drawable.read_color));
+        view.setBackgroundResource(R.drawable.read_color);
       } else if (status == HistoryItem.Status.SKIMMED) {
-        view.setBackground(mContext.getResources().getDrawable(R.drawable.skimmed_color));
+        view.setBackgroundResource(R.drawable.skimmed_color);
       } else {
-        view.setBackground(mContext.getResources().getDrawable(R.drawable.transparent));
+        view.setBackgroundResource(R.drawable.transparent);
       }
     } else {
-      view.setBackground(mContext.getResources().getDrawable(R.drawable.transparent));
+      view.setBackgroundResource(R.drawable.transparent);
     }
   }
 

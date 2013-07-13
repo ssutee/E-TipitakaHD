@@ -3,4 +3,6 @@
     <dimen name="slidingmenu_offset">60dp</dimen>
     <dimen name="list_padding">10dp</dimen>
     <dimen name="shadow_width">15dp</dimen>
+    <dimen name="subtitle_text_size">15sp</dimen>
+    <dimen name="tabwidget_text_size">14sp</dimen>
 </resources>
