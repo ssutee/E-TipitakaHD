@@ -19,7 +19,6 @@ public class History extends ModelBase {
   private int result3;
   private String content;
 
-
   public History() {
     super();
   }
