@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.watnapp.etipitaka">
+          package="com.watnapp.etipitaka.plus">
 
     <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="17"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -11,16 +11,25 @@
             android:label="@string/app_name"
             android:theme="@style/CustomTheme"
             android:name=".E_TipitakaApplication">
+
         <activity
-                android:name=".activity.MainActivity"
+                android:name=".activity.StartupActivity"
                 android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
-                android:label="E-Tipitaka"
-                android:uiOptions="splitActionBarWhenNarrow">
+                android:theme="@style/Theme.Sherlock.Light.NoActionBar"
+                android:label="E-Tipitaka">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+                android:name=".activity.MainActivity"
+                android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
+                android:label="E-Tipitaka"
+                android:uiOptions="splitActionBarWhenNarrow">
+        </activity>
+
         <activity
                 android:name=".activity.ComparisonActivity"
                 android:screenOrientation="landscape"
@@ -33,7 +42,7 @@
 
         <provider
                 android:name=".model.DatabaseProvider"
-                android:authorities="com.watnapp.etipitaka.model.contentprovider"
+                android:authorities="com.watnapp.etipitaka.plus.model.contentprovider"
                 android:enabled="true"
                 tools:ignore="ExportedContentProvider" >
         </provider>

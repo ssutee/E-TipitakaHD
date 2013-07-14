@@ -147,6 +147,9 @@
     <string name="export_title">เลือกโฟล์เดอร์ที่ต้องการนำข้อมูลออก</string>
     <string name="import_title">เลือกไฟล์ข้อมูลที่ต้องการนำเข้า</string>
     <string name="exporting_data">กำลังนำข้อมูลออก</string>
-    <string name="export_complete">นำข้อมูลออกเสร็จ</string>
+    <string name="export_complete">นำข้อมูลออกสำเร็จ</string>
     <string name="file_not_found">ไม่พบไฟล์ข้อมูล</string>
+    <string name="importing_data">กำลังนำข้อมูลเข้า</string>
+    <string name="import_complete">นำข้อมูลเข้าสำเร็จ</string>
+    <string name="confirm_delete_history">คุณต้องการลบประวัติการค้นหานี้หรือไม่?</string>
 </resources>
