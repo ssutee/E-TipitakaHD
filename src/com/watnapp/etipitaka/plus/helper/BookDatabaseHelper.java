@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
 
 import java.io.File;
@@ -25,15 +26,13 @@ public class BookDatabaseHelper {
 
   protected static final String TAG = "DatabaseHelper";
   private SQLiteDatabase db;
-  private static final String DATABASE_PATH = Environment.getExternalStorageDirectory().getPath()
-      + "/ETPK/etipitaka_plus.db";
 
   @Inject
   private Context mContext;
 
   public void openDatabase() {
-    if ((db == null || !db.isOpen()) && (new File(DATABASE_PATH)).exists()) {
-      db = SQLiteDatabase.openDatabase(DATABASE_PATH, null, 0);
+    if ((db == null || !db.isOpen()) && (new File(Constants.DATABASE_PATH)).exists()) {
+      db = SQLiteDatabase.openDatabase(Constants.DATABASE_PATH, null, 0);
     }
   }
 

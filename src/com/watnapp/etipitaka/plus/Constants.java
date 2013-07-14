@@ -1,6 +1,7 @@
 package com.watnapp.etipitaka.plus;
 
 import android.net.Uri;
+import android.os.Environment;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +34,11 @@ public class Constants {
   public static final String DATABASE_URL     = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus.db.zip";
   public static final String CHECK_SUM_DB_ZIP = "16510601dfc383e45cec485e0f5835fa";
   public static final String CHECK_SUM_DB     = "2d093a4b06517efb7689a4d6b0135ec0";
+
+  public static final String DATABASE_FOLDER    = Environment.getExternalStorageDirectory().getPath() + "/ETPK";
+  public static final String DATABASE_PATH      = DATABASE_FOLDER + "/etipitaka_plus.db";
+  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus.db.zip";
+  public static final long DATABASE_SIZE        = 158919680;
 
   public static final String LANGUAGE_KEY     = "language";
   public static final String VOLUME_KEY       = "volume";

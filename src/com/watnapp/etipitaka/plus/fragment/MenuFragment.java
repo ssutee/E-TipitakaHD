@@ -1,6 +1,7 @@
 package com.watnapp.etipitaka.plus.fragment;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -9,10 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TabHost;
-import android.widget.TabWidget;
+import android.widget.*;
 import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockFragment;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.E_TipitakaApplication;
@@ -61,6 +59,14 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+
+    Resources res = getResources();
+    float scale = res.getDisplayMetrics().density;
+
+    for (int i = 0; i < mTabHost.getTabWidget().getChildCount(); i++) {
+      TextView tv = (TextView) mTabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
+      tv.setTextSize(getResources().getDimension(R.dimen.tabwidget_text_size)/scale);
+    }
 
     radioButtonThai.setChecked(application.getLanguage() == BookDatabaseHelper.Language.THAI);
     radioButtonPali.setChecked(application.getLanguage() == BookDatabaseHelper.Language.PALI);

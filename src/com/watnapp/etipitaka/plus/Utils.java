@@ -1,7 +1,18 @@
 package com.watnapp.etipitaka.plus;
 
 import android.content.Context;
+import android.provider.MediaStore;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
+
+import java.io.*;
+import java.math.BigInteger;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Created with IntelliJ IDEA.
  * User: sutee
@@ -38,4 +49,21 @@ public class Utils {
         Utils.convertToThaiNumber(context, volume),
         Utils.convertToThaiNumber(context, page), item);
   }
+
+  public static String readTextFile(String path) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
+    StringBuffer sb = new StringBuffer();
+    String line;
+    while((line = br.readLine()) != null) {
+      sb.append(line);
+    }
+    br.close();
+    return sb.toString();
+  }
+
+  public static String getMD5Checksum(String path) throws IOException {
+    HashCode md5 = Files.hash(new File(path), Hashing.md5());
+    return md5.toString();
+  }
+
 }

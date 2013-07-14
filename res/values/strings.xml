@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">E-Tipitaka</string>
+    <string name="title_template">%1$s v%2$s</string>
     <string name="volume">เล่ม</string>
     <string name="search">ค้นหา</string>
     <string name="history">ประวัติ</string>
@@ -152,4 +153,8 @@
     <string name="importing_data">กำลังนำข้อมูลเข้า</string>
     <string name="import_complete">นำข้อมูลเข้าสำเร็จ</string>
     <string name="confirm_delete_history">คุณต้องการลบประวัติการค้นหานี้หรือไม่?</string>
+    <string name="database_error">ฐานข้อมูลผิดพลาด</string>
+    <string name="downloading_database">กำลังดาวน์โหลดฐานข้อมูล</string>
+    <string name="no_internet_connection">ไม่สามารถเชื่อมต่ออินเทอร์เน็ต</string>
+    <string name="uncompressing_database">กำลังขยายฐานข้อมูล</string>
 </resources>

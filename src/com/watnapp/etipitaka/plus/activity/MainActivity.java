@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -82,8 +84,13 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
     application = (E_TipitakaApplication) getApplication();
     mDatabaseHelper.openDatabase();
-
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    try {
+      String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+      getSupportActionBar().setTitle(getString(R.string.title_template, getString(R.string.app_name), versionName));
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
     setupSlidingMenu();
     initReader();
   }
@@ -482,14 +489,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       @Override
       public void run() {
         try {
-          BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
-          StringBuffer sb = new StringBuffer();
-          String line;
-          while((line = br.readLine()) != null) {
-            sb.append(line);
-          }
-          br.close();
-          JSONObject jsonObject = new JSONObject(sb.toString());
+          JSONObject jsonObject = new JSONObject(Utils.readTextFile(path));
           Log.d(TAG, jsonObject.toString());
 
           mFavoriteDaoHelper.restoreJSONArray(jsonObject.getJSONArray(FavoriteTable.TABLE_NAME));
