@@ -46,6 +46,12 @@
                 android:windowSoftInputMode="stateHidden"
                 android:theme="@style/Theme.Sherlock.Light.NoActionBar"/>
 
+        <activity
+                android:name=".activity.PaliDictActivity"
+                android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
+                android:theme="@style/Theme.Sherlock.Light"
+                android:label="@string/pali_dict"/>
+
         <provider
                 android:name=".model.DatabaseProvider"
                 android:authorities="com.watnapp.etipitaka.plus.model.contentprovider"

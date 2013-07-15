@@ -127,6 +127,22 @@
         </html>
     ]]>
     </string>
+    <string name="html_dict_template">
+        <![CDATA[
+        <html>
+            <head>
+                %4$s
+                <style type=\"text/css\">
+                    p { margin: 0px; padding: 0px; }
+                    hr { margin: 5px 0px 5px 0px; padding: 0px; }
+                </style>
+            </head>
+            <body style=\"font-size:%3$s; font-family:\'TH SarabunPSK\'\">
+                <p style=\"white-space: pre-wrap;\"><span style=\"color:blue;\">%1$s</span><hr/>%2$s</p>
+            </body>
+        </html>
+    ]]>
+    </string>
     <string name="font_size">ขนาดอักษร</string>
     <string name="increase_font_size">เพิ่มขนาดอักษร</string>
     <string name="decrease_font_size">ลดขนาดอักษร</string>
@@ -157,4 +173,5 @@
     <string name="downloading_database">กำลังดาวน์โหลดฐานข้อมูล</string>
     <string name="no_internet_connection">ไม่สามารถเชื่อมต่ออินเทอร์เน็ต</string>
     <string name="uncompressing_database">กำลังขยายฐานข้อมูล</string>
+    <string name="pali_dict">พจนานุกรม บาลี-ไทย</string>
 </resources>

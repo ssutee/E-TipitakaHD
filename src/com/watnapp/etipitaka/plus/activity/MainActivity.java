@@ -193,6 +193,9 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_EXPORT_DATA,
         Menu.NONE, R.string.export_data)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_PALI_DICT,
+        Menu.NONE, R.string.pali_dict)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
     preferencesMenu.setIcon(android.R.drawable.ic_menu_preferences);
     preferencesMenu.getItem().setIcon(android.R.drawable.ic_menu_preferences)
@@ -235,8 +238,15 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_IMPORT_DATA:
         importData();
         return true;
+      case Constants.MENU_ITEM_PALI_DICT:
+        showPaliDict();
+        return true;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void showPaliDict() {
+    startActivity(new Intent(this, PaliDictActivity.class));
   }
 
   private void exportData() {

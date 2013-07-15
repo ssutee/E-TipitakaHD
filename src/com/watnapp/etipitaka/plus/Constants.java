@@ -21,6 +21,7 @@ public class Constants {
   public static final int MENU_ITEM_DELETE              = 1009;
   public static final int MENU_ITEM_IMPORT_DATA         = 1010;
   public static final int MENU_ITEM_EXPORT_DATA         = 1011;
+  public static final int MENU_ITEM_PALI_DICT           = 1012;
 
   public static final int GOTO_PAGE_ID      = 0;
   public static final int GOTO_ITEM_ID      = 1;
@@ -61,4 +62,5 @@ public class Constants {
   public static final int SELECT_MODE_FOLDER  = 2;
 
   public static final String SETTING_PREFERENCES = "setting_preferences";
+
 }
