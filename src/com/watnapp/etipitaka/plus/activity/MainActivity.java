@@ -336,6 +336,8 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         Intent intent = new Intent(MainActivity.this, ComparisonActivity.class);
         intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
         intent.putExtra(Constants.VOLUME_KEY, currentVolume);
+        intent.putExtra(Constants.KEYWORDS_KEY, currentKeywords);
+        intent.putExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage());
         intent.putExtra(Constants.ITEM_KEY, items[which]);
         intent.putExtra(Constants.SECTION_KEY, sections[which]);
         startActivityForResult(intent, COMPARE_REQ);

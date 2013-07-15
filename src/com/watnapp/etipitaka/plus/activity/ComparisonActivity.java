@@ -41,6 +41,12 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   @InjectExtra(Constants.SECTION_KEY)
   private int mSection;
 
+  @InjectExtra(Constants.KEYWORDS_KEY)
+  private String mKeywords;
+
+  @InjectExtra(Constants.PAGE_KEY)
+  private int mPage;
+
   @Inject
   private BookDatabaseHelper mBookDatabaseHelper;
 
@@ -53,8 +59,7 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    int page1 = mBookDatabaseHelper.getPageById(
-        mBookDatabaseHelper.getPageIdByItem(BookDatabaseHelper.Language.THAI, mVolume, mItem, mSection));
+    int page1 = mPage;
     int page2 = mBookDatabaseHelper.getPageById(
         mBookDatabaseHelper.getPageIdByItem(BookDatabaseHelper.Language.PALI, mVolume, mItem, mSection));
 
@@ -69,7 +74,7 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
       mLanguage2 = BookDatabaseHelper.Language.THAI;
     }
 
-    mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, "", true);
+    mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, mKeywords, true);
     getSupportFragmentManager().beginTransaction()
         .add(R.id.left_reader_fragment,
             mLeftFragment, "left").commit();
@@ -82,7 +87,6 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
     mHandler.postDelayed(new Runnable() {
       @Override
       public void run() {
-        mLeftFragment.getPageFragment(mLeftFragment.getCurrentPage()).scrollToItem(mItem);
         mRightFragment.getPageFragment(mRightFragment.getCurrentPage()).scrollToItem(mItem);
       }
     }, 500);
