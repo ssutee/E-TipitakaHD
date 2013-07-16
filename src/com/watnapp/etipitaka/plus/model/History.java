@@ -18,6 +18,7 @@ public class History extends ModelBase {
   private int result2;
   private int result3;
   private String content;
+  private int score;
 
   public History() {
     super();
@@ -117,6 +118,14 @@ public class History extends ModelBase {
     this.content = content;
   }
 
+  public int getScore() {
+    return score;
+  }
+
+  public void setScore(int score) {
+    this.score = score;
+  }
+
   @Override
   public void fromCursor(Cursor cursor, Context context) {
     this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
@@ -128,6 +137,7 @@ public class History extends ModelBase {
     this.result1 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.RESULT1));
     this.result2 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.RESULT2));
     this.result3 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.RESULT3));
+    this.score = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.SCORE));
     this.content = cursor.getString(cursor.getColumnIndex(HistoryTable.HistoryColumns.CONTENT));
     this.context = context;
   }
@@ -143,6 +153,7 @@ public class History extends ModelBase {
     values.put(HistoryTable.HistoryColumns.RESULT1, this.result1);
     values.put(HistoryTable.HistoryColumns.RESULT2, this.result2);
     values.put(HistoryTable.HistoryColumns.RESULT3, this.result3);
+    values.put(HistoryTable.HistoryColumns.SCORE, this.score);
     values.put(HistoryTable.HistoryColumns.CONTENT, this.content);
     return values;
   }

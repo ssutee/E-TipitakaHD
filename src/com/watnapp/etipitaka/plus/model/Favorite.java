@@ -13,6 +13,7 @@ public class Favorite extends ModelBase {
   private int volume;
   private int page;
   private int item;
+  private int score;
 
 
   public Favorite() {
@@ -69,6 +70,14 @@ public class Favorite extends ModelBase {
     this.item = item;
   }
 
+  public int getScore() {
+    return score;
+  }
+
+  public void setScore(int score) {
+    this.score = score;
+  }
+
   @Override
   public void fromCursor(Cursor cursor, Context context) {
     this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
@@ -77,6 +86,7 @@ public class Favorite extends ModelBase {
     this.volume = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.VOLUME));
     this.page = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.PAGE));
     this.item = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.ITEM));
+    this.score = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.SCORE));
     this.context = context;
   }
 
@@ -88,6 +98,7 @@ public class Favorite extends ModelBase {
     values.put(FavoriteTable.FavoriteColumns.VOLUME, this.volume);
     values.put(FavoriteTable.FavoriteColumns.PAGE, this.page);
     values.put(FavoriteTable.FavoriteColumns.ITEM, this.item);
+    values.put(FavoriteTable.FavoriteColumns.SCORE, this.score);
     return values;
   }
 

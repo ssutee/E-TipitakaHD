@@ -185,6 +185,12 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
         if (fragment != null && fontSize != fragment.getFontSize()) {
           fragment.setFontSize(fontSize);
         }
+        String fontColor = prefs.getString(Constants.FONT_COLOR_KEY, Constants.DEFAULT_FONT_COLOR);
+        String backgroundColor = prefs.getString(Constants.BACKGROUND_COLOR_KEY, Constants.DEFAULT_BACKGROUND_COLOR);
+        if (fragment != null && !fontColor.equalsIgnoreCase(fragment.getFontColor())
+            && !backgroundColor.equalsIgnoreCase(fragment.getBackgroundColor())) {
+          fragment.setColor(fontColor, backgroundColor);
+        }
       }
 
       @Override

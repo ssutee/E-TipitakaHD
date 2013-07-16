@@ -71,6 +71,7 @@ public class HistoryDaoHelper extends DaoHelper {
           int result1 = jsonObject.getInt(HistoryColumns.RESULT1);
           int result2 = jsonObject.getInt(HistoryColumns.RESULT2);
           int result3 = jsonObject.getInt(HistoryColumns.RESULT3);
+          int score = jsonObject.has(HistoryColumns.SCORE) ? jsonObject.getInt(HistoryColumns.SCORE) : 0;
           String content = jsonObject.getString(HistoryColumns.CONTENT);
           History history = new History();
           history.setLanguage(language);
@@ -79,6 +80,7 @@ public class HistoryDaoHelper extends DaoHelper {
           history.setResult1(result1);
           history.setResult2(result2);
           history.setResult3(result3);
+          history.setScore(score);
           history.setSection1(selectedSections.get(0));
           history.setSection2(selectedSections.get(1));
           history.setSection3(selectedSections.get(2));
@@ -106,6 +108,7 @@ public class HistoryDaoHelper extends DaoHelper {
         jsonObject.put(HistoryColumns.SECTION1, history.isSection1());
         jsonObject.put(HistoryColumns.SECTION2, history.isSection2());
         jsonObject.put(HistoryColumns.SECTION3, history.isSection3());
+        jsonObject.put(HistoryColumns.SCORE, history.getScore());
         jsonObject.put(HistoryItemTable.TABLE_NAME, historyItemDaoHelper.dumpJSONArray(history.getId()));
       } catch (JSONException e) {
         e.printStackTrace();

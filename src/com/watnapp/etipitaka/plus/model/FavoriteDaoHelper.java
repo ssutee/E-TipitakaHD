@@ -48,6 +48,7 @@ public class FavoriteDaoHelper extends DaoHelper {
         int volume = jsonObject.getInt(FavoriteColumns.VOLUME);
         int page = jsonObject.getInt(FavoriteColumns.PAGE);
         int item = jsonObject.getInt(FavoriteColumns.ITEM);
+        int score = jsonObject.has(FavoriteColumns.SCORE) ? jsonObject.getInt(FavoriteColumns.SCORE) : 0;
         String note = jsonObject.getString(FavoriteColumns.NOTE);
         if (!contains(languageCode, volume, page, item, note)) {
           Favorite favorite = new Favorite();
@@ -56,6 +57,7 @@ public class FavoriteDaoHelper extends DaoHelper {
           favorite.setPage(page);
           favorite.setItem(item);
           favorite.setNote(note);
+          favorite.setScore(score);
           mDao.insert(favorite);
         }
       } catch (JSONException e) {
@@ -74,6 +76,7 @@ public class FavoriteDaoHelper extends DaoHelper {
         jsonObject.put(FavoriteColumns.VOLUME, favorite.getVolume());
         jsonObject.put(FavoriteColumns.PAGE, favorite.getPage());
         jsonObject.put(FavoriteColumns.ITEM, favorite.getItem());
+        jsonObject.put(FavoriteColumns.SCORE, favorite.getScore());
         jsonArray.put(jsonObject);
       } catch (JSONException e) {
         e.printStackTrace();

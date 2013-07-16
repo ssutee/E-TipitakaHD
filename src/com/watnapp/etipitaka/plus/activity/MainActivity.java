@@ -181,18 +181,30 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
     SubMenu preferencesMenu = menu.addSubMenu(R.string.preferences);
-    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_INCREASE_FONT_SIZE,
-        Menu.NONE, R.string.increase_font_size)
-        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_DECREASE_FONT_SIZE,
-        Menu.NONE, R.string.decrease_font_size)
-        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_IMPORT_DATA,
-        Menu.NONE, R.string.import_data)
-        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_EXPORT_DATA,
-        Menu.NONE, R.string.export_data)
-        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+    SubMenu dataMenu = preferencesMenu.addSubMenu(R.string.manage_data);
+    dataMenu.add(Menu.NONE, Constants.MENU_ITEM_IMPORT_DATA,
+        Menu.NONE, R.string.import_data);
+    dataMenu.add(Menu.NONE, Constants.MENU_ITEM_EXPORT_DATA,
+        Menu.NONE, R.string.export_data);
+    dataMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+    SubMenu fontSizeMenu = preferencesMenu.addSubMenu(R.string.adjust_font_size);
+    fontSizeMenu.add(Menu.NONE, Constants.MENU_ITEM_INCREASE_FONT_SIZE,
+        Menu.NONE, R.string.increase_font_size);
+    fontSizeMenu.add(Menu.NONE, Constants.MENU_ITEM_DECREASE_FONT_SIZE,
+        Menu.NONE, R.string.decrease_font_size);
+    fontSizeMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+    SubMenu colorMenu = preferencesMenu.addSubMenu(R.string.adjust_font_color);
+    colorMenu.add(Menu.NONE, Constants.MENU_ITEM_BLACK_COLOR,
+        Menu.NONE, R.string.black_color);
+    colorMenu.add(Menu.NONE, Constants.MENU_ITEM_WHITE_COLOR,
+        Menu.NONE, R.string.white_color);
+    colorMenu.add(Menu.NONE, Constants.MENU_ITEM_SEPIA_COLOR,
+        Menu.NONE, R.string.sepia_color);
+    colorMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
     preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_PALI_DICT,
         Menu.NONE, R.string.pali_dict)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -223,14 +235,11 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_COMPARE:
         compare();
         return true;
-      case Constants.MENU_ITEM_INCREASE_FONT_SIZE:
-        increaseFontSize();
-        return true;
-      case Constants.MENU_ITEM_DECREASE_FONT_SIZE:
-        decreaseFontSize();
-        return true;
       case Constants.MENU_ITEM_SAVE:
         takeNote();
+        return true;
+      case Constants.MENU_ITEM_PALI_DICT:
+        showPaliDict();
         return true;
       case Constants.MENU_ITEM_EXPORT_DATA:
         exportData();
@@ -238,9 +247,22 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_IMPORT_DATA:
         importData();
         return true;
-      case Constants.MENU_ITEM_PALI_DICT:
-        showPaliDict();
+      case Constants.MENU_ITEM_INCREASE_FONT_SIZE:
+        increaseFontSize();
         return true;
+      case Constants.MENU_ITEM_DECREASE_FONT_SIZE:
+        decreaseFontSize();
+        return true;
+      case Constants.MENU_ITEM_BLACK_COLOR:
+        setColor("#010101", "#FEFEFE");
+        return true;
+      case Constants.MENU_ITEM_WHITE_COLOR:
+        setColor("#FEFEFE", "#010101");
+        return true;
+      case Constants.MENU_ITEM_SEPIA_COLOR:
+        setColor("#5E4933", "#F9EFD8");
+        return true;
+
     }
     return super.onOptionsItemSelected(item);
   }
@@ -329,6 +351,10 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     size -= Constants.FONT_SIZE_STEP;
     getReaderFragment().getCurrentPageFragment().setFontSize(size);
+  }
+
+  private void setColor(String font, String background) {
+    getReaderFragment().getCurrentPageFragment().setColor(font, background);
   }
 
   private void compare(final Integer[] items, final Integer[] sections) {

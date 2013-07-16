@@ -22,6 +22,12 @@ public class Constants {
   public static final int MENU_ITEM_IMPORT_DATA         = 1010;
   public static final int MENU_ITEM_EXPORT_DATA         = 1011;
   public static final int MENU_ITEM_PALI_DICT           = 1012;
+  public static final int MENU_ITEM_ADJUST_FONT_SIZE    = 1013;
+  public static final int MENU_ITEM_MANAGE_DATA         = 1014;
+  public static final int MENU_ITEM_BLACK_COLOR         = 1015;
+  public static final int MENU_ITEM_WHITE_COLOR         = 1016;
+  public static final int MENU_ITEM_SEPIA_COLOR         = 1017;
+
 
   public static final int GOTO_PAGE_ID      = 0;
   public static final int GOTO_ITEM_ID      = 1;
@@ -41,19 +47,21 @@ public class Constants {
   public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus.db.zip";
   public static final long DATABASE_SIZE        = 158919680;
 
-  public static final String LANGUAGE_KEY     = "language";
-  public static final String VOLUME_KEY       = "volume";
-  public static final String ITEM_KEY         = "item";
-  public static final String SECTION_KEY      = "section";
-  public static final String KEYWORDS_KEY     = "keywords";
-  public static final String PAGE_KEY         = "page";
-  public static final String CONTENT_KEY      = "content";
-  public static final String NUMBER_KEY       = "number";
-  public static final String BUTTON_KEY       = "button";
-  public static final String FONT_SIZE_KEY    = "font_size";
-  public static final String TITLE_KEY        = "title";
-  public static final String SELECT_MODE_KEY  = "select_mode";
-  public static final String PATH_KEY         = "path";
+  public static final String LANGUAGE_KEY           = "language";
+  public static final String VOLUME_KEY             = "volume";
+  public static final String ITEM_KEY               = "item";
+  public static final String SECTION_KEY            = "section";
+  public static final String KEYWORDS_KEY           = "keywords";
+  public static final String PAGE_KEY               = "page";
+  public static final String CONTENT_KEY            = "content";
+  public static final String NUMBER_KEY             = "number";
+  public static final String BUTTON_KEY             = "button";
+  public static final String FONT_SIZE_KEY          = "font_size";
+  public static final String TITLE_KEY              = "title";
+  public static final String SELECT_MODE_KEY        = "select_mode";
+  public static final String PATH_KEY               = "path";
+  public static final String FONT_COLOR_KEY         = "font_color";
+  public static final String BACKGROUND_COLOR_KEY   = "background_color";
 
   public static final int DEFAULT_FONT_SIZE   = 20;
   public static final int FONT_SIZE_STEP      = 2;
@@ -63,4 +71,7 @@ public class Constants {
 
   public static final String SETTING_PREFERENCES = "setting_preferences";
 
+
+  public static final String DEFAULT_FONT_COLOR       = "#010101";
+  public static final String DEFAULT_BACKGROUND_COLOR = "#FEFEFE";
 }
