@@ -97,7 +97,9 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   @Override
   protected void onDestroy() {
-    mDatabaseHelper.closeDatabase();
+    if (mDatabaseHelper != null) {
+      mDatabaseHelper.closeDatabase();
+    }
     SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(Constants.LANGUAGE_KEY, application.getLanguage().getCode());

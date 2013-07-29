@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +24,14 @@ public class BookListFragment extends RoboSherlockListFragment {
   private E_TipitakaApplication application;
 
   @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    application = (E_TipitakaApplication) activity.getApplication();
+  }
+
+  @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    application = (E_TipitakaApplication) getActivity().getApplication();
   }
 
   @Override

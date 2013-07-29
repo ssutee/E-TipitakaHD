@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -53,6 +54,11 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
     application = (E_TipitakaApplication) getActivity().getApplication();
   }
 

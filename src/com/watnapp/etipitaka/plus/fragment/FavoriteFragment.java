@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.ContentObserver;
@@ -47,26 +48,44 @@ public class FavoriteFragment extends RoboSherlockListFragment
 
   private Handler mHandler = new Handler();
 
-  private ContentObserver mContentObserver = new ContentObserver(mHandler) {
+  private ContentObserver mContentObserver;
 
-    @Override
-    public void onChange(boolean selfChange) {
-      getListView().post(new Runnable() {
-        @Override
-        public void run() {
-          getLoaderManager().restartLoader(Constants.HISTORY_LOADER, null, FavoriteFragment.this);
-        }
-      });
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    application = (E_TipitakaApplication) activity.getApplication();
+    mContentObserver = new ContentObserver(mHandler) {
+      @Override
+      public void onChange(boolean selfChange) {
+        getListView().post(new Runnable() {
+          @Override
+          public void run() {
+            getLoaderManager().restartLoader(Constants.HISTORY_LOADER, null, FavoriteFragment.this);
+          }
+        });
+      }
+    };
+    activity.getContentResolver()
+        .registerContentObserver(Constants.LANGUAGE_CHANGE_URI, false, mContentObserver);
+  }
+
+  @Override
+  public void onDetach() {
+    if (getActivity() != null && mContentObserver != null) {
+      getActivity().getContentResolver().unregisterContentObserver(mContentObserver);
     }
-  };
+    super.onDetach();
+  }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    application = (E_TipitakaApplication) getActivity().getApplication();
     getLoaderManager().initLoader(Constants.FAVORITE_LOADER, null, this);
-    getActivity().getContentResolver()
-        .registerContentObserver(Constants.LANGUAGE_CHANGE_URI, false, mContentObserver);
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
   }
 
   @Override

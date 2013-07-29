@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -81,36 +82,50 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   private History mCurrentHistory;
   private List<HistoryItem> mCurrentHistoryItems;
 
-  private ContentObserver mContentObserver = new ContentObserver(mHandler) {
-    @Override
-    public void onChange(boolean selfChange) {
-      mListView.post(new Runnable() {
-        @Override
-        public void run() {
-          mAdapter.notifyDataSetChanged();
-        }
-      });
-    }
-  };
+  private ContentObserver mContentObserver;
 
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    getActivity().getContentResolver()
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    application = (E_TipitakaApplication) activity.getApplication();
+    mContentObserver = new ContentObserver(mHandler) {
+      @Override
+      public void onChange(boolean selfChange) {
+        mListView.post(new Runnable() {
+          @Override
+          public void run() {
+            mAdapter.notifyDataSetChanged();
+          }
+        });
+      }
+    };
+    activity.getContentResolver()
         .registerContentObserver(DatabaseProvider.HISTORY_ITEM_CONTENT_URI, false, mContentObserver);
-    application = (E_TipitakaApplication) getActivity().getApplication();
-    mProgressDialog = new ProgressDialog(getActivity());
+
+    mProgressDialog = new ProgressDialog(activity);
     mProgressDialog.setCancelable(false);
     mProgressDialog.setTitle(R.string.searching);
     mProgressDialog.setMessage(getString(R.string.please_wait));
     mProgressDialog.setIndeterminate(false);
     mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+
+  }
+
+  @Override
+  public void onDetach() {
+    if (getActivity() != null && mContentObserver != null) {
+      getActivity().getContentResolver().unregisterContentObserver(mContentObserver);
+    }
+    super.onDetach();
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
   }
 
   @Override
   public void onDestroy() {
-    getActivity().getContentResolver()
-        .unregisterContentObserver(mContentObserver);
     super.onDestroy();
   }
 
