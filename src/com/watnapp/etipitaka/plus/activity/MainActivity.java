@@ -135,10 +135,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     } else {
       getReaderFragment().openBook(language, volume, page, item);
     }
-
     mSlidingMenu.showContent();
-    getSupportActionBar().setTitle(application.getLanguage() == BookDatabaseHelper.Language.THAI
-        ? R.string.thai_full_name : R.string.pali_full_name);
   }
 
 

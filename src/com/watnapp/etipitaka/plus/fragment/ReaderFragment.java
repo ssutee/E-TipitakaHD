@@ -257,6 +257,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
+    mLanguage = language;
     mKeywords = keywords;
     mVolume = volume;
     Cursor cursor = mDatabaseHelper.read(language, volume);
