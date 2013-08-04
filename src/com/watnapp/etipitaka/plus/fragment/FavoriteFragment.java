@@ -37,6 +37,8 @@ public class FavoriteFragment extends RoboSherlockListFragment
     implements LoaderManager.LoaderCallbacks<Cursor>, TextEntryDialogFragment.TextEntryDialogButtonClickListener {
 
   private static final String TAG = "FavoriteFragment";
+  private static final int FRAGMENT_GROUPID = 1;
+
 
   @Inject
   private FavoriteAdapter mAdapter;
@@ -103,26 +105,28 @@ public class FavoriteFragment extends RoboSherlockListFragment
   @Override
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
     if (v.getId() == android.R.id.list) {
-      menu.add(Menu.NONE, Constants.MENU_ITEM_OPEN, Menu.NONE, R.string.open_note);
-      menu.add(Menu.NONE, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
+      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_OPEN, Menu.NONE, R.string.open_note);
+      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
     }
   }
 
   @Override
   public boolean onContextItemSelected(MenuItem item) {
-    AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-    Cursor cursor = mAdapter.getCursor();
-    cursor.moveToPosition(info.position);
-    Favorite favorite = Favorite.newInstance(cursor, getActivity());
-    switch (item.getItemId()) {
-      case Constants.MENU_ITEM_OPEN:
-        openNote(favorite);
-        return true;
-      case Constants.MENU_ITEM_DELETE:
-        delete(favorite);
-        return true;
+    if (item.getGroupId() == FRAGMENT_GROUPID) {
+      AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+      Cursor cursor = mAdapter.getCursor();
+      cursor.moveToPosition(info.position);
+      Favorite favorite = Favorite.newInstance(cursor, getActivity());
+      switch (item.getItemId()) {
+        case Constants.MENU_ITEM_OPEN:
+          openNote(favorite);
+          return true;
+        case Constants.MENU_ITEM_DELETE:
+          delete(favorite);
+          return true;
+      }
     }
-    return false;
+    return super.onContextItemSelected(item);
   }
 
   private void delete(final Favorite favorite) {

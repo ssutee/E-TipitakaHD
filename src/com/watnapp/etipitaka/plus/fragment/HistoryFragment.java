@@ -35,6 +35,7 @@ import com.watnapp.etipitaka.plus.model.HistoryTable;
 public class HistoryFragment extends RoboSherlockListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
   public static final String TAG = "HistoryFragment";
+  private static final int FRAGMENT_GROUPID = 2;
 
   private E_TipitakaApplication application;
 
@@ -103,21 +104,23 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
   @Override
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
     if (v.getId() == android.R.id.list) {
-      menu.add(Menu.NONE, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
+      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
     }
   }
 
   @Override
   public boolean onContextItemSelected(MenuItem item) {
-    AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-    Cursor cursor = mAdapter.getCursor();
-    History history = History.newInstance(cursor, getActivity());
-    switch (item.getItemId()) {
-      case Constants.MENU_ITEM_DELETE:
-        delete(history);
-        return true;
+    if (item.getGroupId() == FRAGMENT_GROUPID) {
+      AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+      Cursor cursor = mAdapter.getCursor();
+      History history = History.newInstance(cursor, getActivity());
+      switch (item.getItemId()) {
+        case Constants.MENU_ITEM_DELETE:
+          delete(history);
+          return true;
+      }
     }
-    return false;
+    return super.onContextItemSelected(item);
   }
 
   private void delete(final History history) {
