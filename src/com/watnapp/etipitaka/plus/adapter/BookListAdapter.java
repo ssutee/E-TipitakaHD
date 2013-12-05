@@ -1,6 +1,7 @@
 package com.watnapp.etipitaka.plus.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,10 +62,13 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
   public View getView(int position, View convertView, ViewGroup parent) {
     ViewHolder viewHolder;
     if (convertView == null) {
+      Resources res = mContext.getResources();
+      float scale = res.getDisplayMetrics().density;
       viewHolder = new ViewHolder();
       convertView = LayoutInflater.from(mContext).inflate(android.R.layout.simple_list_item_1, parent, false);
       viewHolder.text1 = (TextView) convertView.findViewById(android.R.id.text1);
       viewHolder.text1.setSingleLine(true);
+      viewHolder.text1.setTextSize(res.getDimension(R.dimen.subtitle_text_size)/scale);
       convertView.setTag(viewHolder);
     } else {
       viewHolder = (ViewHolder) convertView.getTag();
@@ -80,7 +84,6 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
       viewHolder = new HeaderViewHolder();
       convertView = LayoutInflater.from(mContext).inflate(R.layout.item_book_title, parent, false);
       viewHolder.text1 = (TextView) convertView.findViewById(android.R.id.text1);
-      viewHolder.text1.setTextSize(20);
       viewHolder.text1.setGravity(Gravity.CENTER_VERTICAL);
       viewHolder.text1.setLines(1);
       convertView.setTag(viewHolder);
