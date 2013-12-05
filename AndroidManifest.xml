@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          android:versionName="2.0.2"
-          android:versionCode="02002"
+          android:versionName="2.0.4"
+          android:versionCode="02004"
           package="com.watnapp.etipitaka.plus">
 
     <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="17"/>
@@ -21,7 +21,7 @@
                 android:name=".activity.StartupActivity"
                 android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
                 android:theme="@style/Theme.Sherlock.Light.NoActionBar"
-                android:label="E-Tipitaka">
+                android:label="E-Tipitaka+">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

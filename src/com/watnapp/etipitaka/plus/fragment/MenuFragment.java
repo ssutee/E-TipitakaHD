@@ -94,6 +94,14 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
     });
   }
 
+  public void setRadioButton(BookDatabaseHelper.Language language) {
+    if (language == BookDatabaseHelper.Language.THAI) {
+      radioButtonThai.setChecked(true);
+    } else {
+      radioButtonPali.setChecked(true);
+    }
+  }
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     mTabHost = (TabHost) inflater.inflate(R.layout.fragment_menu, container, false);

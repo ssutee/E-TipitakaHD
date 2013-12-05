@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -17,15 +18,13 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
+import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockDialogFragment;
 import com.google.inject.Inject;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.E_TipitakaApplication;
 import com.watnapp.etipitaka.plus.Utils;
-import com.watnapp.etipitaka.plus.fragment.MenuFragment;
-import com.watnapp.etipitaka.plus.fragment.PageFragment;
-import com.watnapp.etipitaka.plus.fragment.ReaderFragment;
-import com.watnapp.etipitaka.plus.fragment.TextEntryDialogFragment;
+import com.watnapp.etipitaka.plus.fragment.*;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.plus.R;
@@ -48,7 +47,7 @@ import java.util.Locale;
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends RoboSherlockFragmentActivity implements
-    TextEntryDialogFragment.TextEntryDialogButtonClickListener {
+    TextEntryDialogFragment.TextEntryDialogButtonClickListener, FontDialogFragment.FontDialogListener, FontDialogFragment.FontDialogDataSource {
 
   protected static final String TAG = "MainActivity";
   private static final String READER_FRAG_TAG = "reader";
@@ -188,12 +187,13 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         Menu.NONE, R.string.export_data);
     dataMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-    SubMenu fontSizeMenu = preferencesMenu.addSubMenu(R.string.adjust_font_size);
-    fontSizeMenu.add(Menu.NONE, Constants.MENU_ITEM_INCREASE_FONT_SIZE,
-        Menu.NONE, R.string.increase_font_size);
-    fontSizeMenu.add(Menu.NONE, Constants.MENU_ITEM_DECREASE_FONT_SIZE,
-        Menu.NONE, R.string.decrease_font_size);
-    fontSizeMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_ADJUST_FONT_SIZE, Menu.NONE, R.string.adjust_font_size);
+//    SubMenu fontSizeMenu = preferencesMenu.addSubMenu(R.string.adjust_font_size);
+//    fontSizeMenu.add(Menu.NONE, Constants.MENU_ITEM_INCREASE_FONT_SIZE,
+//        Menu.NONE, R.string.increase_font_size);
+//    fontSizeMenu.add(Menu.NONE, Constants.MENU_ITEM_DECREASE_FONT_SIZE,
+//        Menu.NONE, R.string.decrease_font_size);
+//    fontSizeMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
     SubMenu colorMenu = preferencesMenu.addSubMenu(R.string.adjust_font_color);
     colorMenu.add(Menu.NONE, Constants.MENU_ITEM_BLACK_COLOR,
@@ -261,9 +261,16 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_SEPIA_COLOR:
         setColor("#5E4933", "#F9EFD8");
         return true;
-
+      case Constants.MENU_ITEM_ADJUST_FONT_SIZE:
+        showFontDialog();
+        return true;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  private void showFontDialog() {
+    FontDialogFragment dialog = new FontDialogFragment();
+    dialog.show(getSupportFragmentManager(), "FontDialogFragment");
   }
 
   private void showPaliDict() {
@@ -498,6 +505,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       if (data.getIntExtra(Constants.LANGUAGE_KEY, Language.THAI.getCode()) == Language.THAI.getCode()) {
         language = Language.THAI;
       }
+      mMenuFragment.setRadioButton(language);
       openBook(language, data.getIntExtra(Constants.VOLUME_KEY, currentVolume),
           data.getIntExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage()),
           currentKeywords);
@@ -608,5 +616,26 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         });
       }
     }).start();
+  }
+
+
+  @Override
+  public void onDialogPositiveClick(RoboSherlockDialogFragment dialog, int fontSize) {
+    getReaderFragment().getCurrentPageFragment().setFontSize(fontSize);
+  }
+
+  @Override
+  public void onDialogNegativeClick(RoboSherlockDialogFragment dialog) {
+  }
+
+  @Override
+  public int getFontSize() {
+    return getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE)
+        .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
+  }
+
+  @Override
+  public String getContent() {
+    return getReaderFragment().getCurrentPageFragment().getContent();
   }
 }

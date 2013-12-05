@@ -40,6 +40,7 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
   private int mFontSize = Constants.DEFAULT_FONT_SIZE;
   private String mFontColor = Constants.DEFAULT_FONT_COLOR;
   private String mBackgroundColor = Constants.DEFAULT_BACKGROUND_COLOR;
+  private String mText, mHtml;
 
   @InjectView(R.id.webview)
   private MyWebView mWebView;
@@ -55,7 +56,8 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     mWebView.getSettings().setJavaScriptEnabled(true);
-    String text = getArguments().getString(Constants.CONTENT_KEY);
+    mText = getArguments().getString(Constants.CONTENT_KEY);
+    mText = mText.replace("\t", "   ");
     String keywords = getArguments().getString(Constants.KEYWORDS_KEY);
     mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
     mWebView.setOnTouchListener(this);
@@ -77,13 +79,12 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     int fontSize = prefs.getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     String fontColor = prefs.getString(Constants.FONT_COLOR_KEY, Constants.DEFAULT_FONT_COLOR);
     String backgroundColor = prefs.getString(Constants.BACKGROUND_COLOR_KEY, Constants.DEFAULT_BACKGROUND_COLOR);
-    mWebView.loadDataWithBaseURL("http://etipitaka.com",
-        getString(R.string.html_text_template,
-            highlightItemNumbers(highlightKeywords(text, keywords)),
-            String.format("%dpt", fontSize),
-            getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old),
-            fontColor, backgroundColor),
-        "text/html", "UTF-8", null);
+    mHtml = getString(R.string.html_text_template,
+        highlightItemNumbers(highlightKeywords(mText, keywords)),
+        String.format("%dpt", fontSize),
+        getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old),
+        fontColor, backgroundColor);
+    mWebView.loadDataWithBaseURL("http://etipitaka.com", mHtml, "text/html", "UTF-8", null);
     mWebView.setOnScrollChangedListener((MyWebView.OnScrollChangedListener) getParentFragment());
   }
 
@@ -99,6 +100,10 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
 
   public int getFontSize() {
     return mFontSize;
+  }
+
+  public String getContent() {
+    return mHtml;
   }
 
   public void setColor(String font, String background) {
