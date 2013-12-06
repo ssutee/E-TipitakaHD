@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -77,9 +78,19 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   private Handler mHandler = new Handler();
   private int currentVolume, mSelectedPage, mSelectedItem;
   private String currentKeywords;
+  private ContentObserver mContentObserver;
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    mContentObserver = new ContentObserver(mHandler) {
+      @Override
+      public void onChange(boolean selfChange) {
+        getReaderFragment().openBook(application.getLanguage(), currentVolume, 1, "");
+      }
+    };
+
+    getContentResolver().registerContentObserver(Constants.LANGUAGE_CHANGE_URI, false, mContentObserver);
 
     application = (E_TipitakaApplication) getApplication();
     mDatabaseHelper.openDatabase();
@@ -188,12 +199,6 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     dataMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
     preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_ADJUST_FONT_SIZE, Menu.NONE, R.string.adjust_font_size);
-//    SubMenu fontSizeMenu = preferencesMenu.addSubMenu(R.string.adjust_font_size);
-//    fontSizeMenu.add(Menu.NONE, Constants.MENU_ITEM_INCREASE_FONT_SIZE,
-//        Menu.NONE, R.string.increase_font_size);
-//    fontSizeMenu.add(Menu.NONE, Constants.MENU_ITEM_DECREASE_FONT_SIZE,
-//        Menu.NONE, R.string.decrease_font_size);
-//    fontSizeMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
     SubMenu colorMenu = preferencesMenu.addSubMenu(R.string.adjust_font_color);
     colorMenu.add(Menu.NONE, Constants.MENU_ITEM_BLACK_COLOR,
