@@ -1,0 +1,50 @@
+package com.watnapp.etipitaka.plus.model;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
+
+import java.io.File;
+
+/**
+ * Created by sutee on 4/2/14.
+ */
+
+public abstract class ETDataModel {
+
+  protected SQLiteDatabase db;
+
+  abstract protected String getDatabasePath();
+  abstract public BookDatabaseHelper.Language getLanguage();
+
+  abstract public void getItemsAtPage(int volume, int page, BookDatabaseHelper.OnGetItemsListener listener);
+  abstract public Cursor read(int volume, int page);
+  abstract public int getMaximumPageNumber(int volume);
+  abstract public int getMinimumItemNumber(int volume);
+  abstract public int getMaximumItemNumber(int volume);
+  abstract public int getPageIdByItem(int volume, int item, int section);
+  abstract public int getPageById(int pageId);
+  abstract public Integer[] getPagesByItem(int volume, int item);
+  abstract public void search(String keywords, BookDatabaseHelper.OnSearchListener listener, Integer[] volumes);
+  abstract public void search(String keywords, BookDatabaseHelper.OnSearchListener listener);
+
+  public void openDatabase() {
+    if ((db == null || !db.isOpen()) && (new File(getDatabasePath())).exists()) {
+      db = SQLiteDatabase.openDatabase(getDatabasePath(), null, 0);
+    }
+  }
+
+  public void closeDatabase() {
+    if (db != null && db.isOpen()) {
+      db.close();
+    }
+  }
+
+  public Cursor read(int volume) {
+    return read(volume, 0);
+  }
+
+  public int getMinimumPageNumber(int volume) {
+    return 1;
+  }
+}

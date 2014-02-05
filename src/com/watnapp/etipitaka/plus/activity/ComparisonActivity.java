@@ -13,6 +13,8 @@ import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.fragment.ReaderFragment;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
+import com.watnapp.etipitaka.plus.model.ETDataModel;
+import com.watnapp.etipitaka.plus.model.ETDataModelCreator;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectExtra;
 
@@ -31,6 +33,9 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
 
   @InjectExtra(Constants.LANGUAGE_KEY)
   private int mLanguageCode;
+
+  @InjectExtra(Constants.COMPARING_LANGUAGE_KEY)
+  private int mComparingLanguageCode;
 
   @InjectExtra(Constants.VOLUME_KEY)
   private int mVolume;
@@ -55,24 +60,20 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   private BookDatabaseHelper.Language mLanguage2;
   private ReaderFragment mLeftFragment;
   private ReaderFragment mRightFragment;
+  private ETDataModel mDataModel1;
+  private ETDataModel mDataModel2;
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     int page1 = mPage;
-    int page2 = mBookDatabaseHelper.getPageById(
-        mBookDatabaseHelper.getPageIdByItem(BookDatabaseHelper.Language.PALI, mVolume, mItem, mSection));
+    mLanguage1 = Language.values()[mLanguageCode];
+    mLanguage2 = Language.values()[mComparingLanguageCode];
 
-    mLanguage1 = BookDatabaseHelper.Language.THAI;
-    mLanguage2 = BookDatabaseHelper.Language.PALI;
+    mDataModel1 = ETDataModelCreator.create(mLanguage1);
+    mDataModel2 = ETDataModelCreator.create(mLanguage2);
 
-    if (mLanguageCode == BookDatabaseHelper.Language.PALI.getCode()) {
-      int tmp = page2;
-      page2 = page1;
-      page1 = tmp;
-      mLanguage1 = BookDatabaseHelper.Language.PALI;
-      mLanguage2 = BookDatabaseHelper.Language.THAI;
-    }
+    int page2 = mDataModel2.getPageById(mDataModel2.getPageIdByItem(mVolume, mItem, mSection));
 
     mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, mKeywords, true);
     getSupportFragmentManager().beginTransaction()
@@ -94,8 +95,17 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   }
 
   @Override
+  protected void onDestroy() {
+    mDataModel1.closeDatabase();
+    mDataModel2.closeDatabase();
+    super.onDestroy();
+  }
+
+  @Override
   public void onCompareButtonClick(final Language language, final int volume, int page) {
-    mBookDatabaseHelper.getItemsAtPage(language, volume, page, new BookDatabaseHelper.OnGetItemsListener() {
+    final ETDataModel sourceModel = language == mDataModel1.getLanguage() ? mDataModel1 : mDataModel2;
+    final ETDataModel targetModel = language == mDataModel1.getLanguage() ? mDataModel2 : mDataModel1;
+    sourceModel.getItemsAtPage(volume, page, new BookDatabaseHelper.OnGetItemsListener() {
       @Override
       public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
         mHandler.post(new Runnable() {
@@ -109,13 +119,12 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
             new AlertDialog.Builder(ComparisonActivity.this).setTitle(R.string.select_item)
                 .setItems(choices, new DialogInterface.OnClickListener() {
                   @Override
-                  public void onClick(DialogInterface dialog, final int which) {
+                  public void onClick(DialogInterface dialog, int which) {
                     Language targetLanguage = (language.getCode() == mLanguageCode)
                         ? mLanguage2 : mLanguage1;
                     ReaderFragment targetFragment = (language.getCode() == mLanguageCode)
                         ? mRightFragment : mLeftFragment;
-                    int pageId = mBookDatabaseHelper
-                        .getPageIdByItem(targetLanguage, volume, items[which], sections[which]);
+                    int pageId = targetModel.getPageIdByItem(volume, items[which], sections[which]);
                     targetFragment.openBook(targetLanguage, volume, mBookDatabaseHelper.getPageById(pageId));
                     targetFragment.getCurrentPageFragment().scrollToItem(items[which]);
                   }

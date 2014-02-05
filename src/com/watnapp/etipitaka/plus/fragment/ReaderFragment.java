@@ -23,6 +23,8 @@ import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
+import com.watnapp.etipitaka.plus.model.ETDataModel;
+import com.watnapp.etipitaka.plus.model.ETDataModelCreator;
 import com.watnapp.etipitaka.plus.model.HistoryItem;
 import com.watnapp.etipitaka.plus.model.HistoryItemDaoHelper;
 import com.watnapp.etipitaka.plus.widget.MyWebView;
@@ -60,9 +62,6 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   private ImageView returnButton;
 
   @Inject
-  private BookDatabaseHelper mDatabaseHelper;
-
-  @Inject
   private HistoryItemDaoHelper mHistoryItemDaoHelper;
 
   private Handler mHandler = new Handler();
@@ -79,6 +78,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
 
   private boolean mShowingButtons = false;
   private boolean mHidingButtons = false;
+  private ETDataModel dataModel;
 
   public interface OnMenuButtonClickListener {
     public void onCompareButtonClick(Language language, int volume, int page);
@@ -124,7 +124,14 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     mPage = savedInstanceState.getInt(Constants.PAGE_KEY);
     mLanguage = BookDatabaseHelper.Language.values()[savedInstanceState.getInt(Constants.LANGUAGE_KEY)];
     mShowButtons = savedInstanceState.getBoolean(Constants.BUTTON_KEY);
+    dataModel = ETDataModelCreator.create(mLanguage);
 
+  }
+
+  @Override
+  public void onDestroy() {
+    dataModel.closeDatabase();
+    super.onDestroy();
   }
 
   @Override
@@ -257,10 +264,17 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
-    mLanguage = language;
+    if (mLanguage != language) {
+      if (dataModel != null) {
+        dataModel.closeDatabase();
+      }
+      dataModel = ETDataModelCreator.create(language);
+      mLanguage = language;
+    }
+
     mKeywords = keywords;
     mVolume = volume;
-    Cursor cursor = mDatabaseHelper.read(language, volume);
+    Cursor cursor = dataModel.read(volume);
     cursor.moveToFirst();
     mPagerAdapter.swapCursor(cursor);
     mSeekBar.setProgress(0);
@@ -303,28 +317,26 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   }
 
   private void updateSubtitle(final int volume, final int page) {
-
-    mDatabaseHelper.getItemsAtPage(mLanguage, volume, page,
-        new BookDatabaseHelper.OnGetItemsListener() {
+    dataModel.getItemsAtPage(volume, page, new BookDatabaseHelper.OnGetItemsListener() {
+      @Override
+      public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
+        final String thaiItem;
+        if (items.length > 1) {
+          thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]) + "-"
+              + Utils.convertToThaiNumber(getActivity(), items[items.length - 1]);
+        } else if (items.length == 1) {
+          thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]);
+        } else {
+          thaiItem = Utils.convertToThaiNumber(getActivity(), 0);
+        }
+        mHandler.post(new Runnable() {
           @Override
-          public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
-            final String thaiItem;
-            if (items.length > 1) {
-              thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]) + "-"
-                  + Utils.convertToThaiNumber(getActivity(), items[items.length - 1]);
-            } else if (items.length == 1) {
-              thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]);
-            } else {
-              thaiItem = Utils.convertToThaiNumber(getActivity(), 0);
-            }
-            mHandler.post(new Runnable() {
-              @Override
-              public void run() {
-                mTextSubtitle.setText(Utils.getSubtitle(getActivity(), mLanguage, volume, page, thaiItem));
-              }
-            });
+          public void run() {
+            mTextSubtitle.setText(Utils.getSubtitle(getActivity(), mLanguage, volume, page, thaiItem));
           }
         });
+      }
+    });
   }
 
   @Override

@@ -48,6 +48,7 @@ public class Constants {
   public static final long DATABASE_SIZE        = 158919680;
 
   public static final String LANGUAGE_KEY           = "language";
+  public static final String COMPARING_LANGUAGE_KEY = "comparing_language";
   public static final String VOLUME_KEY             = "volume";
   public static final String ITEM_KEY               = "item";
   public static final String SECTION_KEY            = "section";
@@ -74,4 +75,6 @@ public class Constants {
 
   public static final String DEFAULT_FONT_COLOR       = "#010101";
   public static final String DEFAULT_BACKGROUND_COLOR = "#FEFEFE";
+
+  public static final String LANGUAGE_TITLES[] = {"ภาษาไทยฉบับหลวง", "ภาษาบาลีฉบับสยามรัฐ", "ภาษาไทยฉบับมหามกุฏฯ", "ภาษาไทยฉบับมหาจุฬาฯ"};
 }

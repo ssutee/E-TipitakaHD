@@ -237,7 +237,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         showGotoItemDialog();
         return true;
       case Constants.MENU_ITEM_COMPARE:
-        compare();
+        chooseLanguage();
         return true;
       case Constants.MENU_ITEM_SAVE:
         takeNote();
@@ -368,6 +368,67 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     getReaderFragment().getCurrentPageFragment().setColor(font, background);
   }
 
+  private void chooseLanguage() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle("เลือกภาษาที่ต้องการ");
+    builder.setItems(Constants.LANGUAGE_TITLES, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, final int which) {
+        int page = getReaderFragment().getCurrentPage();
+        mDatabaseHelper.getItemsAtPage(application.getLanguage(), currentVolume, page,
+            new BookDatabaseHelper.OnGetItemsListener() {
+              @Override
+              public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
+                mHandler.post(new Runnable() {
+                  @Override
+                  public void run() {
+                    Language language = Language.THAI;
+                    switch (which) {
+                      case 0:
+                        language = Language.THAI;
+                        break;
+                      case 1:
+                        language = Language.PALI;
+                        break;
+                    }
+                    compare(items, sections, language);
+                  }
+                });
+              }
+            });
+      }
+    });
+    builder.create().show();
+  }
+
+  private void compare(final Integer[] items, final Integer[] sections, final Language language) {
+    CharSequence[] choices = new CharSequence[items.length];
+    for (int i=0; i < items.length; ++i) {
+      choices[i] = String.format("%s %s", getString(R.string.go_to_item),
+          Utils.convertToThaiNumber(this, items[i]));
+    }
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle(R.string.select_item);
+    builder.setItems(choices, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        Intent intent = new Intent(MainActivity.this, ComparisonActivity.class);
+        // TODO: choose comparing language
+        intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
+        intent.putExtra(Constants.COMPARING_LANGUAGE_KEY, language.getCode());
+        intent.putExtra(Constants.VOLUME_KEY, currentVolume);
+        intent.putExtra(Constants.KEYWORDS_KEY, currentKeywords);
+        intent.putExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage());
+        intent.putExtra(Constants.ITEM_KEY, items[which]);
+        intent.putExtra(Constants.SECTION_KEY, sections[which]);
+        startActivityForResult(intent, COMPARE_REQ);
+      }
+    });
+    builder.create().show();
+  }
+
+
   private void compare(final Integer[] items, final Integer[] sections) {
     CharSequence[] choices = new CharSequence[items.length];
     for (int i=0; i < items.length; ++i) {
@@ -381,6 +442,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       @Override
       public void onClick(DialogInterface dialog, int which) {
         Intent intent = new Intent(MainActivity.this, ComparisonActivity.class);
+        // TODO: choose comparing language
         intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
         intent.putExtra(Constants.VOLUME_KEY, currentVolume);
         intent.putExtra(Constants.KEYWORDS_KEY, currentKeywords);
