@@ -8,10 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -58,9 +56,6 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   private static final int IMPORT_REQ = 2;
 
   @Inject
-  private BookDatabaseHelper mDatabaseHelper;
-
-  @Inject
   private InputMethodManager mInputMethodManager;
 
   @Inject
@@ -78,22 +73,32 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   private Handler mHandler = new Handler();
   private int currentVolume, mSelectedPage, mSelectedItem;
   private String currentKeywords;
+  private Language currentLanguage;
   private ContentObserver mContentObserver;
+  private ETDataModel dataModel;
+  private int mItemIndexSystem = 1;
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
+    application = (E_TipitakaApplication) getApplication();
     mContentObserver = new ContentObserver(mHandler) {
       @Override
       public void onChange(boolean selfChange) {
+        if (currentLanguage == Language.THAIMM) {
+          currentVolume = dataModel.getComparingVolume(currentVolume, 1);
+        } else if (application.getLanguage() == Language.THAIMM) {
+          dataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
+          currentVolume = dataModel.convertVolume(currentVolume, 1, 1);
+        }
+        dataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
         getReaderFragment().openBook(application.getLanguage(), currentVolume, 1, "");
+        currentLanguage = application.getLanguage();
       }
     };
 
-    getContentResolver().registerContentObserver(Constants.LANGUAGE_CHANGE_URI, false, mContentObserver);
+    currentLanguage = application.getLanguage();
+    dataModel = ETDataModelCreator.create(application.getLanguage(), this);
 
-    application = (E_TipitakaApplication) getApplication();
-    mDatabaseHelper.openDatabase();
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     try {
       String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -106,10 +111,21 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   }
 
   @Override
-  protected void onDestroy() {
-    if (mDatabaseHelper != null) {
-      mDatabaseHelper.closeDatabase();
+  protected void onStart() {
+    super.onStart();
+    getContentResolver().registerContentObserver(Constants.LANGUAGE_CHANGE_URI, false, mContentObserver);
+  }
+
+  @Override
+  protected void onStop() {
+    if (mContentObserver != null) {
+      getContentResolver().unregisterContentObserver(mContentObserver);
     }
+    super.onStop();
+  }
+
+  @Override
+  protected void onDestroy() {
     SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
@@ -121,9 +137,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   private void initReader() {
     SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-    Language language =
-        prefs.getInt(Constants.LANGUAGE_KEY,
-            Language.THAI.getCode()) == Language.THAI.getCode() ? Language.THAI : Language.PALI;
+    Language language = Language.values()[prefs.getInt(Constants.LANGUAGE_KEY, Language.THAI.getCode())];
     application.setLanguage(language);
     currentVolume = prefs.getInt(Constants.VOLUME_KEY, 1);
     int page = prefs.getInt(Constants.PAGE_KEY, 1);
@@ -234,7 +248,12 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         showGotoPageDialog();
         return true;
       case Constants.MENU_ITEM_GOTO_ITEM:
-        showGotoItemDialog();
+        if (currentLanguage == Language.THAIMC) {
+          showItemsIndexSystemDialog();
+        } else {
+          mItemIndexSystem = 1;
+          showGotoItemDialog();
+        }
         return true;
       case Constants.MENU_ITEM_COMPARE:
         chooseLanguage();
@@ -298,45 +317,44 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   private void takeNote() {
     mSelectedPage = getReaderFragment().getCurrentPage();
-    mDatabaseHelper.getItemsAtPage(application.getLanguage(), currentVolume, mSelectedPage,
-        new BookDatabaseHelper.OnGetItemsListener() {
-          @Override
-          public void onGetItemsFinish(final Integer[] items, Integer[] sections) {
-            final String[] choices = new String[items.length];
-            for (int i = 0; i < items.length; ++i) {
-              choices[i] = getString(R.string.go_to_item) + " "
-                  + Utils.convertToThaiNumber(MainActivity.this, items[i]);
+    dataModel.getItemsAtPage(currentVolume, mSelectedPage, new BookDatabaseHelper.OnGetItemsListener() {
+      @Override
+      public void onGetItemsFinish(final Integer[] items, Integer[] sections) {
+        final String[] choices = new String[items.length];
+        for (int i = 0; i < items.length; ++i) {
+          choices[i] = getString(R.string.go_to_item) + " "
+              + Utils.convertToThaiNumber(MainActivity.this, items[i]);
+        }
+        if (items.length > 1) {
+          mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+              new AlertDialog.Builder(MainActivity.this).setTitle(R.string.select_item)
+                  .setItems(choices, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                      mSelectedItem = items[which];
+                      String message = Utils.getSubtitle(MainActivity.this,
+                          application.getLanguage(), currentVolume, mSelectedPage,
+                          Utils.convertToThaiNumber(MainActivity.this, mSelectedItem));
+                      TextEntryDialogFragment.newInstance(R.string.enter_note, message,
+                          Constants.TAKE_NOTE_ID, 5, TextEntryDialogFragment.InputMode.TEXT)
+                          .show(getSupportFragmentManager(), "take_note_dialog");
+                    }
+                  }).create().show();
             }
-            if (items.length > 1) {
-              mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                  new AlertDialog.Builder(MainActivity.this).setTitle(R.string.select_item)
-                      .setItems(choices, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                          mSelectedItem = items[which];
-                          String message = Utils.getSubtitle(MainActivity.this,
-                              application.getLanguage(), currentVolume, mSelectedPage,
-                              Utils.convertToThaiNumber(MainActivity.this, mSelectedItem));
-                          TextEntryDialogFragment.newInstance(R.string.enter_note, message,
-                              Constants.TAKE_NOTE_ID, 5, TextEntryDialogFragment.InputMode.TEXT)
-                              .show(getSupportFragmentManager(), "take_note_dialog");
-                        }
-                      }).create().show();
-                }
-              });
-            } else if (items.length == 1) {
-              mSelectedItem = items[0];
-              String message = Utils.getSubtitle(MainActivity.this,
-                  application.getLanguage(), currentVolume, mSelectedPage,
-                  Utils.convertToThaiNumber(MainActivity.this, mSelectedItem));
-              TextEntryDialogFragment.newInstance(R.string.enter_note, message,
-                  Constants.TAKE_NOTE_ID, 5, TextEntryDialogFragment.InputMode.TEXT)
-                  .show(getSupportFragmentManager(), "take_note_dialog");
-            }
-          }
-        });
+          });
+        } else if (items.length == 1) {
+          mSelectedItem = items[0];
+          String message = Utils.getSubtitle(MainActivity.this,
+              application.getLanguage(), currentVolume, mSelectedPage,
+              Utils.convertToThaiNumber(MainActivity.this, mSelectedItem));
+          TextEntryDialogFragment.newInstance(R.string.enter_note, message,
+              Constants.TAKE_NOTE_ID, 5, TextEntryDialogFragment.InputMode.TEXT)
+              .show(getSupportFragmentManager(), "take_note_dialog");
+        }
+      }
+    });
   }
 
   private void takeNote(Language language, int volume, int page, int item, String text) {
@@ -370,35 +388,37 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   private void chooseLanguage() {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setTitle("เลือกภาษาที่ต้องการ");
+    builder.setTitle(R.string.select_langauge);
     builder.setItems(Constants.LANGUAGE_TITLES, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, final int which) {
         int page = getReaderFragment().getCurrentPage();
-        mDatabaseHelper.getItemsAtPage(application.getLanguage(), currentVolume, page,
-            new BookDatabaseHelper.OnGetItemsListener() {
+        dataModel.getComparingItemsAtPage(currentVolume, page, new BookDatabaseHelper.OnGetItemsListener() {
+          @Override
+          public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
+            mHandler.post(new Runnable() {
               @Override
-              public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
-                mHandler.post(new Runnable() {
-                  @Override
-                  public void run() {
-                    Language language = Language.THAI;
-                    switch (which) {
-                      case 0:
-                        language = Language.THAI;
-                        break;
-                      case 1:
-                        language = Language.PALI;
-                        break;
-                    }
-                    compare(items, sections, language);
-                  }
-                });
+              public void run() {
+                compare(items, sections, Language.values()[which]);
               }
             });
+          }
+        });
       }
     });
     builder.create().show();
+  }
+
+  private void startComparisonActivity(int item, int section, Language language) {
+    Intent intent = new Intent(MainActivity.this, ComparisonActivity.class);
+    intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
+    intent.putExtra(Constants.COMPARING_LANGUAGE_KEY, language.getCode());
+    intent.putExtra(Constants.VOLUME_KEY, currentVolume);
+    intent.putExtra(Constants.KEYWORDS_KEY, currentKeywords);
+    intent.putExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage());
+    intent.putExtra(Constants.ITEM_KEY, item);
+    intent.putExtra(Constants.SECTION_KEY, section);
+    startActivityForResult(intent, COMPARE_REQ);
   }
 
   private void compare(final Integer[] items, final Integer[] sections, final Language language) {
@@ -408,71 +428,24 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
           Utils.convertToThaiNumber(this, items[i]));
     }
 
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setTitle(R.string.select_item);
-    builder.setItems(choices, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        Intent intent = new Intent(MainActivity.this, ComparisonActivity.class);
-        // TODO: choose comparing language
-        intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
-        intent.putExtra(Constants.COMPARING_LANGUAGE_KEY, language.getCode());
-        intent.putExtra(Constants.VOLUME_KEY, currentVolume);
-        intent.putExtra(Constants.KEYWORDS_KEY, currentKeywords);
-        intent.putExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage());
-        intent.putExtra(Constants.ITEM_KEY, items[which]);
-        intent.putExtra(Constants.SECTION_KEY, sections[which]);
-        startActivityForResult(intent, COMPARE_REQ);
-      }
-    });
-    builder.create().show();
-  }
-
-
-  private void compare(final Integer[] items, final Integer[] sections) {
-    CharSequence[] choices = new CharSequence[items.length];
-    for (int i=0; i < items.length; ++i) {
-      choices[i] = String.format("%s %s", getString(R.string.go_to_item),
-          Utils.convertToThaiNumber(this, items[i]));
+    if (items.length > 1) {
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
+      builder.setTitle(R.string.select_item);
+      builder.setItems(choices, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          startComparisonActivity(items[which], sections[which], language);
+        }
+      });
+      builder.create().show();
+    } else {
+      startComparisonActivity(items[0], sections[0], language);
     }
 
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setTitle(R.string.select_item);
-    builder.setItems(choices, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        Intent intent = new Intent(MainActivity.this, ComparisonActivity.class);
-        // TODO: choose comparing language
-        intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
-        intent.putExtra(Constants.VOLUME_KEY, currentVolume);
-        intent.putExtra(Constants.KEYWORDS_KEY, currentKeywords);
-        intent.putExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage());
-        intent.putExtra(Constants.ITEM_KEY, items[which]);
-        intent.putExtra(Constants.SECTION_KEY, sections[which]);
-        startActivityForResult(intent, COMPARE_REQ);
-      }
-    });
-    builder.create().show();
   }
 
   private ReaderFragment getReaderFragment() {
     return (ReaderFragment) getSupportFragmentManager().findFragmentByTag(READER_FRAG_TAG);
-  }
-
-  private void compare() {
-    int page = getReaderFragment().getCurrentPage();
-    mDatabaseHelper.getItemsAtPage(application.getLanguage(), currentVolume, page,
-        new BookDatabaseHelper.OnGetItemsListener() {
-          @Override
-          public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
-            mHandler.post(new Runnable() {
-              @Override
-              public void run() {
-                compare(items, sections);
-              }
-            });
-          }
-        });
   }
 
   @Override
@@ -501,8 +474,8 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   }
 
   private void showGotoPageDialog() {
-    int minPage = mDatabaseHelper.getMinimumPageNumber(application.getLanguage(), currentVolume);
-    int maxPage = mDatabaseHelper.getMaximumPageNumber(application.getLanguage(), currentVolume);
+    int minPage = dataModel.getMinimumPageNumber(currentVolume);
+    int maxPage = dataModel.getMaximumPageNumber(currentVolume);
 
     TextEntryDialogFragment.newInstance(R.string.goto_page_title,
         getString(R.string.goto_page_message, minPage, maxPage), Constants.GOTO_PAGE_ID)
@@ -510,12 +483,32 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   }
 
   private void showGotoItemDialog() {
-    int minItem = mDatabaseHelper.getMinimumItemNumber(application.getLanguage(), currentVolume);
-    int maxItem = mDatabaseHelper.getMaximumItemNumber(application.getLanguage(), currentVolume);
+    int minItem, maxItem;
+
+    if (mItemIndexSystem == 0) {
+      ETDataModel dm = ETDataModelCreator.create(Language.THAI, this);
+      minItem = dm.getMinimumItemNumber(currentVolume);
+      maxItem = dm.getMaximumItemNumber(currentVolume);
+    } else {
+      minItem = dataModel.getMinimumItemNumber(currentVolume);
+      maxItem = dataModel.getMaximumItemNumber(currentVolume);
+    }
 
     TextEntryDialogFragment.newInstance(R.string.goto_item_title,
         getString(R.string.goto_item_message, minItem, maxItem), Constants.GOTO_ITEM_ID)
         .show(getSupportFragmentManager(), "goto_item_dialog");
+  }
+
+  private void showItemsIndexSystemDialog() {
+    new AlertDialog.Builder(this).setTitle(R.string.choose_items_index_system)
+        .setItems(new String[]{getString(R.string.siamrat), getString(R.string.mahachula)},
+            new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                mItemIndexSystem = which;
+                showGotoItemDialog();
+              }
+            }).setNegativeButton(android.R.string.cancel, null).create().show();
   }
 
   @Override
@@ -525,6 +518,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         getReaderFragment().setCurrentPage(Integer.parseInt(text), true);
         break;
       case Constants.GOTO_ITEM_ID:
+        Log.d(TAG, "gotoItem");
         gotoItem(Integer.parseInt(text));
         break;
       case Constants.TAKE_NOTE_ID:
@@ -538,7 +532,8 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   }
 
   private void gotoItem(final int item) {
-    final Integer[] pages = mDatabaseHelper.getPagesByItem(application.getLanguage(), currentVolume, item);
+    final Integer[] pages = dataModel.getPagesByItem(currentVolume, item, mItemIndexSystem==0);
+
     if (pages.length == 1) {
       getReaderFragment().setCurrentPage(pages[0], true);
       PageFragment fragment = getReaderFragment().getPageFragment(pages[0]);

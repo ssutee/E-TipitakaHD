@@ -58,9 +58,6 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   private StickyListHeadersListView mListView;
 
   @Inject
-  private BookDatabaseHelper mDatabaseHelper;
-
-  @Inject
   private InputMethodManager mInputMethodManager;
 
   @Inject
@@ -81,6 +78,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   private SparseBooleanArray mCheckedCategories;
   private History mCurrentHistory;
   private List<HistoryItem> mCurrentHistoryItems;
+  private ETDataModel dataModel;
 
   private ContentObserver mContentObserver;
 
@@ -88,6 +86,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   public void onAttach(Activity activity) {
     super.onAttach(activity);
     application = (E_TipitakaApplication) activity.getApplication();
+    dataModel = ETDataModelCreator.create(application.getLanguage(), activity);
     mContentObserver = new ContentObserver(mHandler) {
       @Override
       public void onChange(boolean selfChange) {
@@ -179,6 +178,11 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
         return item != null ? item.getStatus() : HistoryItem.Status.NONE;
       }
 
+      @Override
+      public ETDataModel getDataModel() {
+        return dataModel;
+      }
+
     };
     mListView.setAdapter(mAdapter);
     mListView.setOnItemClickListener(this);
@@ -201,17 +205,17 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
             mCheckedCategories = ((AlertDialog) dialog).getListView().getCheckedItemPositions();
             ArrayList<Integer> volumes = new ArrayList<Integer>();
             if (mCheckedCategories.get(0, false)) {
-              for (int volume = 1; volume < 9; volume++) {
+              for (int volume = 1; volume <= dataModel.getSectionBoundary(0); volume++) {
                 volumes.add(volume);
               }
             }
             if (mCheckedCategories.get(1, false)) {
-              for (int volume = 9; volume < 34; volume++) {
+              for (int volume = dataModel.getSectionBoundary(0)+1; volume <= dataModel.getSectionBoundary(1); volume++) {
                 volumes.add(volume);
               }
             }
             if (mCheckedCategories.get(2, false)) {
-              for (int volume = 34; volume < 46; volume++) {
+              for (int volume = dataModel.getSectionBoundary(1)+1; volume <= dataModel.getSectionBoundary(2); volume++) {
                 volumes.add(volume);
               }
             }
@@ -241,7 +245,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   private boolean search(Integer[] volumes) {
     if (mSearchInput.getText().length() > 0) {
       mResultsCount = new int[] {0, 0, 0};
-      mDatabaseHelper.search(application.getLanguage(), mSearchInput.getText().toString(), this, volumes);
+      dataModel.search(mSearchInput.getText().toString(), this, volumes);
       mProgressDialog.setMax(volumes.length);
       mProgressDialog.setProgress(0);
       mProgressDialog.show();
@@ -253,9 +257,9 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   @Override
   public void onSearchProgress(String keywords, int volume, int progress, Cursor cursor) {
     mProgressDialog.setProgress(progress);
-    if (volume <= 8) {
+    if (volume <= dataModel.getSectionBoundary(0)) {
       mResultsCount[0] += cursor.getCount();
-    } else if (volume >= 9 && volume <= 33) {
+    } else if (volume >= dataModel.getSectionBoundary(0)+1 && volume <= dataModel.getSectionBoundary(1)) {
       mResultsCount[1] += cursor.getCount();
     } else {
       mResultsCount[2] += cursor.getCount();
@@ -276,9 +280,9 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       if (cursor.getCount() > 3) {
         cursor.moveToPosition(3);
         while (!cursor.isAfterLast()) {
-          sb.append(cursor.getInt(cursor.getColumnIndex("volume")));
+          sb.append(cursor.getInt(cursor.getColumnIndex(dataModel.getVolumeColumn())));
           sb.append(':');
-          sb.append(cursor.getInt(cursor.getColumnIndex("number")));
+          sb.append(cursor.getInt(cursor.getColumnIndex(dataModel.getPageNumberColumn())));
           if (!cursor.isLast()) {
             sb.append(',');
           }
@@ -313,8 +317,8 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       application.setHistory(mCurrentHistory);
       Cursor cursor = mAdapter.getCursor();
       cursor.moveToPosition(position);
-      int volume = cursor.getInt(cursor.getColumnIndex("volume"));
-      int page = cursor.getInt(cursor.getColumnIndex("number"));
+      int volume = cursor.getInt(cursor.getColumnIndex(dataModel.getVolumeColumn()));
+      int page = cursor.getInt(cursor.getColumnIndex(dataModel.getPageNumberColumn()));
       MainActivity activity = (MainActivity) getActivity();
       activity.openBook(application.getLanguage(), volume, page, mKeywords);
       mHistoryItemDaoHelper.insertOrUpdate(mCurrentHistory.getId(), volume, page, HistoryItem.Status.READ);
@@ -332,7 +336,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   }
 
   private Cursor createCursorFromHistory(History history) {
-    MatrixCursor itemCursor = new MatrixCursor(new String[] { "_id", "volume", "number" });
+    MatrixCursor itemCursor = new MatrixCursor(new String[] { "_id", dataModel.getVolumeColumn(), dataModel.getPageNumberColumn() });
     int id = 4;
     mResultsCount = new int[] { 0,0,0 };
     if (history.getContent().length() > 0) {

@@ -6,13 +6,26 @@ import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.util.Log;
+import com.actionbarsherlock.internal.nineoldandroids.animation.ObjectAnimator;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -311,7 +324,7 @@ public class BookDatabaseHelper {
   }
 
   public enum Language {
-    THAI(0), PALI(1);
+    THAI(0), PALI(1), THAIMM(2), THAIMC(3);
 
     private int code;
 
@@ -324,8 +337,150 @@ public class BookDatabaseHelper {
     }
 
     public String getFullName(Context context) {
-      return context.getString(code == 0 ? R.string.thai_full_name : R.string.pali_full_name);
+      switch (code) {
+        case 0:
+          return context.getString(R.string.thai_full_name);
+        case 1:
+          return context.getString(R.string.pali_full_name);
+        case 2:
+          return context.getString(R.string.thaimm_full_name);
+        case 3:
+          return context.getString(R.string.thaimc_full_name);
+      }
+      return null;
+    }
+
+    public String getStringCode() {
+      switch (code) {
+        case 0:
+          return "thai";
+        case 1:
+          return "pali";
+        case 2:
+          return "thaimm";
+        case 3:
+          return "thaimc";
+      }
+      return null;
     }
   }
 
+  static Map<String, Integer> thaiMMVolumeMap = null;
+  public static Map<String, Integer> getThaiMMVolumeMap(Context context) {
+    if (thaiMMVolumeMap != null) {
+      return thaiMMVolumeMap;
+    }
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open("volume_mapping_thaimm.json"), "UTF-8"));
+      Map<String, Integer> result = new Gson().fromJson(reader, new TypeToken<Map<String, Integer>>() {}.getType());
+      reader.close();
+      return result;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiBookItems = null;
+  static Map<String,Map<String,Map<String,ArrayList<Integer>>>> paliBookItems = null;
+  static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiMMBookItems = null;
+  static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiMMOriginBookItems = null;
+  static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiMCBookItems = null;
+
+  private static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getBookItems(Context context, String filename) {
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename), "UTF-8"));
+      Map<String,Map<String,Map<String,ArrayList<Integer>>>> result = new Gson().fromJson(reader, new TypeToken<Map<String,Map<String,Map<String,ArrayList<Integer>>>>>(){}.getType());
+      reader.close();
+      return result;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getThaiBookItems(Context context) {
+    if (thaiBookItems != null) {
+      return thaiBookItems;
+    }
+    thaiBookItems = getBookItems(context, "book_item_thai.json");
+    return thaiBookItems;
+  }
+
+  public static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getPaliBookItems(Context context) {
+    if (paliBookItems != null) {
+      return paliBookItems;
+    }
+    paliBookItems = getBookItems(context, "book_item_pali.json");
+    return paliBookItems;
+  }
+
+  public static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getThaiMMBookItems(Context context) {
+    if (thaiMMBookItems != null) {
+      return thaiMMBookItems;
+    }
+    thaiMMBookItems = getBookItems(context, "book_item_thaimm.json");
+    return thaiMMBookItems;
+  }
+
+  public static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getThaiMMOriginBookItems(Context context) {
+    if (thaiMMOriginBookItems != null) {
+      return thaiMMOriginBookItems;
+    }
+    thaiMMOriginBookItems = getBookItems(context, "book_item_thaimm_orig.json");
+    return thaiMMOriginBookItems;
+  }
+
+  public static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getThaiMCBookItems(Context context) {
+    if (thaiMCBookItems != null) {
+      return thaiMCBookItems;
+    }
+    thaiMCBookItems = getBookItems(context, "book_item_thaimc.json");
+    return thaiMCBookItems;
+  }
+
+  public static int getSubItem(Context context, Language language, int volume, int page, int item) {
+    Map<String,Map<String,Map<String,ArrayList<Integer>>>> bookItems = null;
+    switch (language) {
+      case THAI:
+        bookItems = getThaiBookItems(context);
+        break;
+      case PALI:
+        bookItems = getPaliBookItems(context);
+        break;
+      case THAIMM:
+        bookItems = getThaiMMBookItems(context);
+        break;
+      case THAIMC:
+        bookItems = getThaiMCBookItems(context);
+        break;
+    }
+
+    for (String section : bookItems.get(volume+"").keySet()) {
+      if (bookItems.get(volume+"").get(section).containsKey(item+"") &&
+          bookItems.get(volume+"").get(section).get(item+"").contains(page)) {
+        return Integer.parseInt(section);
+      }
+    }
+
+    return 1;
+  }
+
+  static Map<String, Object> thaiMCConvertItemMap;
+
+  public static Map<String, Object> getThaiMCConvertItemMap(Context context) {
+    if (thaiMCConvertItemMap != null) {
+      return thaiMCConvertItemMap;
+    }
+
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open("mc_map.json"), "UTF-8"));
+      thaiMCConvertItemMap = new Gson().fromJson(reader, new TypeToken<Map<String, Object>>(){}.getType());
+      reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return thaiMCConvertItemMap;
+  }
 }

@@ -38,13 +38,13 @@ public class Constants {
   public static final int FAVORITE_LOADER   = 1;
 
   public static final Uri LANGUAGE_CHANGE_URI = Uri.parse("content://etipitaka.com/language_change");
-  public static final String DATABASE_URL     = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus.db.zip";
-  public static final String CHECK_SUM_DB_ZIP = "16510601dfc383e45cec485e0f5835fa";
-  public static final String CHECK_SUM_DB     = "2d093a4b06517efb7689a4d6b0135ec0";
+  public static final String DATABASE_URL     = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v2.zip";
 
   public static final String DATABASE_FOLDER    = Environment.getExternalStorageDirectory().getPath() + "/ETPK";
   public static final String DATABASE_PATH      = DATABASE_FOLDER + "/etipitaka_plus.db";
-  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus.db.zip";
+  public static final String MM_DATABASE_PATH   = DATABASE_FOLDER + "/thaimm.db";
+  public static final String MC_DATABASE_PATH   = DATABASE_FOLDER + "/thaimc.db";
+  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v2.zip";
   public static final long DATABASE_SIZE        = 158919680;
 
   public static final String LANGUAGE_KEY           = "language";
@@ -55,6 +55,7 @@ public class Constants {
   public static final String KEYWORDS_KEY           = "keywords";
   public static final String PAGE_KEY               = "page";
   public static final String CONTENT_KEY            = "content";
+  public static final String FOOTER_KEY             = "footer";
   public static final String NUMBER_KEY             = "number";
   public static final String BUTTON_KEY             = "button";
   public static final String FONT_SIZE_KEY          = "font_size";

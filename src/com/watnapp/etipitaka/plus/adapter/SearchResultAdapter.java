@@ -11,6 +11,7 @@ import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.plus.model.ETDataModel;
 import com.watnapp.etipitaka.plus.model.HistoryItem;
 
 /**
@@ -43,6 +44,7 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
   abstract public int[] getResultsCount();
   abstract public BookDatabaseHelper.Language getLanguage();
   abstract public HistoryItem.Status getStatus(int volume, int page);
+  abstract public ETDataModel getDataModel();
 
   @Override
   public int getItemViewType(int position) {
@@ -93,13 +95,13 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
       }
     } else {
       viewHolder.text1.setText(context.getString(R.string.n_volume_n_page,
-          Utils.convertToThaiNumber(context, cursor.getInt(cursor.getColumnIndex("volume"))),
-          Utils.convertToThaiNumber(context, cursor.getInt(cursor.getColumnIndex("number")))));
+          Utils.convertToThaiNumber(context, cursor.getInt(cursor.getColumnIndex(getDataModel().getVolumeColumn()))),
+          Utils.convertToThaiNumber(context, cursor.getInt(cursor.getColumnIndex(getDataModel().getPageNumberColumn())))));
     }
 
     if (getItemViewType(cursor.getPosition()) == TYPE_CONTENT) {
-      HistoryItem.Status status = getStatus(cursor.getInt(cursor.getColumnIndex("volume")),
-          cursor.getInt(cursor.getColumnIndex("number")));
+      HistoryItem.Status status = getStatus(cursor.getInt(cursor.getColumnIndex(getDataModel().getVolumeColumn())),
+          cursor.getInt(cursor.getColumnIndex(getDataModel().getPageNumberColumn())));
       if (status == HistoryItem.Status.READ) {
         view.setBackgroundResource(R.drawable.read_color);
       } else if (status == HistoryItem.Status.SKIMMED) {
@@ -161,12 +163,12 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
     Cursor cursor = getCursor();
     cursor.moveToPosition(position);
 
-    int volume = cursor.getInt(cursor.getColumnIndex("volume"));
+    int volume = cursor.getInt(cursor.getColumnIndex(getDataModel().getVolumeColumn()));
 
-    if (volume >= 1 && volume <= 8)
+    if (volume >= 1 && volume <= getDataModel().getSectionBoundary(0))
       return ID_SECTION_1;
 
-    if (volume >= 9 && volume <= 33)
+    if (volume >= getDataModel().getSectionBoundary(0)+1 && volume <= getDataModel().getSectionBoundary(1))
       return ID_SECTION_2;
 
     return ID_SECTION_3;

@@ -124,7 +124,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     mPage = savedInstanceState.getInt(Constants.PAGE_KEY);
     mLanguage = BookDatabaseHelper.Language.values()[savedInstanceState.getInt(Constants.LANGUAGE_KEY)];
     mShowButtons = savedInstanceState.getBoolean(Constants.BUTTON_KEY);
-    dataModel = ETDataModelCreator.create(mLanguage);
+    dataModel = ETDataModelCreator.create(mLanguage, getActivity());
 
   }
 
@@ -162,8 +162,11 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       public Bundle buildArguments(Cursor cursor) {
         Bundle args = new Bundle();
         args.putString(Constants.KEYWORDS_KEY, mKeywords);
-        args.putString(Constants.CONTENT_KEY, cursor.getString(cursor.getColumnIndex("content")));
-        args.putInt(Constants.NUMBER_KEY, cursor.getInt(cursor.getColumnIndex("number")));
+        args.putString(Constants.CONTENT_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getContentColumn())));
+        args.putInt(Constants.NUMBER_KEY, cursor.getInt(cursor.getColumnIndex(dataModel.getPageNumberColumn())));
+        if (dataModel.hasFooter()) {
+          args.putString(Constants.FOOTER_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getFooterColumn())).trim());
+        }
         return args;
       }
     };
@@ -268,7 +271,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       if (dataModel != null) {
         dataModel.closeDatabase();
       }
-      dataModel = ETDataModelCreator.create(language);
+      dataModel = ETDataModelCreator.create(language, getActivity());
       mLanguage = language;
     }
 
@@ -317,6 +320,9 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   }
 
   private void updateSubtitle(final int volume, final int page) {
+    if (getActivity() == null) {
+      return;
+    }
     dataModel.getItemsAtPage(volume, page, new BookDatabaseHelper.OnGetItemsListener() {
       @Override
       public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {

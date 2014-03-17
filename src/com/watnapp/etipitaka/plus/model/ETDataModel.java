@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.model;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -13,11 +14,15 @@ import java.io.File;
 public abstract class ETDataModel {
 
   protected SQLiteDatabase db;
+  protected Context mContext;
 
   abstract protected String getDatabasePath();
   abstract public BookDatabaseHelper.Language getLanguage();
+  abstract public String getContentColumn();
+  abstract public String getPageNumberColumn();
 
   abstract public void getItemsAtPage(int volume, int page, BookDatabaseHelper.OnGetItemsListener listener);
+  abstract public void getComparingItemsAtPage(int volume, int page, BookDatabaseHelper.OnGetItemsListener listener);
   abstract public Cursor read(int volume, int page);
   abstract public int getMaximumPageNumber(int volume);
   abstract public int getMinimumItemNumber(int volume);
@@ -27,6 +32,11 @@ public abstract class ETDataModel {
   abstract public Integer[] getPagesByItem(int volume, int item);
   abstract public void search(String keywords, BookDatabaseHelper.OnSearchListener listener, Integer[] volumes);
   abstract public void search(String keywords, BookDatabaseHelper.OnSearchListener listener);
+  abstract public int getSectionBoundary(int index);
+
+  public ETDataModel(Context context) {
+    this.mContext = context;
+  }
 
   public void openDatabase() {
     if ((db == null || !db.isOpen()) && (new File(getDatabasePath())).exists()) {
@@ -46,5 +56,33 @@ public abstract class ETDataModel {
 
   public int getMinimumPageNumber(int volume) {
     return 1;
+  }
+
+  public String getVolumeColumn() {
+    return "volume";
+  }
+
+  public int convertVolume(int volume, int section, int item) {
+    return volume;
+  }
+
+  public int getComparingVolume(int volume, int page) {
+    return volume;
+  }
+
+  public boolean hasFooter() {
+    return false;
+  }
+
+  public String getFooterColumn() {
+    return null;
+  }
+
+  public Integer[] getPagesByItem(int volume, int item, boolean needConvertToSiamrat) {
+    return getPagesByItem(volume, item);
+  }
+
+  public int getPageByItem(int volume, int item, int section, boolean needConvertToSiamrat) {
+    return getPageById(getPageIdByItem(volume, item, section));
   }
 }

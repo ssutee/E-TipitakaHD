@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.model;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
@@ -12,6 +13,10 @@ import java.util.ArrayList;
  * Created by sutee on 4/2/14.
  */
 abstract public class ETSiamratDataModel extends ETDataModel {
+
+  public ETSiamratDataModel(Context context) {
+    super(context);
+  }
 
   @Override
   protected String getDatabasePath() {
@@ -61,12 +66,17 @@ abstract public class ETSiamratDataModel extends ETDataModel {
   }
 
   @Override
+  public void getComparingItemsAtPage(int volume, int page, BookDatabaseHelper.OnGetItemsListener listener) {
+    getItemsAtPage(volume, page, listener);
+  }
+
+  @Override
   public Cursor read(int volume, int page) {
     openDatabase();
     Cursor cursor = db.query("page", null, "language = ? AND volume = ?",
         new String[] {String.valueOf(getLanguage().getCode()), String.valueOf(volume)}, null, null, null);
     cursor.moveToFirst();
-    if (page >= 0 && page <= cursor.getCount()) {
+    if (page > 0 && page <= cursor.getCount()) {
       cursor.moveToPosition(page-1);
     }
     return cursor;
@@ -260,5 +270,39 @@ abstract public class ETSiamratDataModel extends ETDataModel {
         }
       }
     }).start();
+  }
+
+  @Override
+  public void search(String keywords, BookDatabaseHelper.OnSearchListener listener) {
+    search(keywords, listener,
+        new Integer[] {
+            1,2,3,4,5,6,7,8,9,10,
+            11,12,13,14,15,16,17,18,19,20,
+            21,22,23,24,25,26,27,28,29,30,
+            31,32,33,34,35,36,37,38,39,40,
+            41,42,43,44,45
+        }
+    );
+  }
+
+  @Override
+  public String getContentColumn() {
+    return "content";
+  }
+
+  @Override
+  public String getPageNumberColumn() {
+    return "number";
+  }
+
+  @Override
+  public int getSectionBoundary(int index) {
+    if (index == 0) {
+      return 8;
+    }
+    if (index == 1) {
+      return 33;
+    }
+    return 45;
   }
 }

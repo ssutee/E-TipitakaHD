@@ -21,17 +21,28 @@ import com.watnapp.etipitaka.plus.R;
 
 public class BookListAdapter extends BaseAdapter implements StickyListHeadersAdapter {
 
-  private String[] mTitles;
-  private String[] mSections;
+  public interface BookListAdapterDataSource {
+    public int getTitlesArrayId();
+    public int getSectionsArrayId();
+  }
+
+  private BookListAdapterDataSource mDataSource;
 
   @Inject
   private Context mContext;
 
   @Inject
-  public BookListAdapter(Context context) {
+  public BookListAdapter(Context context, BookListAdapterDataSource dataSource) {
     mContext = context;
-    mTitles = context.getResources().getStringArray(R.array.book_titles_with_number);
-    mSections = context.getResources().getStringArray(R.array.sections);
+    mDataSource = dataSource;
+  }
+
+  private String[] getTitles() {
+    return mContext.getResources().getStringArray(mDataSource.getTitlesArrayId());
+  }
+
+  private String[] getSections() {
+    return mContext.getResources().getStringArray(mDataSource.getSectionsArrayId());
   }
 
   @Override
@@ -45,12 +56,12 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
 
   @Override
   public int getCount() {
-    return mTitles.length;
+    return getTitles().length;
   }
 
   @Override
   public Object getItem(int position) {
-    return mTitles[position];
+    return getTitles()[position];
   }
 
   @Override
@@ -73,7 +84,7 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
     } else {
       viewHolder = (ViewHolder) convertView.getTag();
     }
-    viewHolder.text1.setText(mTitles[position]);
+    viewHolder.text1.setText(getTitles()[position]);
     return convertView;
   }
 
@@ -92,16 +103,15 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
     }
 
     if (getHeaderId(position) == 1) {
-      viewHolder.text1.setText(mSections[0]);
+      viewHolder.text1.setText(getSections()[0]);
     } else if (getHeaderId(position) == 2) {
-      viewHolder.text1.setText(mSections[1]);
+      viewHolder.text1.setText(getSections()[1]);
     } else {
-      viewHolder.text1.setText(mSections[2]);
+      viewHolder.text1.setText(getSections()[2]);
     }
 
     return convertView;
   }
-
 
   static private class HeaderViewHolder {
     TextView text1;

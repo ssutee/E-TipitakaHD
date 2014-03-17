@@ -37,15 +37,8 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
   private TabsAdapter mTabsAdapter;
   private E_TipitakaApplication application;
 
-
-  @InjectView(R.id.rdg_languages)
-  private RadioGroup radioGroup;
-
-  @InjectView(R.id.rbt_pali)
-  private RadioButton radioButtonPali;
-
-  @InjectView(R.id.rbt_thai)
-  private RadioButton radioButtonThai;
+  @InjectView(R.id.spn_languages)
+  private Spinner spinner;
 
   public void setCurrentTab(int index) {
     mTabHost.setCurrentTab(index);
@@ -74,32 +67,27 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
       tv.setTextSize(getResources().getDimension(R.dimen.tabwidget_text_size)/scale);
     }
 
-    radioButtonThai.setChecked(application.getLanguage() == BookDatabaseHelper.Language.THAI);
-    radioButtonPali.setChecked(application.getLanguage() == BookDatabaseHelper.Language.PALI);
-
-    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+        R.array.full_languages, android.R.layout.simple_spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(adapter);
+    spinner.setSelection(application.getLanguage().getCode());
+    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
-      public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-          case R.id.rbt_thai:
-            application.setLanguage(BookDatabaseHelper.Language.THAI);
-            getActivity().getContentResolver().notifyChange(Constants.LANGUAGE_CHANGE_URI, null);
-            break;
-          case R.id.rbt_pali:
-            application.setLanguage(BookDatabaseHelper.Language.PALI);
-            getActivity().getContentResolver().notifyChange(Constants.LANGUAGE_CHANGE_URI, null);
-            break;
-        }
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        application.setLanguage(BookDatabaseHelper.Language.values()[position]);
+        getActivity().getContentResolver().notifyChange(Constants.LANGUAGE_CHANGE_URI, null);
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+
       }
     });
   }
 
   public void setRadioButton(BookDatabaseHelper.Language language) {
-    if (language == BookDatabaseHelper.Language.THAI) {
-      radioButtonThai.setChecked(true);
-    } else {
-      radioButtonPali.setChecked(true);
-    }
+    spinner.setSelection(language.getCode());
   }
 
   @Override

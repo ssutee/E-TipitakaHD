@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.model;
 
+import android.content.Context;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 /**
@@ -7,12 +8,16 @@ import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
  */
 
 public class ETDataModelCreator {
-  public static ETDataModel create(BookDatabaseHelper.Language language) {
+  public static ETDataModel create(BookDatabaseHelper.Language language, Context context) {
     switch (language) {
       case PALI:
-        return new ETPaliSiamratDataModel();
+        return new ETPaliSiamratDataModel(context);
       case THAI:
-        return new ETThaiSiamratDataModel();
+        return new ETThaiSiamratDataModel(context);
+      case THAIMM:
+        return new ETThaiMahaMakutDataModel(context);
+      case THAIMC:
+        return new ETThaiMahaChulaDataModel(context);
     }
     return null;
   }

@@ -9,6 +9,8 @@
     <string name="thai">ไทย</string>
     <string name="pali">บาลี</string>
     <string name="thai_full_name"> พระไตรปิฎกไทย (ฉบับหลวง) </string>
+    <string name="thaimm_full_name"> พระไตรปิฎกไทย (ฉบับมหามกุฏฯ) </string>
+    <string name="thaimc_full_name"> พระไตรปิฎกไทย (ฉบับมหาจุฬาฯ) </string>
     <string name="pali_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ) </string>
     <string name="subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s ข้อที่ %4$s</string>
     <string name="favorite_template">เล่มที่ %1$s หน้าที่ %2$s ข้อที่ %3$s</string>
@@ -36,7 +38,8 @@
     <string name="abbr_section3">อภิ.(%1$s)</string>
     <string name="not_found">ไม่พบข้อมูล</string>
     <string name="seq_thai_numbers">๐๑๒๓๔๕๖๗๘๙</string>
-    <string name="regex_item_number">\\n\\s*\\[[๐๑๒๓๔๕๖๗๘๙]+?\\]|^\\s*\\[[๐๑๒๓๔๕๖๗๘๙]+?\\]</string>
+    <string name="regex_item_number_1">^(\\s*)(\\{[๐๑๒๓๔๕๖๗๘๙]+\\})*(\\s*)\\[([๐๑๒๓๔๕๖๗๘๙-]+)\\]</string>
+    <string name="regex_item_number_2">^(\\s*)\\{([๐๑๒๓๔๕๖๗๘๙]+)\\}</string>
     <string name="select_item">เลือกข้อที่ต้องการ</string>
     <string name="select_page">เลือกหน้าที่ต้องการ</string>
     <string name="font_family_new">
@@ -98,6 +101,7 @@
                 %3$s
                 <style type=\"text/css\">
                     body { color:%4$s; background-color:%5$s; }
+                    p { margin-bottom:0px; padding-bottom:0px; }
                 </style>
                 <script>
                     function scrollToElement(theElement) {
@@ -126,12 +130,13 @@
             </head>
             <body style=\"font-size:%2$s; font-family:\'TH SarabunPSK\'\">
                 <p style=\"white-space: pre-wrap;\">%1$s</p>
+                <div style=\"white-space: pre-wrap; font-size:80%%; color:green;\">%6$s</div>
             </body>
         </html>
     ]]>
     </string>
     <string name="html_dict_template">
-        <![CDATA[
+    <![CDATA[
         <html>
             <head>
                 %4$s
@@ -183,4 +188,8 @@
     <string name="black_color">สีดำ</string>
     <string name="white_color">สีขาว</string>
     <string name="sepia_color">สีน้ำตาลอ่อน</string>
+    <string name="select_langauge">เลือกภาษาที่ต้องการ</string>
+    <string name="siamrat">สยามรัฐ</string>
+    <string name="mahachula">มหาจุฬาฯ</string>
+    <string name="choose_items_index_system">เลือกระบบเลขข้อที่ต้องการ</string>
 </resources>

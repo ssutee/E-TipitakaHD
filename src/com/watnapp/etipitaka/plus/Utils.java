@@ -43,11 +43,8 @@ public class Utils {
   }
 
   public static String getSubtitle(Context context, Language language, int volume, int page, String item) {
-    return context.getString(R.string.subtitle_template,
-        context.getString(language == Language.THAI
-            ? R.string.thai_full_name : R.string.pali_full_name),
-        Utils.convertToThaiNumber(context, volume),
-        Utils.convertToThaiNumber(context, page), item);
+    return context.getString(R.string.subtitle_template, language.getFullName(context),
+        Utils.convertToThaiNumber(context, volume), Utils.convertToThaiNumber(context, page), item);
   }
 
   public static String readTextFile(String path) throws IOException {

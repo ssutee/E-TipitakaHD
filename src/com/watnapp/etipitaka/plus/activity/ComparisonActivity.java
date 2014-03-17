@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
-import com.google.inject.Inject;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
@@ -52,9 +51,6 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   @InjectExtra(Constants.PAGE_KEY)
   private int mPage;
 
-  @Inject
-  private BookDatabaseHelper mBookDatabaseHelper;
-
   private Handler mHandler = new Handler();
   private BookDatabaseHelper.Language mLanguage1;
   private BookDatabaseHelper.Language mLanguage2;
@@ -70,17 +66,18 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
     mLanguage1 = Language.values()[mLanguageCode];
     mLanguage2 = Language.values()[mComparingLanguageCode];
 
-    mDataModel1 = ETDataModelCreator.create(mLanguage1);
-    mDataModel2 = ETDataModelCreator.create(mLanguage2);
+    mDataModel1 = ETDataModelCreator.create(mLanguage1, this);
+    mDataModel2 = ETDataModelCreator.create(mLanguage2, this);
 
-    int page2 = mDataModel2.getPageById(mDataModel2.getPageIdByItem(mVolume, mItem, mSection));
+    int volume = mDataModel2.convertVolume(mDataModel1.getComparingVolume(mVolume, mPage), mSection, mItem);
+    int page2 = mDataModel2.getPageByItem(volume, mItem, mSection, true);
 
     mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, mKeywords, true);
     getSupportFragmentManager().beginTransaction()
         .add(R.id.left_reader_fragment,
             mLeftFragment, "left").commit();
 
-    mRightFragment = ReaderFragment.newInstance(mLanguage2, mVolume, page2, "", true);
+    mRightFragment = ReaderFragment.newInstance(mLanguage2, volume, page2, "", true);
     getSupportFragmentManager().beginTransaction()
         .add(R.id.right_reader_fragment,
             mRightFragment, "right").commit();
@@ -102,10 +99,10 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   }
 
   @Override
-  public void onCompareButtonClick(final Language language, final int volume, int page) {
+  public void onCompareButtonClick(final Language language, final int volume, final int page) {
     final ETDataModel sourceModel = language == mDataModel1.getLanguage() ? mDataModel1 : mDataModel2;
     final ETDataModel targetModel = language == mDataModel1.getLanguage() ? mDataModel2 : mDataModel1;
-    sourceModel.getItemsAtPage(volume, page, new BookDatabaseHelper.OnGetItemsListener() {
+    sourceModel.getComparingItemsAtPage(volume, page, new BookDatabaseHelper.OnGetItemsListener() {
       @Override
       public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
         mHandler.post(new Runnable() {
@@ -124,8 +121,9 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
                         ? mLanguage2 : mLanguage1;
                     ReaderFragment targetFragment = (language.getCode() == mLanguageCode)
                         ? mRightFragment : mLeftFragment;
-                    int pageId = targetModel.getPageIdByItem(volume, items[which], sections[which]);
-                    targetFragment.openBook(targetLanguage, volume, mBookDatabaseHelper.getPageById(pageId));
+                    int volume2 = targetModel.convertVolume(sourceModel.getComparingVolume(volume, page), sections[which], items[which]);
+                    int page2 = targetModel.getPageByItem(volume2, items[which], sections[which], true);
+                    targetFragment.openBook(targetLanguage, volume2, page2);
                     targetFragment.getCurrentPageFragment().scrollToItem(items[which]);
                   }
                 }).create().show();
