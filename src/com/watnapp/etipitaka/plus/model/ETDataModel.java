@@ -62,6 +62,14 @@ public abstract class ETDataModel {
     return "volume";
   }
 
+  public int getVolume(Cursor cursor) {
+    return Integer.parseInt(cursor.getString(cursor.getColumnIndex(getVolumeColumn())));
+  }
+
+  public int getPageNumber(Cursor cursor) {
+    return Integer.parseInt(cursor.getString(cursor.getColumnIndex(getPageNumberColumn())));
+  }
+
   public int convertVolume(int volume, int section, int item) {
     return volume;
   }

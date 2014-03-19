@@ -163,7 +163,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
         Bundle args = new Bundle();
         args.putString(Constants.KEYWORDS_KEY, mKeywords);
         args.putString(Constants.CONTENT_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getContentColumn())));
-        args.putInt(Constants.NUMBER_KEY, cursor.getInt(cursor.getColumnIndex(dataModel.getPageNumberColumn())));
+        args.putInt(Constants.NUMBER_KEY, dataModel.getPageNumber(cursor));
         if (dataModel.hasFooter()) {
           args.putString(Constants.FOOTER_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getFooterColumn())).trim());
         }

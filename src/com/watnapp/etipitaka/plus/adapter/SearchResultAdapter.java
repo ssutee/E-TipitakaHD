@@ -94,14 +94,16 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
           break;
       }
     } else {
+      int volume = getDataModel().getVolume(cursor);
+      int page = getDataModel().getPageNumber(cursor);
       viewHolder.text1.setText(context.getString(R.string.n_volume_n_page,
-          Utils.convertToThaiNumber(context, cursor.getInt(cursor.getColumnIndex(getDataModel().getVolumeColumn()))),
-          Utils.convertToThaiNumber(context, cursor.getInt(cursor.getColumnIndex(getDataModel().getPageNumberColumn())))));
+          Utils.convertToThaiNumber(context, volume), Utils.convertToThaiNumber(context, page)));
     }
 
     if (getItemViewType(cursor.getPosition()) == TYPE_CONTENT) {
-      HistoryItem.Status status = getStatus(cursor.getInt(cursor.getColumnIndex(getDataModel().getVolumeColumn())),
-          cursor.getInt(cursor.getColumnIndex(getDataModel().getPageNumberColumn())));
+      int volume = getDataModel().getVolume(cursor);
+      int page = getDataModel().getPageNumber(cursor);
+      HistoryItem.Status status = getStatus(volume, page);
       if (status == HistoryItem.Status.READ) {
         view.setBackgroundResource(R.drawable.read_color);
       } else if (status == HistoryItem.Status.SKIMMED) {
@@ -163,7 +165,7 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
     Cursor cursor = getCursor();
     cursor.moveToPosition(position);
 
-    int volume = cursor.getInt(cursor.getColumnIndex(getDataModel().getVolumeColumn()));
+    int volume = getDataModel().getVolume(cursor);
 
     if (volume >= 1 && volume <= getDataModel().getSectionBoundary(0))
       return ID_SECTION_1;

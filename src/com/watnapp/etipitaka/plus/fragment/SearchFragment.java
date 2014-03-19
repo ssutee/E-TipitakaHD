@@ -8,6 +8,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -25,6 +26,7 @@ import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockFragment;
 import com.google.inject.Inject;
 import com.touchsi.widget.ClearableAutoCompleteTextView;
+import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.E_TipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.activity.MainActivity;
@@ -83,23 +85,38 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   private ContentObserver mContentObserver;
 
   @Override
-  public void onAttach(Activity activity) {
+  public void onAttach(final Activity activity) {
     super.onAttach(activity);
     application = (E_TipitakaApplication) activity.getApplication();
     dataModel = ETDataModelCreator.create(application.getLanguage(), activity);
     mContentObserver = new ContentObserver(mHandler) {
       @Override
-      public void onChange(boolean selfChange) {
-        mListView.post(new Runnable() {
-          @Override
-          public void run() {
-            mAdapter.notifyDataSetChanged();
-          }
-        });
+      public void onChange(boolean selfChange, Uri uri) {
+        if (uri.compareTo(DatabaseProvider.HISTORY_ITEM_CONTENT_URI) == 0) {
+          mListView.post(new Runnable() {
+            @Override
+            public void run() {
+              mAdapter.notifyDataSetChanged();
+            }
+          });
+        } else if (uri.compareTo(Constants.LANGUAGE_CHANGE_URI) == 0) {
+          dataModel = ETDataModelCreator.create(application.getLanguage(), activity);
+          mListView.post(new Runnable() {
+            @Override
+            public void run() {
+              mAdapter.swapCursor(null);
+              mAdapter.notifyDataSetChanged();
+            }
+          });
+        }
       }
     };
+
     activity.getContentResolver()
         .registerContentObserver(DatabaseProvider.HISTORY_ITEM_CONTENT_URI, false, mContentObserver);
+
+    activity.getContentResolver()
+        .registerContentObserver(Constants.LANGUAGE_CHANGE_URI, false, mContentObserver);
 
     mProgressDialog = new ProgressDialog(activity);
     mProgressDialog.setCancelable(false);
@@ -280,9 +297,9 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       if (cursor.getCount() > 3) {
         cursor.moveToPosition(3);
         while (!cursor.isAfterLast()) {
-          sb.append(cursor.getInt(cursor.getColumnIndex(dataModel.getVolumeColumn())));
+          sb.append(dataModel.getVolume(cursor));
           sb.append(':');
-          sb.append(cursor.getInt(cursor.getColumnIndex(dataModel.getPageNumberColumn())));
+          sb.append(dataModel.getPageNumber(cursor));
           if (!cursor.isLast()) {
             sb.append(',');
           }
@@ -317,8 +334,10 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       application.setHistory(mCurrentHistory);
       Cursor cursor = mAdapter.getCursor();
       cursor.moveToPosition(position);
-      int volume = cursor.getInt(cursor.getColumnIndex(dataModel.getVolumeColumn()));
-      int page = cursor.getInt(cursor.getColumnIndex(dataModel.getPageNumberColumn()));
+
+      int volume = dataModel.getVolume(cursor);
+      int page = dataModel.getPageNumber(cursor);
+
       MainActivity activity = (MainActivity) getActivity();
       activity.openBook(application.getLanguage(), volume, page, mKeywords);
       mHistoryItemDaoHelper.insertOrUpdate(mCurrentHistory.getId(), volume, page, HistoryItem.Status.READ);
@@ -345,9 +364,9 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
         int volume = Integer.parseInt(tokens[0]);
         int page = Integer.parseInt(tokens[1]);
         itemCursor.addRow(new Object[] { id, volume, page });
-        if (volume <= 8) {
+        if (volume <= dataModel.getSectionBoundary(0)) {
           mResultsCount[0] += 1;
-        } else if (volume >=9 && volume <= 33) {
+        } else if (volume >= dataModel.getSectionBoundary(0)+1 && volume <= dataModel.getSectionBoundary(1)) {
           mResultsCount[1] += 1;
         } else {
           mResultsCount[2] += 1;

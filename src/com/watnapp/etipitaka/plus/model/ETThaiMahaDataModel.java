@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
+import android.util.Log;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -13,6 +14,9 @@ import java.util.Map;
  * Created by sutee on 19/2/14.
  */
 public abstract class ETThaiMahaDataModel extends ETDataModel {
+
+  protected static final String TAG = "ETThaiMahaDataModel";
+
   public ETThaiMahaDataModel(Context context) {
     super(context);
   }
@@ -165,10 +169,13 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
 
           if (volume >= 1 && volume <= getSectionBoundary(0)) {
             totalPages[0] += cursor.getCount();
+            Log.d(TAG, "1:" + volume + ":" + cursor.getCount());
           } else if (volume >= getSectionBoundary(0)+1 && volume <= getSectionBoundary(1)) {
             totalPages[1] += cursor.getCount();
+            Log.d(TAG, "2:" + volume + ":" + cursor.getCount());
           } else {
             totalPages[2] += cursor.getCount();
+            Log.d(TAG, "3:" + volume + ":" + cursor.getCount());
           }
 
           cursors[i+1] = cursor;
