@@ -14,6 +14,7 @@
     <string name="pali_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ) </string>
     <string name="subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s ข้อที่ %4$s</string>
     <string name="favorite_template">เล่มที่ %1$s หน้าที่ %2$s ข้อที่ %3$s</string>
+    <string name="favorite_no_item_template">เล่มที่ %1$s หน้าที่ %2$s</string>
     <string name="non_item_subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s</string>
     <string name="go_to">ข้ามไปที่</string>
     <string name="go_to_page">หน้าที่</string>
@@ -192,4 +193,5 @@
     <string name="siamrat">สยามรัฐ</string>
     <string name="mahachula">มหาจุฬาฯ</string>
     <string name="choose_items_index_system">เลือกระบบเลขข้อที่ต้องการ</string>
+    <string name="unsupported_old_version_file">ไม่สามารถนำเข้าไฟล์รุ่นเก่า</string>
 </resources>

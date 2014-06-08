@@ -27,25 +27,27 @@ public class Constants {
   public static final int MENU_ITEM_BLACK_COLOR         = 1015;
   public static final int MENU_ITEM_WHITE_COLOR         = 1016;
   public static final int MENU_ITEM_SEPIA_COLOR         = 1017;
+  public static final int MENU_ITEM_EDIT                = 1018;
 
 
   public static final int GOTO_PAGE_ID      = 0;
   public static final int GOTO_ITEM_ID      = 1;
   public static final int TAKE_NOTE_ID      = 2;
   public static final int OPEN_NOTE_ID      = 3;
+  public static final int EDIT_NOTE_ID      = 4;
 
   public static final int HISTORY_LOADER    = 0;
   public static final int FAVORITE_LOADER   = 1;
 
   public static final Uri LANGUAGE_CHANGE_URI = Uri.parse("content://etipitaka.com/language_change");
-  public static final String DATABASE_URL     = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v2.zip";
+  public static final String DATABASE_URL     = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v4.zip";
 
   public static final String DATABASE_FOLDER    = Environment.getExternalStorageDirectory().getPath() + "/ETPK";
   public static final String DATABASE_PATH      = DATABASE_FOLDER + "/etipitaka_plus.db";
   public static final String MM_DATABASE_PATH   = DATABASE_FOLDER + "/thaimm.db";
   public static final String MC_DATABASE_PATH   = DATABASE_FOLDER + "/thaimc.db";
-  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v2.zip";
-  public static final long DATABASE_SIZE        = 158919680;
+  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v4.zip";
+  public static final long DATABASE_SIZE        = 185511936;
 
   public static final String LANGUAGE_KEY           = "language";
   public static final String COMPARING_LANGUAGE_KEY = "comparing_language";

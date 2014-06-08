@@ -28,6 +28,7 @@ import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.model.*;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import roboguice.inject.ContentView;
@@ -36,6 +37,8 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -581,11 +584,168 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     super.onActivityResult(requestCode, resultCode, data);
   }
 
-  private void importData(final String path) {
-    if (!(new File(path).exists())) {
-      Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
-      return;
+
+  private String unpackAppleImportData(String filePath) {
+    InputStream is;
+    ZipInputStream zis;
+    ByteArrayOutputStream sout = new ByteArrayOutputStream();
+    StringBuffer sb = new StringBuffer();
+    try {
+      is = new FileInputStream(filePath);
+      zis = new ZipInputStream(new BufferedInputStream(is));
+      ZipEntry ze;
+      byte[] buffer = new byte[1024];
+      int count;
+      while ((ze = zis.getNextEntry()) != null) {
+        while ((count = zis.read(buffer)) != -1) {
+          sout.write(buffer, 0, count);
+          sb.append(sout.toString("utf-8"));
+          sout.reset();
+        }
+        zis.closeEntry();
+      }
+      sout.close();
+      zis.close();
+      return sb.toString();
+    } catch(IOException e) {
+      e.printStackTrace();
+      return null;
     }
+  }
+
+  private void importAndroidData(String path) {
+    try {
+      JSONObject jsonObject = new JSONObject(Utils.readTextFile(path));
+      Log.d(TAG, jsonObject.toString());
+
+      mFavoriteDaoHelper.restoreJSONArray(jsonObject.getJSONArray(FavoriteTable.TABLE_NAME));
+      mHistoryDaoHelper.restoreJSONArray(jsonObject.getJSONArray(HistoryTable.TABLE_NAME));
+
+      mHandler.post(new Runnable() {
+        @Override
+        public void run() {
+          Toast.makeText(MainActivity.this, R.string.import_complete, Toast.LENGTH_SHORT).show();
+        }
+      });
+
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private JSONArray convertBookmarksAppleData(JSONArray bookmarks) throws JSONException {
+    JSONArray results = new JSONArray();
+    for (int i=0; i < bookmarks.length(); ++i) {
+      JSONObject originObj = (JSONObject) bookmarks.get(i);
+      JSONObject convertedObj = new JSONObject();
+      convertedObj.put(FavoriteTable.FavoriteColumns.VOLUME, originObj.getInt("volume"));
+      convertedObj.put(FavoriteTable.FavoriteColumns.PAGE, originObj.getInt("page"));
+      convertedObj.put(FavoriteTable.FavoriteColumns.LANGUAGE, originObj.getInt("code")-1);
+      convertedObj.put(FavoriteTable.FavoriteColumns.ITEM, 0);
+      convertedObj.put(FavoriteTable.FavoriteColumns.NOTE, originObj.getString("note"));
+      convertedObj.put(FavoriteTable.FavoriteColumns.SCORE, originObj.getInt("rank"));
+      results.put(convertedObj);
+    }
+    return results;
+  }
+
+  private JSONArray convertHistoriesAppleData(JSONArray histories) throws JSONException {
+    JSONArray results = new JSONArray();
+    for (int i=0; i < histories.length(); ++i) {
+      JSONObject originObj = (JSONObject) histories.get(i);
+      JSONObject convertedObj = new JSONObject();
+      convertedObj.put(HistoryTable.HistoryColumns.KEYWORDS, originObj.getString("keywords"));
+      convertedObj.put(HistoryTable.HistoryColumns.SECTION1, true);
+      convertedObj.put(HistoryTable.HistoryColumns.SECTION2, true);
+      convertedObj.put(HistoryTable.HistoryColumns.SECTION3, true);
+      convertedObj.put(HistoryTable.HistoryColumns.CONTENT, originObj.getString("items").replace(' ', ','));
+      convertedObj.put(HistoryTable.HistoryColumns.LANGUAGE, originObj.getInt("code")-1);
+      convertedObj.put(HistoryTable.HistoryColumns.SCORE, originObj.getBoolean("starred") ? 1 : 0);
+      int b1 = 8, b2 = 33;
+      if (originObj.getInt("code") == 3) {
+        b1 = 10;
+        b2 = 74;
+      }
+      int result1 = 0, result2 = 0, result3 = 0;
+      if (originObj.getString("items").length() > 0) {
+        for (String token : originObj.getString("items").split("\\s+")) {
+          int volume = Integer.parseInt(token.split(":")[0]);
+          if (volume <= b1) {
+            result1 += 1;
+          } else if (volume <= b2) {
+            result2 += 1;
+          } else {
+            result3 += 1;
+          }
+        }
+      }
+      convertedObj.put(HistoryTable.HistoryColumns.RESULT1, result1);
+      convertedObj.put(HistoryTable.HistoryColumns.RESULT2, result2);
+      convertedObj.put(HistoryTable.HistoryColumns.RESULT3, result3);
+      JSONArray items = new JSONArray();
+      if (originObj.getString("items").length() > 0) {
+        String[] tokens = originObj.getString("items").split("\\s+");
+        for (String index : originObj.getString("read").split("\\s+")) {
+          if (index.length() == 0) {
+            continue;
+          }
+          String[] pair = tokens[Integer.parseInt(index)].split(":");
+          JSONObject item =  new JSONObject();
+          item.put(HistoryItemTable.HistoryItemColumns.VOLUME, Integer.parseInt(pair[0]));
+          item.put(HistoryItemTable.HistoryItemColumns.PAGE, Integer.parseInt(pair[1]));
+          item.put(HistoryItemTable.HistoryItemColumns.STATUS, 1);
+          items.put(item);
+        }
+        for (String index : originObj.getString("skimmed").split("\\s+")) {
+          if (index.length() == 0) {
+            continue;
+          }
+          String[] pair = tokens[Integer.parseInt(index)].split(":");
+          JSONObject item =  new JSONObject();
+          item.put(HistoryItemTable.HistoryItemColumns.VOLUME, Integer.parseInt(pair[0]));
+          item.put(HistoryItemTable.HistoryItemColumns.PAGE, Integer.parseInt(pair[1]));
+          item.put(HistoryItemTable.HistoryItemColumns.STATUS, 2);
+          items.put(item);
+        }
+      }
+      convertedObj.put(HistoryItemTable.TABLE_NAME, items);
+      results.put(convertedObj);
+    }
+    return results;
+  }
+
+  private void importAppleData(String path) {
+    try {
+      JSONObject jsonObject = new JSONObject(unpackAppleImportData(path));
+      if (jsonObject.has("version") && jsonObject.getInt("version") > 1) {
+        JSONArray bookmarks = convertBookmarksAppleData(jsonObject.getJSONArray("bookmarks"));
+        JSONArray histories = convertHistoriesAppleData(jsonObject.getJSONArray("histories"));
+        mFavoriteDaoHelper.restoreJSONArray(bookmarks);
+        mHistoryDaoHelper.restoreJSONArray(histories);
+        mHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(MainActivity.this, R.string.import_complete, Toast.LENGTH_SHORT).show();
+          }
+        });
+      } else {
+        mHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(MainActivity.this, R.string.unsupported_old_version_file, Toast.LENGTH_SHORT).show();
+          }
+        });
+      }
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void importData(final String path) {
     final ProgressDialog dialog = new ProgressDialog(this);
     dialog.setIndeterminate(false);
     dialog.setCancelable(false);
@@ -595,26 +755,17 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     new Thread(new Runnable() {
       @Override
       public void run() {
-        try {
-          JSONObject jsonObject = new JSONObject(Utils.readTextFile(path));
-          Log.d(TAG, jsonObject.toString());
-
-          mFavoriteDaoHelper.restoreJSONArray(jsonObject.getJSONArray(FavoriteTable.TABLE_NAME));
-          mHistoryDaoHelper.restoreJSONArray(jsonObject.getJSONArray(HistoryTable.TABLE_NAME));
-
+        if (!(new File(path).exists())) {
           mHandler.post(new Runnable() {
             @Override
             public void run() {
-              Toast.makeText(MainActivity.this, R.string.import_complete, Toast.LENGTH_SHORT).show();
+              Toast.makeText(MainActivity.this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
             }
           });
-
-        } catch (FileNotFoundException e) {
-          e.printStackTrace();
-        } catch (IOException e) {
-          e.printStackTrace();
-        } catch (JSONException e) {
-          e.printStackTrace();
+        } else if (path.endsWith(".js")) {
+          importAndroidData(path);
+        } else if (path.endsWith(".json.etz")) {
+          importAppleData(path);
         }
         mHandler.post(new Runnable() {
           @Override

@@ -52,6 +52,8 @@ public class FavoriteFragment extends RoboSherlockListFragment
 
   private ContentObserver mContentObserver;
 
+  private Favorite selectedFavorite;
+
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
@@ -106,6 +108,7 @@ public class FavoriteFragment extends RoboSherlockListFragment
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
     if (v.getId() == android.R.id.list) {
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_OPEN, Menu.NONE, R.string.open_note);
+      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_EDIT, Menu.NONE, R.string.edit_note);
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
     }
   }
@@ -116,13 +119,16 @@ public class FavoriteFragment extends RoboSherlockListFragment
       AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
       Cursor cursor = mAdapter.getCursor();
       cursor.moveToPosition(info.position);
-      Favorite favorite = Favorite.newInstance(cursor, getActivity());
+      selectedFavorite = Favorite.newInstance(cursor, getActivity());
       switch (item.getItemId()) {
         case Constants.MENU_ITEM_OPEN:
-          openNote(favorite);
+          openNote(selectedFavorite);
+          return true;
+        case Constants.MENU_ITEM_EDIT:
+          editNote(selectedFavorite);
           return true;
         case Constants.MENU_ITEM_DELETE:
-          delete(favorite);
+          delete(selectedFavorite);
           return true;
       }
     }
@@ -142,13 +148,18 @@ public class FavoriteFragment extends RoboSherlockListFragment
         .create().show();
   }
 
-  private void openNote(Favorite favorite) {
+  private void editNote(Favorite favorite) {
     String message = Utils.getSubtitle(getActivity(),favorite.getLanguage(),
         favorite.getVolume(), favorite.getPage(),
         Utils.convertToThaiNumber(getActivity(), favorite.getItem()));
-    TextEntryDialogFragment.newInstance(0, message, Constants.OPEN_NOTE_ID, 5,
+    TextEntryDialogFragment.newInstance(0, message, Constants.EDIT_NOTE_ID, 5,
         TextEntryDialogFragment.InputMode.TEXT, favorite.getNote())
         .show(getChildFragmentManager(), "open_note_dialog");
+  }
+
+  private void openNote(Favorite favorite) {
+    MainActivity activity = (MainActivity) getActivity();
+    activity.openBook(favorite.getLanguage(), favorite.getVolume(), favorite.getPage(), "", favorite.getItem());
   }
 
   @Override
@@ -173,14 +184,15 @@ public class FavoriteFragment extends RoboSherlockListFragment
     Cursor cursor = mAdapter.getCursor();
     cursor.moveToPosition(position);
     Favorite favorite = Favorite.newInstance(cursor, getActivity());
-    MainActivity activity = (MainActivity) getActivity();
-    activity.openBook(favorite.getLanguage(), favorite.getVolume(), favorite.getPage(), "", favorite.getItem());
+    openNote(favorite);
   }
 
   @Override
   public void onTextEntryDialogPositiveButtonClick(String text, int id) {
-    if (id == Constants.OPEN_NOTE_ID) {
-      Log.d(TAG, text);
+    if (id == Constants.EDIT_NOTE_ID) {
+      selectedFavorite.setNote(text);
+      mDaoHelper.update(selectedFavorite);
+      getLoaderManager().restartLoader(Constants.FAVORITE_LOADER, null, this);
     }
   }
 

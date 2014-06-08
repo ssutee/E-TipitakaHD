@@ -3,6 +3,8 @@ package com.watnapp.etipitaka.plus.activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.UnzipUtility;
 import com.watnapp.etipitaka.plus.Utils;
+import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.FileDownloader;
 import roboguice.inject.ContentView;
 
@@ -50,12 +53,23 @@ public class StartupActivity extends RoboSherlockFragmentActivity implements Fil
     });
   }
 
+  private int getThaiMCDatabaseVersion() {
+    SQLiteDatabase db = SQLiteDatabase.openDatabase(Constants.MC_DATABASE_PATH, null, 0);
+    Cursor cursor = db.rawQuery("pragma user_version", null);
+    cursor.moveToFirst();
+    int version = Integer.parseInt(cursor.getString(0));
+    cursor.close();
+    db.close();
+    return version;
+  }
+
   private void checkSumDatabase(final Runnable runnableOnSuccess, final Runnable runnableOnFail) {
     new Thread(new Runnable() {
       @Override
       public void run() {
         if (new File(Constants.DATABASE_PATH).length()==Constants.DATABASE_SIZE
-            && new File(Constants.MC_DATABASE_PATH).exists() && new File(Constants.MM_DATABASE_PATH).exists()) {
+            && new File(Constants.MC_DATABASE_PATH).exists() && new File(Constants.MM_DATABASE_PATH).exists()
+            && getThaiMCDatabaseVersion() == 2) {
           Log.d(TAG, String.valueOf(new File(Constants.DATABASE_PATH).length()));
           mHandler.post(runnableOnSuccess);
         } else {

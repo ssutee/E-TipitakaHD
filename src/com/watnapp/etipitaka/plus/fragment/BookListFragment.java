@@ -16,6 +16,8 @@ import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.activity.MainActivity;
 import com.watnapp.etipitaka.plus.adapter.BookListAdapter;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.plus.model.ETDataModel;
+import com.watnapp.etipitaka.plus.model.ETDataModelCreator;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,15 +32,18 @@ public class BookListFragment extends RoboSherlockListFragment implements BookLi
   private ContentObserver mContentObserver;
   private Handler mHandler = new Handler();
   private BookListAdapter mAdapter;
+  private ETDataModel dataModel;
 
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
     application = (E_TipitakaApplication) activity.getApplication();
+    dataModel = ETDataModelCreator.create(application.getLanguage(), getActivity());
     mContentObserver = new ContentObserver(mHandler) {
       @Override
       public void onChange(boolean selfChange) {
         mAdapter.notifyDataSetChanged();
+        dataModel = ETDataModelCreator.create(application.getLanguage(), getActivity());
       }
     };
     activity.getContentResolver()
@@ -93,5 +98,10 @@ public class BookListFragment extends RoboSherlockListFragment implements BookLi
       return R.array.pali_sections;
     }
     return R.array.sections;
+  }
+
+  @Override
+  public int getSectionBoundary(int index) {
+    return dataModel.getSectionBoundary(index);
   }
 }

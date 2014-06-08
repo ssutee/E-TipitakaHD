@@ -60,7 +60,8 @@ public class FileExplorerActivity extends RoboSherlockListActivity {
     public boolean accept(File path) {
       return !path.getName().startsWith(".")
           && (path.isDirectory() || path.getName()
-          .toLowerCase(Locale.US).endsWith(".js"));
+          .toLowerCase(Locale.US).endsWith(".js") || path.getName()
+          .toLowerCase(Locale.US).endsWith(".json.etz"));
     }
   };
 

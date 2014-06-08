@@ -24,6 +24,7 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
   public interface BookListAdapterDataSource {
     public int getTitlesArrayId();
     public int getSectionsArrayId();
+    public int getSectionBoundary(int index);
   }
 
   private BookListAdapterDataSource mDataSource;
@@ -47,9 +48,9 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
 
   @Override
   public long getHeaderId(int position) {
-    if (position >= 0 && position <= 7)
+    if (position >= 0 && position < mDataSource.getSectionBoundary(0))
       return 1;
-    else if (position >= 8 && position <= 32)
+    else if (position >= mDataSource.getSectionBoundary(0) && position < mDataSource.getSectionBoundary(1))
       return 2;
     return 3;
   }

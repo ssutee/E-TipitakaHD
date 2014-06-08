@@ -46,10 +46,16 @@ public class FavoriteAdapter extends CursorAdapter {
   public void bindView(View view, Context context, Cursor cursor) {
     ViewHolder viewHolder = (ViewHolder) view.getTag();
     Favorite fav = Favorite.newInstance(cursor, context);
-    viewHolder.text1.setText(context.getString(com.watnapp.etipitaka.plus.R.string.favorite_template,
-        Utils.convertToThaiNumber(context, fav.getVolume()),
-        Utils.convertToThaiNumber(context, fav.getPage()),
-        Utils.convertToThaiNumber(context, fav.getItem())));
+    if (fav.getItem() > 0) {
+      viewHolder.text1.setText(context.getString(com.watnapp.etipitaka.plus.R.string.favorite_template,
+          Utils.convertToThaiNumber(context, fav.getVolume()),
+          Utils.convertToThaiNumber(context, fav.getPage()),
+          Utils.convertToThaiNumber(context, fav.getItem())));
+    } else {
+      viewHolder.text1.setText(context.getString(com.watnapp.etipitaka.plus.R.string.favorite_no_item_template,
+          Utils.convertToThaiNumber(context, fav.getVolume()),
+          Utils.convertToThaiNumber(context, fav.getPage())));
+    }
     viewHolder.text2.setText(fav.getNote());
   }
 

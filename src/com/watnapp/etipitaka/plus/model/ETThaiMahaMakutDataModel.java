@@ -50,7 +50,7 @@ public class ETThaiMahaMakutDataModel extends ETThaiMahaDataModel {
   @Override
   public int getSectionBoundary(int index) {
     if (index == 0) {
-      return 9;
+      return 10;
     }
     if (index == 1) {
       return 74;
