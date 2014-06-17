@@ -20,10 +20,8 @@ import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.E_TipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.adapter.HistoryAdapter;
-import com.watnapp.etipitaka.plus.model.DatabaseProvider;
-import com.watnapp.etipitaka.plus.model.History;
-import com.watnapp.etipitaka.plus.model.HistoryDaoHelper;
-import com.watnapp.etipitaka.plus.model.HistoryTable;
+import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.plus.model.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,7 +37,6 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
 
   private E_TipitakaApplication application;
 
-  @Inject
   private HistoryAdapter mAdapter;
 
   @Inject
@@ -82,6 +79,12 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     getLoaderManager().initLoader(Constants.HISTORY_LOADER, null, this);
+    mAdapter = new HistoryAdapter(getActivity()) {
+      @Override
+      public BookDatabaseHelper.Language getLanguage() {
+        return application.getLanguage();
+      }
+    };
   }
 
   @Override
@@ -159,7 +162,7 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
   public void onListItemClick(ListView l, View v, int position, long id) {
     MenuFragment parentFragment = (MenuFragment) getParentFragment();
     try {
-      OnHistorySelectedListener listener = (OnHistorySelectedListener)parentFragment;
+      OnHistorySelectedListener listener = parentFragment;
       parentFragment.setCurrentTab(1);
       Cursor cursor = mAdapter.getCursor();
       cursor.moveToPosition(position);

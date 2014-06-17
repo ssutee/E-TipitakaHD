@@ -75,15 +75,15 @@ public class History extends ModelBase {
   }
 
   public void setSections(SparseBooleanArray sections) {
-    setSection1(sections.get(0, false));
-    setSection2(sections.get(1, false));
-    setSection3(sections.get(2, false));
+    setSection1(sections != null && sections.get(0, false));
+    setSection2(sections != null && sections.get(1, false));
+    setSection3(sections != null && sections.get(2, false));
   }
 
   public void setResults(int[] results) {
-    setResult1(results[0]);
-    setResult2(results[1]);
-    setResult3(results[2]);
+    setResult1(results.length > 0 ? results[0] : 0);
+    setResult2(results.length > 1 ? results[1] : 0);
+    setResult3(results.length > 2 ? results[2] : 0);
   }
 
   public int getResult1() {

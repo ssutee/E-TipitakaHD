@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import com.watnapp.etipitaka.plus.model.ETDataModelCreator;
 import com.watnapp.etipitaka.plus.model.HistoryItem;
 import com.watnapp.etipitaka.plus.model.HistoryItemDaoHelper;
 import com.watnapp.etipitaka.plus.widget.MyWebView;
+import org.apache.commons.lang3.StringUtils;
 import roboguice.inject.InjectView;
 
 /**
@@ -162,7 +164,8 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       public Bundle buildArguments(Cursor cursor) {
         Bundle args = new Bundle();
         args.putString(Constants.KEYWORDS_KEY, mKeywords);
-        args.putString(Constants.CONTENT_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getContentColumn())));
+        String content = StringUtils.strip(cursor.getString(cursor.getColumnIndex(dataModel.getContentColumn())), "\n");
+        args.putString(Constants.CONTENT_KEY, content);
         args.putInt(Constants.NUMBER_KEY, dataModel.getPageNumber(cursor));
         if (dataModel.hasFooter()) {
           args.putString(Constants.FOOTER_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getFooterColumn())).trim());
@@ -275,9 +278,14 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       mLanguage = language;
     }
 
+    Log.d(TAG, "page = " + page);
+    page = page - dataModel.getMinimumPageNumber(volume) + 1;
     mKeywords = keywords;
     mVolume = volume;
     Cursor cursor = dataModel.read(volume);
+    Log.d(TAG, "total = " + cursor.getCount() + "");
+    Log.d(TAG, "page = " + page);
+
     cursor.moveToFirst();
     mPagerAdapter.swapCursor(cursor);
     mSeekBar.setProgress(0);
@@ -298,7 +306,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, int item) {
     openBook(language, volume, page, "");
     PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
-    if (fragment != null) {
+    if (fragment != null && item > 0) {
       fragment.scrollToItem(item);
     }
   }
@@ -327,18 +335,21 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       @Override
       public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
         final String thaiItem;
-        if (items.length > 1) {
+        if (items != null && items.length > 1) {
           thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]) + "-"
               + Utils.convertToThaiNumber(getActivity(), items[items.length - 1]);
-        } else if (items.length == 1) {
+        } else if (items != null && items.length == 1) {
           thaiItem = Utils.convertToThaiNumber(getActivity(), items[0]);
-        } else {
+        } else if (items != null) {
           thaiItem = Utils.convertToThaiNumber(getActivity(), 0);
+        } else {
+          thaiItem = "";
         }
         mHandler.post(new Runnable() {
           @Override
           public void run() {
-            mTextSubtitle.setText(Utils.getSubtitle(getActivity(), mLanguage, volume, page, thaiItem));
+            mTextSubtitle.setText(Utils.getSubtitle(getActivity(), mLanguage, volume,
+                page + dataModel.getMinimumPageNumber(volume) - 1, thaiItem));
           }
         });
       }

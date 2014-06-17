@@ -72,11 +72,16 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(adapter);
     spinner.setSelection(application.getLanguage().getCode());
+    spinner.setTag(R.id.pos, -1);
     spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         application.setLanguage(BookDatabaseHelper.Language.values()[position]);
         getActivity().getContentResolver().notifyChange(Constants.LANGUAGE_CHANGE_URI, null);
+        if ((Integer)spinner.getTag(R.id.pos) != position) {
+          getActivity().getContentResolver().notifyChange(Constants.RESET_PAGE_URI, null);
+        }
+        spinner.setTag(R.id.pos, position);
       }
 
       @Override
@@ -87,7 +92,8 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
   }
 
   public void setRadioButton(BookDatabaseHelper.Language language) {
-    spinner.setSelection(language.getCode());
+    spinner.setTag(R.id.pos, language.getCode());
+    spinner.setSelection(language.getCode(), false);
   }
 
   @Override

@@ -43,7 +43,8 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
   }
 
   private String[] getSections() {
-    return mContext.getResources().getStringArray(mDataSource.getSectionsArrayId());
+    return mDataSource.getSectionsArrayId() > 0
+        ? mContext.getResources().getStringArray(mDataSource.getSectionsArrayId()) : null;
   }
 
   @Override
@@ -103,12 +104,14 @@ public class BookListAdapter extends BaseAdapter implements StickyListHeadersAda
       viewHolder = (HeaderViewHolder) convertView.getTag();
     }
 
-    if (getHeaderId(position) == 1) {
+    if (getSections() != null && getHeaderId(position) == 1) {
       viewHolder.text1.setText(getSections()[0]);
-    } else if (getHeaderId(position) == 2) {
+    } else if (getSections() != null && getHeaderId(position) == 2) {
       viewHolder.text1.setText(getSections()[1]);
-    } else {
+    } else if (getSections() != null) {
       viewHolder.text1.setText(getSections()[2]);
+    } else {
+      viewHolder.text1.setText("");
     }
 
     return convertView;

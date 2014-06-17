@@ -43,9 +43,9 @@ public class HistoryDaoHelper extends DaoHelper {
         + HistoryTable.HistoryColumns.SECTION2 + " = ? AND "
         + HistoryTable.HistoryColumns.SECTION3 + " = ?",
         new String[]{keywords, language.getCode() + "",
-            (selectedSections.get(0, false) ? "1" : "0"),
-            (selectedSections.get(1, false) ? "1" : "0"),
-            (selectedSections.get(2, false) ? "1" : "0")});
+            (selectedSections != null && selectedSections.get(0, false) ? "1" : "0"),
+            (selectedSections != null && selectedSections.get(1, false) ? "1" : "0"),
+            (selectedSections != null && selectedSections.get(2, false) ? "1" : "0")});
 
     return result != null && result.size() > 0 ? (History) result.get(0) : null;
   }

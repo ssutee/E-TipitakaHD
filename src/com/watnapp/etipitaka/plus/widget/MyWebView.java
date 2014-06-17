@@ -44,9 +44,6 @@ public class MyWebView extends WebView {
 
   @Override
   protected void onScrollChanged(int left, int top, int oldLeft, int oldTop) {
-
-    Log.d(TAG, top + ":" + oldTop);
-
     if ( mOnScrollChangedListener != null ) {
       if (top - oldTop > 10) {
         mOnScrollChangedListener.onScrollUp(this);

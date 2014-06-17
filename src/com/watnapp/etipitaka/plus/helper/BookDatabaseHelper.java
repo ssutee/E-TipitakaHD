@@ -324,7 +324,7 @@ public class BookDatabaseHelper {
   }
 
   public enum Language {
-    THAI(0), PALI(1), THAIMM(2), THAIMC(3);
+    THAI(0), PALI(1), THAIMM(2), THAIMC(3), THAIBT(4);
 
     private int code;
 
@@ -346,6 +346,8 @@ public class BookDatabaseHelper {
           return context.getString(R.string.thaimm_full_name);
         case 3:
           return context.getString(R.string.thaimc_full_name);
+        case 4:
+          return context.getString(R.string.thaibt_full_name);
       }
       return null;
     }
@@ -360,6 +362,8 @@ public class BookDatabaseHelper {
           return "thaimm";
         case 3:
           return "thaimc";
+        case 4:
+          return "thaibt";
       }
       return null;
     }

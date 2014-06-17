@@ -3,6 +3,7 @@ package com.watnapp.etipitaka.plus.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,8 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
 
   @Override
   public int getItemViewType(int position) {
+    if (getLanguage() == BookDatabaseHelper.Language.THAIBT)
+      return TYPE_CONTENT;
     return (position <= 2) ? TYPE_HEAD : TYPE_CONTENT;
   }
 
@@ -76,7 +79,7 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
   public void bindView(View view, Context context, Cursor cursor) {
     ViewHolder viewHolder = (ViewHolder) view.getTag();
     if (getItemViewType(cursor.getPosition()) == TYPE_HEAD) {
-      switch ((int)cursor.getPosition()) {
+      switch (cursor.getPosition()) {
         case 0:
           viewHolder.text1.setText(mSections[0]);
           viewHolder.text2.setText(context.getString(R.string.found_n_pages,
@@ -93,16 +96,12 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
               Utils.convertToThaiNumber(context, getResultsCount()[2])));
           break;
       }
-    } else {
+    } else if (getItemViewType(cursor.getPosition()) == TYPE_CONTENT) {
       int volume = getDataModel().getVolume(cursor);
       int page = getDataModel().getPageNumber(cursor);
-      viewHolder.text1.setText(context.getString(R.string.n_volume_n_page,
+      viewHolder.text1.setText(context.getString(getLanguage() == BookDatabaseHelper.Language.THAIBT ?
+              R.string.n_volume_n_page_minimal : R.string.n_volume_n_page,
           Utils.convertToThaiNumber(context, volume), Utils.convertToThaiNumber(context, page)));
-    }
-
-    if (getItemViewType(cursor.getPosition()) == TYPE_CONTENT) {
-      int volume = getDataModel().getVolume(cursor);
-      int page = getDataModel().getPageNumber(cursor);
       HistoryItem.Status status = getStatus(volume, page);
       if (status == HistoryItem.Status.READ) {
         view.setBackgroundResource(R.drawable.read_color);
@@ -134,13 +133,12 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
       case ID_HEAD:
         if (getResultsCount()[0]+getResultsCount()[1]+getResultsCount()[2] > 0) {
           viewHolder.text1.setText(mContext.getString(
-              R.string.search_result_summary,
-              getKeywords(), Utils.convertToThaiNumber(mContext, getCursor().getCount() - 3)));
+              R.string.search_result_summary, getKeywords(),
+              Utils.convertToThaiNumber(mContext, getResultsCount()[0]+getResultsCount()[1]+getResultsCount()[2])));
           viewHolder.text1.setSingleLine(false);
         } else {
           viewHolder.text1.setText(mContext.getString(R.string.search_result_not_found,
-              getKeywords(), mContext.getString(getLanguage() == BookDatabaseHelper.Language.THAI
-              ? R.string.thai_full_name : R.string.pali_full_name)));
+              getKeywords(), getDataModel().getLanguage().getFullName(mContext) ));
         }
         viewHolder.text1.setSingleLine(false);
         break;
@@ -159,8 +157,10 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
 
   @Override
   public long getHeaderId(int position) {
-    if (position <= 2)
+    if (getLanguage() == BookDatabaseHelper.Language.THAIBT ||
+        position <= 2 && getLanguage() != BookDatabaseHelper.Language.THAIBT) {
       return ID_HEAD;
+    }
 
     Cursor cursor = getCursor();
     cursor.moveToPosition(position);

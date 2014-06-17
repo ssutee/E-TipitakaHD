@@ -43,8 +43,9 @@ public class Utils {
   }
 
   public static String getSubtitle(Context context, Language language, int volume, int page, String item) {
-    return context.getString(R.string.subtitle_template, language.getFullName(context),
-        Utils.convertToThaiNumber(context, volume), Utils.convertToThaiNumber(context, page), item);
+    return item.length() == 0
+        ? context.getString(R.string.subtitle_noitem_template, language.getFullName(context), Utils.convertToThaiNumber(context, volume), Utils.convertToThaiNumber(context, page))
+        : context.getString(R.string.subtitle_template, language.getFullName(context), Utils.convertToThaiNumber(context, volume), Utils.convertToThaiNumber(context, page), item);
   }
 
   public static String readTextFile(String path) throws IOException {

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
@@ -51,6 +52,9 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   @InjectExtra(Constants.PAGE_KEY)
   private int mPage;
 
+  @InjectExtra(value = Constants.COMPARING_VOLUME_KEY, optional = true)
+  private int mComparingVolume = 0;
+
   private Handler mHandler = new Handler();
   private BookDatabaseHelper.Language mLanguage1;
   private BookDatabaseHelper.Language mLanguage2;
@@ -69,7 +73,9 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
     mDataModel1 = ETDataModelCreator.create(mLanguage1, this);
     mDataModel2 = ETDataModelCreator.create(mLanguage2, this);
 
-    int volume = mDataModel2.convertVolume(mDataModel1.getComparingVolume(mVolume, mPage), mSection, mItem);
+    int volume = mComparingVolume == 0
+        ? mDataModel2.convertVolume(mDataModel1.getComparingVolume(mVolume, mPage), mSection, mItem)
+        : mComparingVolume;
     int page2 = mDataModel2.getPageByItem(volume, mItem, mSection, true);
 
     mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, mKeywords, true);
@@ -102,6 +108,15 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   public void onCompareButtonClick(final Language language, final int volume, final int page) {
     final ETDataModel sourceModel = language == mDataModel1.getLanguage() ? mDataModel1 : mDataModel2;
     final ETDataModel targetModel = language == mDataModel1.getLanguage() ? mDataModel2 : mDataModel1;
+
+    Log.d(TAG, language.toString());
+    Log.d(TAG, sourceModel.getLanguage().toString());
+    Log.d(TAG, targetModel.getLanguage().toString());
+
+    if (sourceModel.getLanguage() == Language.THAIBT || targetModel.getLanguage() == Language.THAIBT) {
+      return;
+    }
+
     sourceModel.getComparingItemsAtPage(volume, page, new BookDatabaseHelper.OnGetItemsListener() {
       @Override
       public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
@@ -139,6 +154,9 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
     data.putExtra(Constants.LANGUAGE_KEY, language.getCode());
     data.putExtra(Constants.VOLUME_KEY, volume);
     data.putExtra(Constants.PAGE_KEY, page);
+
+    Log.d(TAG, language.toString() + ":" + volume + ":" + page);
+
     setResult(RESULT_OK, data);
     finish();
   }

@@ -18,6 +18,8 @@ public class ETDataModelCreator {
         return new ETThaiMahaMakutDataModel(context);
       case THAIMC:
         return new ETThaiMahaChulaDataModel(context);
+      case THAIBT:
+        return new ETThaiFiveBooksDataModel(context);
     }
     return null;
   }

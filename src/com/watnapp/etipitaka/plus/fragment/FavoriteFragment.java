@@ -151,7 +151,7 @@ public class FavoriteFragment extends RoboSherlockListFragment
   private void editNote(Favorite favorite) {
     String message = Utils.getSubtitle(getActivity(),favorite.getLanguage(),
         favorite.getVolume(), favorite.getPage(),
-        Utils.convertToThaiNumber(getActivity(), favorite.getItem()));
+        favorite.getItem() != 0 ? Utils.convertToThaiNumber(getActivity(), favorite.getItem()) : "");
     TextEntryDialogFragment.newInstance(0, message, Constants.EDIT_NOTE_ID, 5,
         TextEntryDialogFragment.InputMode.TEXT, favorite.getNote())
         .show(getChildFragmentManager(), "open_note_dialog");
@@ -159,6 +159,7 @@ public class FavoriteFragment extends RoboSherlockListFragment
 
   private void openNote(Favorite favorite) {
     MainActivity activity = (MainActivity) getActivity();
+    Log.d(TAG, favorite.getVolume() + ":" + favorite.getPage());
     activity.openBook(favorite.getLanguage(), favorite.getVolume(), favorite.getPage(), "", favorite.getItem());
   }
 

@@ -40,17 +40,20 @@ public class Constants {
   public static final int FAVORITE_LOADER   = 1;
 
   public static final Uri LANGUAGE_CHANGE_URI = Uri.parse("content://etipitaka.com/language_change");
-  public static final String DATABASE_URL     = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v4.zip";
+  public static final Uri RESET_PAGE_URI = Uri.parse("content://etipitaka.com/reset_page");
+  public static final String DATABASE_URL     = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v5.zip";
 
   public static final String DATABASE_FOLDER    = Environment.getExternalStorageDirectory().getPath() + "/ETPK";
   public static final String DATABASE_PATH      = DATABASE_FOLDER + "/etipitaka_plus.db";
   public static final String MM_DATABASE_PATH   = DATABASE_FOLDER + "/thaimm.db";
   public static final String MC_DATABASE_PATH   = DATABASE_FOLDER + "/thaimc.db";
-  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v4.zip";
+  public static final String BT_DATABASE_PATH   = DATABASE_FOLDER + "/thaibt.db";
+  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v5.zip";
   public static final long DATABASE_SIZE        = 185511936;
 
   public static final String LANGUAGE_KEY           = "language";
   public static final String COMPARING_LANGUAGE_KEY = "comparing_language";
+  public static final String COMPARING_VOLUME_KEY   = "comparing_volume";
   public static final String VOLUME_KEY             = "volume";
   public static final String ITEM_KEY               = "item";
   public static final String SECTION_KEY            = "section";
@@ -80,4 +83,6 @@ public class Constants {
   public static final String DEFAULT_BACKGROUND_COLOR = "#FEFEFE";
 
   public static final String LANGUAGE_TITLES[] = {"ภาษาไทยฉบับหลวง", "ภาษาบาลีฉบับสยามรัฐ", "ภาษาไทยฉบับมหามกุฏฯ", "ภาษาไทยฉบับมหาจุฬาฯ"};
+  public static final String LANGUAGE_TITLES_BT[] = {"ภาษาไทยฉบับหลวง", "ภาษาบาลีฉบับสยามรัฐ"};
+  public static final String REFS_PATTERN = "([๐๑๒๓๔๕๖๗๘๙][–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+)/([–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+)/([–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+[๐๑๒๓๔๕๖๗๘๙])";
 }

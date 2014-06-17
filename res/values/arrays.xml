@@ -5,6 +5,7 @@
         <item>" ภาษาบาลี ฉบับสยามรัฐ "</item>
         <item>" ภาษาไทย ฉบับมหามกุฏฯ "</item>
         <item>" ภาษาไทย ฉบับมหาจุฬาฯ "</item>
+        <item>" ชุดห้าเล่มจากพระโอษฐ์ "</item>
     </string-array>
     <string-array name="book_titles">
         <item>" วินัยปิฎก มหาวิภังค์ ภาค ๑ "</item>
@@ -416,5 +417,12 @@
     <string-array name="languages">
         <item>ภาษาไทย</item>
         <item>ภาษาบาลี</item>
+    </string-array>
+    <string-array name="thaibt_book_titles_with_numbers">
+        <item>" ๑. ขุมทรัพย์จากพระโอษฐ์ "</item>
+        <item>" ๒. อริยสัจจากพระโอษฐ์ ๑ "</item>
+        <item>" ๓. อริยสัจจากพระโอษฐ์ ๒ "</item>
+        <item>" ๔. ปฏิจจสมุปบาทจากพระโอษฐ์ "</item>
+        <item>" ๕. พุทธประวัติจากพระโอษฐ์ "</item>
     </string-array>
 </resources>

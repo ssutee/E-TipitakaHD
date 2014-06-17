@@ -10,6 +10,8 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.plus.Utils;
+import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
+import com.watnapp.etipitaka.plus.model.ETDataModel;
 import com.watnapp.etipitaka.plus.model.History;
 
 /**
@@ -19,7 +21,9 @@ import com.watnapp.etipitaka.plus.model.History;
  * Time: 20:26
   */
 
-public class HistoryAdapter extends CursorAdapter {
+abstract public class HistoryAdapter extends CursorAdapter {
+
+  abstract public BookDatabaseHelper.Language getLanguage();
 
   @Inject
   public HistoryAdapter(Context context) {
@@ -42,18 +46,24 @@ public class HistoryAdapter extends CursorAdapter {
     History history = History.newInstance(cursor, context);
     viewHolder.text1.setText(history.getKeywords());
     String subtitle = "";
-    if (history.getResult1() > 0) {
-      subtitle += " " + context.getString(com.watnapp.etipitaka.plus.R.string.abbr_section1,
-          Utils.convertToThaiNumber(context, history.getResult1()));
+    if (getLanguage() == BookDatabaseHelper.Language.THAIBT) {
+       subtitle = context.getString(com.watnapp.etipitaka.plus.R.string.found_n_pages,
+           Utils.convertToThaiNumber(context, history.getResult1()));
+    } else {
+      if (history.getResult1() > 0) {
+        subtitle += " " + context.getString(com.watnapp.etipitaka.plus.R.string.abbr_section1,
+            Utils.convertToThaiNumber(context, history.getResult1()));
+      }
+      if (history.getResult2() > 0) {
+        subtitle += " " + context.getString(com.watnapp.etipitaka.plus.R.string.abbr_section2,
+            Utils.convertToThaiNumber(context, history.getResult2()));
+      }
+      if (history.getResult3() > 0) {
+        subtitle += " " + context.getString(com.watnapp.etipitaka.plus.R.string.abbr_section3,
+            Utils.convertToThaiNumber(context, history.getResult3()));
+      }
     }
-    if (history.getResult2() > 0) {
-      subtitle += " " + context.getString(com.watnapp.etipitaka.plus.R.string.abbr_section2,
-          Utils.convertToThaiNumber(context, history.getResult2()));
-    }
-    if (history.getResult3() > 0) {
-      subtitle += " " + context.getString(com.watnapp.etipitaka.plus.R.string.abbr_section3,
-          Utils.convertToThaiNumber(context, history.getResult3()));
-    }
+
     viewHolder.text2.setText(subtitle.length() > 0
         ? subtitle.trim() : context.getString(com.watnapp.etipitaka.plus.R.string.not_found));
   }

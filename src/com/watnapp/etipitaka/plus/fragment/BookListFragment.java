@@ -88,6 +88,8 @@ public class BookListFragment extends RoboSherlockListFragment implements BookLi
       return R.array.pali_book_titles_with_numbers;
     } else if (application.getLanguage() == BookDatabaseHelper.Language.THAIMM) {
       return R.array.thaimm_book_titles_with_numbers;
+    } else if (application.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
+      return R.array.thaibt_book_titles_with_numbers;
     }
     return R.array.book_titles_with_number;
   }
@@ -96,6 +98,8 @@ public class BookListFragment extends RoboSherlockListFragment implements BookLi
   public int getSectionsArrayId() {
     if (application.getLanguage() == BookDatabaseHelper.Language.PALI) {
       return R.array.pali_sections;
+    } else if (application.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
+      return 0;
     }
     return R.array.sections;
   }

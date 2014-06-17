@@ -157,7 +157,11 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
     mSearchInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
       @Override
       public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        showBookCategorySelectionDialog();
+        if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
+          search(new Integer[] {1,2,3,4,5});
+        } else {
+          showBookCategorySelectionDialog();
+        }
         return true;
       }
     });
@@ -166,7 +170,11 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       @Override
       public void onClick(View v) {
         if (mSearchInput.getText().length() > 0) {
-          showBookCategorySelectionDialog();
+          if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
+            search(new Integer[] {1,2,3,4,5});
+          } else {
+            showBookCategorySelectionDialog();
+          }
         } else {
           mInputMethodManager.showSoftInput(mSearchInput, InputMethodManager.SHOW_FORCED);
           Toast.makeText(getActivity(), R.string.please_enter_keywords, Toast.LENGTH_SHORT).show();
@@ -186,7 +194,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
 
       @Override
       public BookDatabaseHelper.Language getLanguage() {
-        return application.getLanguage();
+        return dataModel.getLanguage();
       }
 
       @Override
@@ -294,8 +302,9 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       history.setSections(mCheckedCategories);
       history.setResults(totalPages);
       StringBuilder sb = new StringBuilder();
-      if (cursor.getCount() > 3) {
-        cursor.moveToPosition(3);
+      int start = application.getLanguage() == BookDatabaseHelper.Language.THAIBT ? 0 : 3;
+      if (cursor.getCount() > start) {
+        cursor.moveToPosition(start);
         while (!cursor.isAfterLast()) {
           sb.append(dataModel.getVolume(cursor));
           sb.append(':');
@@ -328,7 +337,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
 
   @Override
   public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    if (position <= 2) {
+    if (position <= 2 && dataModel.getLanguage() != BookDatabaseHelper.Language.THAIBT) {
       scrollToSection(position+1);
     } else {
       application.setHistory(mCurrentHistory);
@@ -380,7 +389,8 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
     headCursor.addRow(new Object[] { 2, mResultsCount[1]});
     headCursor.addRow(new Object[] { 3, mResultsCount[2]});
 
-    return new MergeCursor(new Cursor[] {headCursor, itemCursor});
+    return dataModel.getLanguage() == BookDatabaseHelper.Language.THAIBT
+        ? itemCursor : new MergeCursor(new Cursor[] {headCursor, itemCursor});
   }
 
   public void loadHistory(final History history) {

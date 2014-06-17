@@ -137,15 +137,15 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
       Matcher matcher2 = Pattern.compile(getString(R.string.regex_item_number_2), Pattern.MULTILINE).matcher(line);
       if (matcher1.find()) {
         if (matcher1.groupCount() == 4 && matcher1.group(2) != null) {
-          line = matcher1.replaceFirst(String.format("%s<font color='#89C200'><b id=\"i2_%s\">%s</b></font>%s<font color='#EE00EE'><b id=\"i_%s\">[%s]</b></font>",
+          line = matcher1.replaceFirst(String.format("%s<span style='color:#89C200;' id=\"i2_%s\">%s</span>%s<span style='color:#EE00EE;' id=\"i_%s\">[%s]</span>",
               matcher1.group(1), Utils.convertToArabicNumber(getActivity(), matcher1.group(2).replace("{", "").replace("}", "")),
               matcher1.group(2), matcher1.group(3), Utils.convertToArabicNumber(getActivity(), matcher1.group(4)), matcher1.group(4)));
         } else {
-          line = matcher1.replaceFirst(String.format("<font color='#EE00EE'><b id=\"i_%s\">%s[%s]</b></font>",
+          line = matcher1.replaceFirst(String.format("<span style='color:#EE00EE;' id=\"i_%s\">%s[%s]</span>",
               Utils.convertToArabicNumber(getActivity(), matcher1.group(4)), matcher1.group(1), matcher1.group(4)));
         }
       } else if (matcher2.find()) {
-        line = matcher2.replaceFirst(String.format("<font color='#89C200'><b id=\"i2_%s\">%s{%s}</b></font>",
+        line = matcher2.replaceFirst(String.format("<span style='color:#89C200;' id=\"i2_%s\">%s{%s}</span>",
             Utils.convertToArabicNumber(getActivity(), matcher2.group(2)), matcher2.group(1), matcher2.group(2)));
       }
       sb.append(line+"\n");
@@ -162,7 +162,7 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
       int count = 0;
       for(String token: tokens) {
         text = text.replace(token,
-            String.format("<font color='#0000ff'><b id=\"keywords\">-:*%d*:-</b></font>", count));
+            String.format("<span style='color:#0000FF;' id=\"keywords\">-:*%d*:-</span>", count));
         count++;
       }
       count = 0;
