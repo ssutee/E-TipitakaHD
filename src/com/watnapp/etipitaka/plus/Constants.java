@@ -28,6 +28,7 @@ public class Constants {
   public static final int MENU_ITEM_WHITE_COLOR         = 1016;
   public static final int MENU_ITEM_SEPIA_COLOR         = 1017;
   public static final int MENU_ITEM_EDIT                = 1018;
+  public static final int MENU_ITEM_SORT                = 1019;
 
 
   public static final int GOTO_PAGE_ID      = 0;
@@ -85,4 +86,9 @@ public class Constants {
   public static final String LANGUAGE_TITLES[] = {"ภาษาไทยฉบับหลวง", "ภาษาบาลีฉบับสยามรัฐ", "ภาษาไทยฉบับมหามกุฏฯ", "ภาษาไทยฉบับมหาจุฬาฯ"};
   public static final String LANGUAGE_TITLES_BT[] = {"ภาษาไทยฉบับหลวง", "ภาษาบาลีฉบับสยามรัฐ"};
   public static final String REFS_PATTERN = "([๐๑๒๓๔๕๖๗๘๙][–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+)/([–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+)/([–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+[๐๑๒๓๔๕๖๗๘๙])";
+
+  public static final String FAV_SORTING_KEY = "fav_sorting_key";
+  public static final String FAV_ORDERING_KEY = "fav_ordering_key";
+  public static final String HIS_SORTING_KEY = "his_sorting_key";
+  public static final String HIS_ORDERING_KEY = "his_ordering_key";
 }

@@ -425,4 +425,17 @@
         <item>" ๔. ปฏิจจสมุปบาทจากพระโอษฐ์ "</item>
         <item>" ๕. พุทธประวัติจากพระโอษฐ์ "</item>
     </string-array>
+    <string-array name="favorite_sorting_types">
+        <item>เลขเล่ม</item>
+        <item>ตัวอักษร</item>
+        <item>การสร้าง</item>
+    </string-array>
+    <string-array name="history_sorting_types">
+        <item>ตัวอักษร</item>
+        <item>การสร้าง</item>
+    </string-array>
+    <string-array name="ordering_types">
+        <item>น้อยไปมาก</item>
+        <item>มากไปน้อย</item>
+    </string-array>
 </resources>

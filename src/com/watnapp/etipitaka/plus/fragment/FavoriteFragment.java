@@ -2,11 +2,14 @@ package com.watnapp.etipitaka.plus.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.BaseColumns;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -110,6 +113,7 @@ public class FavoriteFragment extends RoboSherlockListFragment
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_OPEN, Menu.NONE, R.string.open_note);
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_EDIT, Menu.NONE, R.string.edit_note);
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
+      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_SORT, Menu.NONE, R.string.sorting);
     }
   }
 
@@ -130,9 +134,57 @@ public class FavoriteFragment extends RoboSherlockListFragment
         case Constants.MENU_ITEM_DELETE:
           delete(selectedFavorite);
           return true;
+        case Constants.MENU_ITEM_SORT:
+          sort();
+          return true;
       }
     }
     return super.onContextItemSelected(item);
+  }
+
+  private void order(int type) {
+    SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(Constants.FAV_ORDERING_KEY, type);
+    editor.commit();
+    getLoaderManager().restartLoader(Constants.FAVORITE_LOADER, null, this);
+  }
+
+  private void order() {
+    new AlertDialog.Builder(getActivity())
+        .setTitle(R.string.select_ordering)
+        .setSingleChoiceItems(R.array.ordering_types,
+            getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.FAV_ORDERING_KEY, 0),
+            new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            order(which);
+            dialog.dismiss();
+          }
+        })
+        .create().show();
+  }
+
+  private void sort(int type) {
+    SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(Constants.FAV_SORTING_KEY, type);
+    editor.commit();
+    order();
+  }
+
+  private void sort() {
+    new AlertDialog.Builder(getActivity())
+        .setTitle(R.string.select_sorting_type)
+        .setSingleChoiceItems(R.array.favorite_sorting_types,
+            getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.FAV_SORTING_KEY, 0),
+            new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            sort(which);
+            dialog.dismiss();
+          }
+        }).create().show();
   }
 
   private void delete(final Favorite favorite) {
@@ -165,9 +217,22 @@ public class FavoriteFragment extends RoboSherlockListFragment
 
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+    int sortingType = getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.FAV_SORTING_KEY, 0);
+    String orderBy = BaseColumns._ID;
+    if (sortingType == 0) {
+      orderBy = FavoriteTable.FavoriteColumns.VOLUME;
+    } else if (sortingType == 1) {
+      orderBy = FavoriteTable.FavoriteColumns.NOTE;
+    }
+
+    int orderingType = getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.FAV_ORDERING_KEY, 0);
+    if (orderingType == 1) {
+      orderBy += " DESC";
+    }
+
     return new CursorLoader(getActivity(), DatabaseProvider.FAVORITE_CONTENT_URI, null,
         FavoriteTable.FavoriteColumns.LANGUAGE + " = ?",
-        new String[] { application.getLanguage().getCode()+"" }, null);
+        new String[] { application.getLanguage().getCode()+"" }, orderBy);
   }
 
   @Override

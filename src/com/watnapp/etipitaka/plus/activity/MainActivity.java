@@ -530,7 +530,18 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     if (mSlidingMenu.isMenuShowing()) {
       mSlidingMenu.showContent();
     } else {
-      super.onBackPressed();
+      new AlertDialog.Builder(this)
+          .setTitle(R.string.exit_program)
+          .setMessage(R.string.are_you_sure)
+          .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              MainActivity.super.onBackPressed();
+            }
+          })
+          .setNegativeButton(android.R.string.no, null)
+          .create()
+          .show();
     }
   }
 

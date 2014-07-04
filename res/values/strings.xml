@@ -197,4 +197,9 @@
     <string name="choose_items_index_system">เลือกระบบเลขข้อที่ต้องการ</string>
     <string name="unsupported_old_version_file">ไม่สามารถนำเข้าไฟล์รุ่นเก่า</string>
     <string name="thaibt_full_name">ชุดห้าเล่มจากพระโอษฐ์</string>
+    <string name="exit_program">ออกจากโปรแกรม</string>
+    <string name="are_you_sure">คุณแน่ใจหรือไม่?</string>
+    <string name="sorting">เรียงลำดับ</string>
+    <string name="select_sorting_type">เลือกรูปแบบการเรียงลำดับ</string>
+    <string name="select_ordering">เรียงลำดับจาก..</string>
 </resources>

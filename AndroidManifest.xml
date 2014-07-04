@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          android:versionName="2.1.7"
-          android:versionCode="02107"
+          android:versionName="2.1.9"
+          android:versionCode="02109"
           package="com.watnapp.etipitaka.plus">
 
     <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="17"/>
@@ -17,6 +17,14 @@
             android:theme="@style/Theme.Sherlock.Light"
             android:name=".E_TipitakaApplication">
 
+        <uses-library android:required="false" android:name="com.sec.android.app.multiwindow" />
+
+        <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
+        <meta-data android:name="com.sec.android.multiwindow.DEFAULT_SIZE_W" android:value="632.0dip" />
+        <meta-data android:name="com.sec.android.multiwindow.DEFAULT_SIZE_H" android:value="598.0dip" />
+        <meta-data android:name="com.sec.android.multiwindow.MINIMUM_SIZE_W" android:value="632.0dip" />
+        <meta-data android:name="com.sec.android.multiwindow.MINIMUM_SIZE_H" android:value="598.0dip" />
+
         <activity
                 android:name=".activity.StartupActivity"
                 android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
@@ -25,6 +33,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -35,22 +44,23 @@
                 android:label="E-Tipitaka"
                 android:uiOptions="splitActionBarWhenNarrow">
         </activity>
-
         <activity
                 android:name=".activity.ComparisonActivity"
                 android:screenOrientation="landscape"
-                android:theme="@style/Theme.Sherlock.Light.NoActionBar"/>
+                android:theme="@style/Theme.Sherlock.Light.NoActionBar">
+        </activity>
         <activity
                 android:name=".activity.FileExplorerActivity"
                 android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
                 android:windowSoftInputMode="stateHidden"
-                android:theme="@style/Theme.Sherlock.Light.NoActionBar"/>
-
+                android:theme="@style/Theme.Sherlock.Light.NoActionBar">
+        </activity>
         <activity
                 android:name=".activity.PaliDictActivity"
                 android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
                 android:theme="@style/Theme.Sherlock.Light"
-                android:label="@string/pali_dict"/>
+                android:label="@string/pali_dict">
+        </activity>
 
         <provider
                 android:name=".model.DatabaseProvider"

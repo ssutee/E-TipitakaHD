@@ -2,11 +2,14 @@ package com.watnapp.etipitaka.plus.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.BaseColumns;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -108,6 +111,7 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
     if (v.getId() == android.R.id.list) {
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
+      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_SORT, Menu.NONE, R.string.sorting);
     }
   }
 
@@ -120,6 +124,9 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
       switch (item.getItemId()) {
         case Constants.MENU_ITEM_DELETE:
           delete(history);
+          return true;
+        case Constants.MENU_ITEM_SORT:
+          sort();
           return true;
       }
     }
@@ -141,11 +148,20 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
 
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-    Log.d(TAG, "language = " + application.getLanguage());
+    int sortingType = getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.HIS_SORTING_KEY, 0);
+    String orderBy = BaseColumns._ID;
+    if (sortingType == 0) {
+      orderBy = HistoryTable.HistoryColumns.KEYWORDS;
+    }
+
+    int orderingType = getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.HIS_ORDERING_KEY, 0);
+    if (orderingType == 1) {
+      orderBy += " DESC";
+    }
+
     return new CursorLoader(getActivity(), DatabaseProvider.HISTORY_CONTENT_URI, null,
         HistoryTable.HistoryColumns.LANGUAGE + " = ?",
-        new String[] { application.getLanguage().getCode()+"" },
-        HistoryTable.HistoryColumns.KEYWORDS);
+        new String[] { application.getLanguage().getCode()+"" }, orderBy);
   }
 
   @Override
@@ -169,6 +185,51 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
       listener.onHistorySelected(History.newInstance(cursor, getActivity()));
     } catch (ClassCastException e) {
     }
+  }
+
+  private void order(int type) {
+    SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(Constants.HIS_ORDERING_KEY, type);
+    editor.commit();
+    getLoaderManager().restartLoader(Constants.HISTORY_LOADER, null, this);
+  }
+
+  private void order() {
+    new AlertDialog.Builder(getActivity())
+        .setTitle(R.string.select_ordering)
+        .setSingleChoiceItems(R.array.ordering_types,
+            getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.HIS_ORDERING_KEY, 0),
+            new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                order(which);
+                dialog.dismiss();
+              }
+            })
+        .create().show();
+  }
+
+  private void sort(int type) {
+    SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(Constants.HIS_SORTING_KEY, type);
+    editor.commit();
+    order();
+  }
+
+  private void sort() {
+    new AlertDialog.Builder(getActivity())
+        .setTitle(R.string.select_sorting_type)
+        .setSingleChoiceItems(R.array.history_sorting_types,
+            getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.HIS_SORTING_KEY, 0),
+            new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                sort(which);
+                dialog.dismiss();
+              }
+            }).create().show();
   }
 
   public interface OnHistorySelectedListener {
