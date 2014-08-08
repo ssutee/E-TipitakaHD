@@ -3,6 +3,7 @@ package com.watnapp.etipitaka.plus.adapter;
 import android.R;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,6 +58,13 @@ public class FavoriteAdapter extends CursorAdapter {
           Utils.convertToThaiNumber(context, fav.getPage())));
     }
     viewHolder.text2.setText(fav.getNote());
+    if (fav.getScore() > 0) {
+      Drawable star = context.getResources().getDrawable(R.drawable.btn_star_big_on);
+      star.setBounds(0, 0, 60, 60);
+      viewHolder.text1.setCompoundDrawables(null, null, star, null);
+    } else {
+      viewHolder.text1.setCompoundDrawables(null, null, null, null);
+    }
   }
 
   private static final class ViewHolder {

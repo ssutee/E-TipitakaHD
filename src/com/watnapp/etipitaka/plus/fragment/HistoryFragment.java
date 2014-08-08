@@ -60,7 +60,6 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
         getListView().post(new Runnable() {
           @Override
           public void run() {
-            Log.d(TAG, "restart");
             getLoaderManager().restartLoader(Constants.HISTORY_LOADER, null, HistoryFragment.this);
           }
         });
@@ -111,6 +110,7 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
     if (v.getId() == android.R.id.list) {
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
+      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_MARK, Menu.NONE, R.string.mark);
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_SORT, Menu.NONE, R.string.sorting);
     }
   }
@@ -128,9 +128,18 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
         case Constants.MENU_ITEM_SORT:
           sort();
           return true;
+        case Constants.MENU_ITEM_MARK:
+          mark(history);
+          return true;
       }
     }
     return super.onContextItemSelected(item);
+  }
+
+  private void mark(History history) {
+    int score = history.getScore();
+    history.setScore(score == 0 ? 1 : 0);
+    mDaoHelper.update(history);
   }
 
   private void delete(final History history) {
@@ -152,6 +161,10 @@ public class HistoryFragment extends RoboSherlockListFragment implements LoaderM
     String orderBy = BaseColumns._ID;
     if (sortingType == 0) {
       orderBy = HistoryTable.HistoryColumns.KEYWORDS;
+    } else if (sortingType == 1) {
+      orderBy = BaseColumns._ID;
+    } else if (sortingType == 2) {
+      orderBy = HistoryTable.HistoryColumns.SCORE;
     }
 
     int orderingType = getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.HIS_ORDERING_KEY, 0);

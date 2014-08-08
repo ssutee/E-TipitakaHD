@@ -67,7 +67,7 @@ public class FavoriteFragment extends RoboSherlockListFragment
         getListView().post(new Runnable() {
           @Override
           public void run() {
-            getLoaderManager().restartLoader(Constants.HISTORY_LOADER, null, FavoriteFragment.this);
+            getLoaderManager().restartLoader(Constants.FAVORITE_LOADER, null, FavoriteFragment.this);
           }
         });
       }
@@ -113,6 +113,7 @@ public class FavoriteFragment extends RoboSherlockListFragment
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_OPEN, Menu.NONE, R.string.open_note);
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_EDIT, Menu.NONE, R.string.edit_note);
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
+      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_MARK, Menu.NONE, R.string.mark);
       menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_SORT, Menu.NONE, R.string.sorting);
     }
   }
@@ -134,12 +135,25 @@ public class FavoriteFragment extends RoboSherlockListFragment
         case Constants.MENU_ITEM_DELETE:
           delete(selectedFavorite);
           return true;
+        case Constants.MENU_ITEM_MARK:
+          mark(selectedFavorite);
+          return true;
         case Constants.MENU_ITEM_SORT:
           sort();
           return true;
       }
     }
     return super.onContextItemSelected(item);
+  }
+
+  private void mark(Favorite favorite) {
+    int score = favorite.getScore();
+    if (score == 0) {
+      favorite.setScore(1);
+    } else {
+      favorite.setScore(0);
+    }
+    mDaoHelper.update(favorite);
   }
 
   private void order(int type) {
@@ -223,6 +237,10 @@ public class FavoriteFragment extends RoboSherlockListFragment
       orderBy = FavoriteTable.FavoriteColumns.VOLUME;
     } else if (sortingType == 1) {
       orderBy = FavoriteTable.FavoriteColumns.NOTE;
+    } else if (sortingType == 2) {
+      orderBy = BaseColumns._ID;
+    } else if (sortingType == 3) {
+      orderBy = FavoriteTable.FavoriteColumns.SCORE;
     }
 
     int orderingType = getActivity().getPreferences(Context.MODE_PRIVATE).getInt(Constants.FAV_ORDERING_KEY, 0);

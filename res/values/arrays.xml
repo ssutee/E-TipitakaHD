@@ -429,10 +429,12 @@
         <item>เลขเล่ม</item>
         <item>ตัวอักษร</item>
         <item>การสร้าง</item>
+        <item>ความสำคัญ</item>
     </string-array>
     <string-array name="history_sorting_types">
         <item>ตัวอักษร</item>
         <item>การสร้าง</item>
+        <item>ความสำคัญ</item>
     </string-array>
     <string-array name="ordering_types">
         <item>น้อยไปมาก</item>

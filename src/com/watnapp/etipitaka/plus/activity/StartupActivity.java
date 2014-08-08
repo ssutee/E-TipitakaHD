@@ -63,13 +63,24 @@ public class StartupActivity extends RoboSherlockFragmentActivity implements Fil
     return version;
   }
 
+  private int getThaiMMDatabaseVersion() {
+    SQLiteDatabase db = SQLiteDatabase.openDatabase(Constants.MM_DATABASE_PATH, null, 0);
+    Cursor cursor = db.rawQuery("pragma user_version", null);
+    cursor.moveToFirst();
+    int version = Integer.parseInt(cursor.getString(0));
+    cursor.close();
+    db.close();
+    return version;
+  }
+
   private void checkSumDatabase(final Runnable runnableOnSuccess, final Runnable runnableOnFail) {
     new Thread(new Runnable() {
       @Override
       public void run() {
         if (new File(Constants.DATABASE_PATH).length()==Constants.DATABASE_SIZE
             && new File(Constants.MC_DATABASE_PATH).exists() && new File(Constants.MM_DATABASE_PATH).exists()
-            && getThaiMCDatabaseVersion() == 2 && new File(Constants.BT_DATABASE_PATH).exists()) {
+            && getThaiMCDatabaseVersion() == 3 && getThaiMMDatabaseVersion() == 2
+            && new File(Constants.BT_DATABASE_PATH).exists()) {
           mHandler.post(runnableOnSuccess);
         } else {
           mHandler.post(runnableOnFail);

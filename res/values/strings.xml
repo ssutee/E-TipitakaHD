@@ -202,4 +202,5 @@
     <string name="sorting">เรียงลำดับ</string>
     <string name="select_sorting_type">เลือกรูปแบบการเรียงลำดับ</string>
     <string name="select_ordering">เรียงลำดับจาก..</string>
+    <string name="mark">สำคัญ</string>
 </resources>
