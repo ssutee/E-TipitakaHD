@@ -2,23 +2,40 @@ package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.database.MergeCursor;
-import android.util.Log;
+import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Created by sutee on 19/2/14.
+ * Created by sutee on 31/8/14.
  */
-public abstract class ETThaiMahaDataModel extends ETDataModel {
+public class ETThaiWatnaDataModel extends ETDataModel {
 
-  protected static final String TAG = "ETThaiMahaDataModel";
-
-  public ETThaiMahaDataModel(Context context) {
+  public ETThaiWatnaDataModel(Context context) {
     super(context);
+  }
+
+  @Override
+  protected String getDatabasePath() {
+    return Constants.WN_DATABASE_PATH;
+  }
+
+  @Override
+  public BookDatabaseHelper.Language getLanguage() {
+    return BookDatabaseHelper.Language.THAIWN;
+  }
+
+  @Override
+  public String getContentColumn() {
+    return "content";
+  }
+
+  @Override
+  public String getPageNumberColumn() {
+    return "page";
   }
 
   @Override
@@ -28,7 +45,7 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
       @Override
       public void run() {
         Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=? AND page=?",
-            new String[]{String.format("%02d", volume), String.format("%04d", page)}, null, null, null);
+            new String[]{String.valueOf(volume), String.valueOf(page)}, null, null, null);
         cursor.moveToFirst();
         String[] tokens = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
         ArrayList<Integer> items = new ArrayList<Integer>();
@@ -43,13 +60,19 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
         listener.onGetItemsFinish(items.toArray(new Integer[items.size()]), sections.toArray(new Integer[sections.size()]));
       }
     }).start();
+
+  }
+
+  @Override
+  public void getComparingItemsAtPage(int volume, int page, BookDatabaseHelper.OnGetItemsListener listener) {
+    getItemsAtPage(volume, page, listener);
   }
 
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
     Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=?",
-        new String[] { String.format("%02d", volume) }, null, null, null);
+        new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
     if (page > 0 && page <= cursor.getCount()) {
       cursor.moveToPosition(page-1);
@@ -58,20 +81,10 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
   }
 
   @Override
-  public String getContentColumn() {
-    return "content";
-  }
-
-  @Override
-  public String getPageNumberColumn() {
-    return "page";
-  }
-
-  @Override
   public int getMaximumPageNumber(int volume) {
     openDatabase();
     Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume = ?",
-       new String[] { String.format("%02d", volume) }, null, null, "page");
+        new String[] { String.valueOf(volume) }, null, null, "page");
     int page = cursor.getCount();
     cursor.close();
     return page;
@@ -81,7 +94,7 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
   public int getMinimumItemNumber(int volume) {
     openDatabase();
     Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume = ?",
-        new String[] { String.format("%02d", volume) }, null, null, "page");
+        new String[] { String.valueOf(volume) }, null, null, "page");
     cursor.moveToFirst();
     String[] items = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
     cursor.close();
@@ -92,13 +105,15 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
   public int getMaximumItemNumber(int volume) {
     openDatabase();
     Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume = ?",
-        new String[] { String.format("%02d", volume) }, null, null, "page");
+        new String[] { String.valueOf(volume) }, null, null, "page");
     cursor.moveToFirst();
     int maxItem = 0;
     while (!cursor.isAfterLast()) {
       String[] items = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
       for (int i=0; i<items.length; ++i) {
-        maxItem = Math.max(maxItem, Integer.parseInt(items[i]));
+        if (items[i].length() > 0) {
+          maxItem = Math.max(maxItem, Integer.parseInt(items[i]));
+        }
       }
       cursor.moveToNext();
     }
@@ -106,14 +121,12 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
     return maxItem;
   }
 
-  abstract protected Map<String,Map<String,Map<String,ArrayList<Integer>>>> getBookItems();
-
   @Override
   public int getPageIdByItem(int volume, int item, int section) {
     openDatabase();
-    int page = getBookItems().get(volume + "").get(section+"").get(item+"").get(0);
+    int page = BookDatabaseHelper.getThaiWNBookItems(mContext).get(volume + "").get(section+"").get(item+"").get(0);
     Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=? AND page=?",
-        new String[] {String.format("%02d", volume), String.format("%04d", page) }, null, null, null);
+        new String[] {String.valueOf(volume), String.valueOf(page) }, null, null, null);
     cursor.moveToFirst();
     int pageId = cursor.getInt(cursor.getColumnIndex("_id"));
     cursor.close();
@@ -125,38 +138,73 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
     openDatabase();
     Cursor cursor = db.query(getLanguage().getStringCode(), null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
     cursor.moveToFirst();
-    int page = Integer.parseInt(cursor.getString(cursor.getColumnIndex("page")).replaceAll("^0+", ""));
+    int page = cursor.getInt(cursor.getColumnIndex("page"));
     cursor.close();
     return page;
   }
 
   @Override
   public Integer[] getPagesByItem(int volume, int item) {
+    Map<String, Map<String, Map<String, ArrayList<Integer>>>> bookItems = BookDatabaseHelper.getThaiWNBookItems(mContext);
     ArrayList<Integer> pages = new ArrayList<Integer>();
-    for (String section : getBookItems().get(volume + "").keySet()) {
-      if (getBookItems().get(volume + "").get(section).containsKey(item+"")) {
-        pages.add(getBookItems().get(volume + "").get(section).get(item + "").get(0));
+    for (String section : bookItems.get(volume + "").keySet()) {
+      if (bookItems.get(volume + "").get(section).containsKey(item+"")) {
+        pages.add(bookItems.get(volume + "").get(section).get(item + "").get(0));
       }
     }
     return pages.toArray(new Integer[pages.size()]);
   }
 
   @Override
-  public void search(final String keywords, final BookDatabaseHelper.OnSearchListener listener, final Integer[] volumes) {
+  public boolean hasHtmlContent() {
+    return true;
+  }
+
+  @Override
+  public int getSectionBoundary(int index) {
+    return 33;
+  }
+
+  @Override
+  public int getTotalVolumes() {
+    return 33;
+  }
+
+  @Override
+  public int convertVolume(int volume, int section, int item) {
+    if (volume <= 8) {
+      return volume + 25;
+    }
+    return volume - 8;
+  }
+
+  @Override
+  public int getComparingVolume(int volume, int page) {
+    if (volume <= 25) {
+      return volume + 8;
+    }
+    return volume - 25;
+  }
+
+  @Override
+  public void search(final String keywords, final BookDatabaseHelper.OnSearchListener listener, final Integer[] volumes, final BookDatabaseHelper.SearchType searchType) {
     openDatabase();
     new Thread(new Runnable() {
       @Override
       public void run() {
-        Cursor[] cursors = new Cursor[volumes.length+1];
-        int totalPages[] = new int[3];
+        Cursor[] cursors = new Cursor[volumes.length];
+        int totalPages[] = new int[1];
+
         for (int i=0; i < volumes.length; ++i) {
           int volume = volumes[i];
+
           String selection = "volume = ?";
           ArrayList<String> selectionArgs = new ArrayList<String>();
-          selectionArgs.add(String.format("%02d", volume));
+          selectionArgs.add(String.valueOf(volume));
 
           for (String keyword : keywords.split("\\s+")) {
-            selection += " AND content LIKE ?";
+            selection += String.format(" AND %s LIKE ?",
+                searchType == BookDatabaseHelper.SearchType.ALL ? "content" : "buddhawaj");
             selectionArgs.add("%" + keyword.replace('+', ' ') + "%");
           }
 
@@ -166,32 +214,29 @@ public abstract class ETThaiMahaDataModel extends ETDataModel {
           if (listener != null) {
             listener.onSearchProgress(keywords, volume, i+1, cursor);
           }
-
-          if (volume >= 1 && volume <= getSectionBoundary(0)) {
-            totalPages[0] += cursor.getCount();
-            Log.d(TAG, "1:" + volume + ":" + cursor.getCount());
-          } else if (volume >= getSectionBoundary(0)+1 && volume <= getSectionBoundary(1)) {
-            totalPages[1] += cursor.getCount();
-            Log.d(TAG, "2:" + volume + ":" + cursor.getCount());
-          } else {
-            totalPages[2] += cursor.getCount();
-            Log.d(TAG, "3:" + volume + ":" + cursor.getCount());
-          }
-
-          cursors[i+1] = cursor;
-
+          totalPages[0] += cursor.getCount();
+          cursors[i] = cursor;
         }
 
-        MatrixCursor headerCursor = new MatrixCursor(new String[] { "_id", "total" });
-        headerCursor.addRow(new Object[] {10001, totalPages[0]});
-        headerCursor.addRow(new Object[] {10002, totalPages[1]});
-        headerCursor.addRow(new Object[] {10003, totalPages[2]});
-        cursors[0] = headerCursor;
         if (listener != null) {
           listener.onSearchFinish(keywords, new MergeCursor(cursors), totalPages);
         }
+
       }
     }).start();
+  }
 
+  @Override
+  public void search(String keywords, BookDatabaseHelper.OnSearchListener listener, Integer[] volumes) {
+    search(keywords, listener, volumes, BookDatabaseHelper.SearchType.ALL);
+  }
+
+  @Override
+  public void search(String keywords, BookDatabaseHelper.OnSearchListener listener) {
+    search(keywords, listener, new Integer[] {
+         1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+        11,12,13,14,15,16,17,18,19,20,
+        21,22,23,24,25,26,27,28,29,30,
+        31,32,33});
   }
 }

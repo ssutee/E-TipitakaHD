@@ -29,6 +29,7 @@ import com.touchsi.widget.ClearableAutoCompleteTextView;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.E_TipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
+import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.activity.MainActivity;
 import com.watnapp.etipitaka.plus.adapter.SearchResultAdapter;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -83,6 +84,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   private ETDataModel dataModel;
 
   private ContentObserver mContentObserver;
+  private boolean mIsBuddhawaj;
 
   @Override
   public void onAttach(final Activity activity) {
@@ -157,11 +159,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
     mSearchInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
       @Override
       public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
-          search(new Integer[] {1,2,3,4,5});
-        } else {
-          showBookCategorySelectionDialog();
-        }
+        startSearch();
         return true;
       }
     });
@@ -170,11 +168,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       @Override
       public void onClick(View v) {
         if (mSearchInput.getText().length() > 0) {
-          if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
-            search(new Integer[] {1,2,3,4,5});
-          } else {
-            showBookCategorySelectionDialog();
-          }
+          startSearch();
         } else {
           mInputMethodManager.showSoftInput(mSearchInput, InputMethodManager.SHOW_FORCED);
           Toast.makeText(getActivity(), R.string.please_enter_keywords, Toast.LENGTH_SHORT).show();
@@ -211,6 +205,44 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
     };
     mListView.setAdapter(mAdapter);
     mListView.setOnItemClickListener(this);
+  }
+
+  private void startSearch() {
+    if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
+      search(createTotalVolumesArray(dataModel.getTotalVolumes()));
+    } else if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIWN) {
+      showBuddhawajDialog();
+    } else {
+      showBookCategorySelectionDialog();
+    }
+  }
+
+  private Integer[] createTotalVolumesArray(int total) {
+    ArrayList<Integer> volumes = new ArrayList<Integer>();
+    for (int volume=1; volume <= total; ++volume) {
+      volumes.add(volume);
+    }
+    return volumes.toArray(new Integer[] {});
+  }
+
+  private void showBuddhawajDialog() {
+    AlertDialog dialog = new AlertDialog.Builder(getActivity())
+        .setTitle(R.string.choose_search_type)
+        .setSingleChoiceItems(R.array.buddhawaj_choices, -1, new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            if (which == 0) {
+              search(createTotalVolumesArray(dataModel.getTotalVolumes()), BookDatabaseHelper.SearchType.ALL);
+            } else {
+              search(createTotalVolumesArray(dataModel.getTotalVolumes()), BookDatabaseHelper.SearchType.BUDDHAWAJ);
+            }
+            dialog.dismiss();
+          }
+        })
+        .setNegativeButton(android.R.string.cancel, null)
+        .create();
+
+    dialog.show();
   }
 
   private void showBookCategorySelectionDialog() {
@@ -267,16 +299,21 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
     dialog.show();
   }
 
-  private boolean search(Integer[] volumes) {
+  private boolean search(Integer[] volumes, BookDatabaseHelper.SearchType searchType) {
     if (mSearchInput.getText().length() > 0) {
       mResultsCount = new int[] {0, 0, 0};
-      dataModel.search(mSearchInput.getText().toString(), this, volumes);
+      mIsBuddhawaj = searchType == BookDatabaseHelper.SearchType.BUDDHAWAJ;
+      dataModel.search(mSearchInput.getText().toString(), this, volumes, searchType);
       mProgressDialog.setMax(volumes.length);
       mProgressDialog.setProgress(0);
       mProgressDialog.show();
       return true;
     }
     return false;
+  }
+
+  private boolean search(Integer[] volumes) {
+    return search(volumes, BookDatabaseHelper.SearchType.ALL);
   }
 
   @Override
@@ -295,14 +332,15 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   public void onSearchFinish(String keywords, final Cursor cursor, int[] totalPages) {
     mKeywords = mSearchInput.getText().toString();
 
-    if (!mHistoryDaoHelper.contains(keywords, application.getLanguage(), mCheckedCategories)) {
+    if (!mHistoryDaoHelper.contains(keywords, application.getLanguage(), mCheckedCategories, mIsBuddhawaj)) {
       History history = new History();
       history.setKeywords(keywords);
       history.setLanguage(application.getLanguage());
       history.setSections(mCheckedCategories);
       history.setResults(totalPages);
+      history.setBuddhawaj(mIsBuddhawaj);
       StringBuilder sb = new StringBuilder();
-      int start = application.getLanguage() == BookDatabaseHelper.Language.THAIBT ? 0 : 3;
+      int start = Utils.isTipitaka(application.getLanguage()) ? 3 : 0;
       if (cursor.getCount() > start) {
         cursor.moveToPosition(start);
         while (!cursor.isAfterLast()) {
@@ -320,7 +358,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       mHistoryDaoHelper.insert(history);
     }
 
-    mCurrentHistory = mHistoryDaoHelper.get(keywords, application.getLanguage(), mCheckedCategories);
+    mCurrentHistory = mHistoryDaoHelper.get(keywords, application.getLanguage(), mCheckedCategories, mIsBuddhawaj);
     mCurrentHistoryItems = mHistoryItemDaoHelper.getByHistoryId(mCurrentHistory.getId());
 
     mProgressDialog.dismiss();
@@ -337,7 +375,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
 
   @Override
   public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    if (position <= 2 && dataModel.getLanguage() != BookDatabaseHelper.Language.THAIBT) {
+    if (position <= 2 && Utils.isTipitaka(dataModel.getLanguage())) {
       scrollToSection(position+1);
     } else {
       application.setHistory(mCurrentHistory);
@@ -348,7 +386,8 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
       int page = dataModel.getPageNumber(cursor);
 
       MainActivity activity = (MainActivity) getActivity();
-      activity.openBook(application.getLanguage(), volume, page, mKeywords);
+      Log.d(TAG, "openBook = " + mIsBuddhawaj);
+      activity.openBook(application.getLanguage(), volume, page, mKeywords, mIsBuddhawaj);
       mHistoryItemDaoHelper.insertOrUpdate(mCurrentHistory.getId(), volume, page, HistoryItem.Status.READ);
     }
   }
@@ -368,6 +407,7 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
     int id = 4;
     mResultsCount = new int[] { 0,0,0 };
     if (history.getContent().length() > 0) {
+      Log.d(TAG, history.getContent().split(",").length + "");
       for (String item : history.getContent().split(",")) {
         String[] tokens = item.split(":");
         int volume = Integer.parseInt(tokens[0]);
@@ -389,14 +429,15 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
     headCursor.addRow(new Object[] { 2, mResultsCount[1]});
     headCursor.addRow(new Object[] { 3, mResultsCount[2]});
 
-    return dataModel.getLanguage() == BookDatabaseHelper.Language.THAIBT
-        ? itemCursor : new MergeCursor(new Cursor[] {headCursor, itemCursor});
+    return Utils.isTipitaka(dataModel.getLanguage()) ? new MergeCursor(new Cursor[] {headCursor, itemCursor}) : itemCursor;
   }
 
   public void loadHistory(final History history) {
     mCurrentHistory = history;
     mSearchInput.setText(history.getKeywords());
     mKeywords = history.getKeywords();
+    mIsBuddhawaj = history.isBuddhawaj();
+    Log.d(TAG, "load history = " + mIsBuddhawaj);
     new Thread(new Runnable() {
       @Override
       public void run() {

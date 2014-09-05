@@ -20,7 +20,7 @@ import com.watnapp.etipitaka.plus.model.History;
  * User: sutee
  * Date: 12/6/2013
  * Time: 20:26
-  */
+ */
 
 abstract public class HistoryAdapter extends CursorAdapter {
 
@@ -48,8 +48,14 @@ abstract public class HistoryAdapter extends CursorAdapter {
     viewHolder.text1.setText(history.getKeywords());
     String subtitle = "";
     if (getLanguage() == BookDatabaseHelper.Language.THAIBT) {
-       subtitle = context.getString(com.watnapp.etipitaka.plus.R.string.found_n_pages,
-           Utils.convertToThaiNumber(context, history.getResult1()));
+      subtitle = context.getString(com.watnapp.etipitaka.plus.R.string.found_n_pages,
+          Utils.convertToThaiNumber(context, history.getResult1()));
+    } else if (getLanguage() == BookDatabaseHelper.Language.THAIWN) {
+      subtitle = context.getString(com.watnapp.etipitaka.plus.R.string.found_n_pages,
+          Utils.convertToThaiNumber(context, history.getResult1()));
+      if (history.isBuddhawaj()) {
+        subtitle += " (" + context.getString(com.watnapp.etipitaka.plus.R.string.buddhawaj) + ")";
+      }
     } else {
       if (history.getResult1() > 0) {
         subtitle += " " + context.getString(com.watnapp.etipitaka.plus.R.string.abbr_section1,

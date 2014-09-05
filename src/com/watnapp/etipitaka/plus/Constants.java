@@ -43,14 +43,15 @@ public class Constants {
 
   public static final Uri LANGUAGE_CHANGE_URI = Uri.parse("content://etipitaka.com/language_change");
   public static final Uri RESET_PAGE_URI = Uri.parse("content://etipitaka.com/reset_page");
-  public static final String DATABASE_URL     = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v7.zip";
+  public static final String DATABASE_URL = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v8.zip";
 
   public static final String DATABASE_FOLDER    = Environment.getExternalStorageDirectory().getPath() + "/ETPK";
   public static final String DATABASE_PATH      = DATABASE_FOLDER + "/etipitaka_plus.db";
   public static final String MM_DATABASE_PATH   = DATABASE_FOLDER + "/thaimm.db";
   public static final String MC_DATABASE_PATH   = DATABASE_FOLDER + "/thaimc.db";
   public static final String BT_DATABASE_PATH   = DATABASE_FOLDER + "/thaibt.db";
-  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v7.zip";
+  public static final String WN_DATABASE_PATH   = DATABASE_FOLDER + "/thaiwn.db";
+  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v8.zip";
   public static final long DATABASE_SIZE        = 185511936;
 
   public static final String LANGUAGE_KEY           = "language";
@@ -60,8 +61,10 @@ public class Constants {
   public static final String ITEM_KEY               = "item";
   public static final String SECTION_KEY            = "section";
   public static final String KEYWORDS_KEY           = "keywords";
+  public static final String BUDDHAWAJ_KEY          = "buddhawaj";
   public static final String PAGE_KEY               = "page";
   public static final String CONTENT_KEY            = "content";
+  public static final String HTML_CONTENT_KEY       = "html_content";
   public static final String FOOTER_KEY             = "footer";
   public static final String NUMBER_KEY             = "number";
   public static final String BUTTON_KEY             = "button";
@@ -84,7 +87,7 @@ public class Constants {
   public static final String DEFAULT_FONT_COLOR       = "#010101";
   public static final String DEFAULT_BACKGROUND_COLOR = "#FEFEFE";
 
-  public static final String LANGUAGE_TITLES[] = {"ภาษาไทยฉบับหลวง", "ภาษาบาลีฉบับสยามรัฐ", "ภาษาไทยฉบับมหามกุฏฯ", "ภาษาไทยฉบับมหาจุฬาฯ"};
+  public static final String LANGUAGE_TITLES[] = {"ภาษาไทยฉบับหลวง", "ภาษาบาลีฉบับสยามรัฐ", "ภาษาไทยฉบับมหามกุฏฯ", "ภาษาไทยฉบับมหาจุฬาฯ", "พุทธวจนปิฎก ๓๓ เล่ม"};
   public static final String LANGUAGE_TITLES_BT[] = {"ภาษาไทยฉบับหลวง", "ภาษาบาลีฉบับสยามรัฐ"};
   public static final String REFS_PATTERN = "([๐๑๒๓๔๕๖๗๘๙][–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+)/([–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+)/([–๐๑๒๓๔๕๖๗๘๙\\s\\-,]+[๐๑๒๓๔๕๖๗๘๙])";
 
@@ -92,4 +95,5 @@ public class Constants {
   public static final String FAV_ORDERING_KEY = "fav_ordering_key";
   public static final String HIS_SORTING_KEY = "his_sorting_key";
   public static final String HIS_ORDERING_KEY = "his_ordering_key";
+
 }

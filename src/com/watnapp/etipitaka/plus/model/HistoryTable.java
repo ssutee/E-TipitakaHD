@@ -17,6 +17,7 @@ public final class HistoryTable {
     public static final String RESULT3 = "result3_column";
     public static final String SCORE = "score_column";
     public static final String CONTENT = "content_column";
+    public static final String BUDDHAWAJ = "buddhawaj_column";
   }
 
 
@@ -40,8 +41,9 @@ public final class HistoryTable {
   }
 
   public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    db.execSQL("DROP TABLE IF EXISTS " + HistoryTable.TABLE_NAME);
-    HistoryTable.onCreate(db);
+    if (oldVersion == 1 && newVersion == 2) {
+      db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + HistoryColumns.BUDDHAWAJ + " BOOLEAN;");
+    }
   }
 
 

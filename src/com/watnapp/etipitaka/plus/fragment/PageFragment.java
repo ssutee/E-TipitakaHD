@@ -19,7 +19,9 @@ import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.widget.MyWebView;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
+import roboguice.util.Strings;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,7 +43,8 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
   private int mFontSize = Constants.DEFAULT_FONT_SIZE;
   private String mFontColor = Constants.DEFAULT_FONT_COLOR;
   private String mBackgroundColor = Constants.DEFAULT_BACKGROUND_COLOR;
-  private String mText, mHtml, mFooter;
+  private String mText, mHtml, mFooter, mKeywords;
+  private boolean mIsBuddhawaj;
 
   @InjectView(R.id.webview)
   private MyWebView mWebView;
@@ -57,10 +60,12 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     mWebView.getSettings().setJavaScriptEnabled(true);
-    mText = getArguments().getString(Constants.CONTENT_KEY);
-    mFooter = getArguments().getString(Constants.FOOTER_KEY, "");
-    mText = mText.replace("\t", "   ");
-    String keywords = getArguments().getString(Constants.KEYWORDS_KEY);
+
+    mText = getArguments().containsKey(Constants.HTML_CONTENT_KEY) ?
+        getArguments().getString(Constants.HTML_CONTENT_KEY) : getArguments().getString(Constants.CONTENT_KEY);
+    mFooter = getArguments().containsKey(Constants.FOOTER_KEY) ? getArguments().getString(Constants.FOOTER_KEY) : "";
+    mKeywords = getArguments().getString(Constants.KEYWORDS_KEY);
+    mIsBuddhawaj = getArguments().getBoolean(Constants.BUDDHAWAJ_KEY);
     mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
     mWebView.setOnTouchListener(this);
     mWebView.setWebViewClient(new WebViewClient() {
@@ -72,7 +77,15 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
 
       @Override
       public void onPageFinished(WebView view, String url) {
-        super.onPageFinished(view, url);
+        if(mKeywords != null && mKeywords.trim().length() > 0) {
+          ArrayList<String> terms = new ArrayList<String>();
+          for (String term : mKeywords.split("\\s+")) {
+            terms.add(term.replace('+', ' '));
+          }
+          Log.d(TAG, "searchType = " + (mIsBuddhawaj ? 2 : 1));
+          view.loadUrl(String.format("javascript:search(\"%s\", %d);", Strings.join("|", terms), mIsBuddhawaj ? 2 : 1));
+          scrollToKeywords();
+        }
       }
     });
     mWebView.setVerticalScrollBarEnabled(false);
@@ -82,11 +95,12 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     String fontColor = prefs.getString(Constants.FONT_COLOR_KEY, Constants.DEFAULT_FONT_COLOR);
     String backgroundColor = prefs.getString(Constants.BACKGROUND_COLOR_KEY, Constants.DEFAULT_BACKGROUND_COLOR);
     mHtml = getString(R.string.html_text_template,
-        highlightItemNumbers(highlightKeywords(mText, keywords)),
+        highlightItemNumbers(mText),
         String.format("%dpt", fontSize),
         getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old),
         fontColor, backgroundColor, mFooter);
-    mWebView.loadDataWithBaseURL("http://etipitaka.com", mHtml, "text/html", "UTF-8", null);
+    mHtml = mHtml.replace("\t", "&#9;");
+    mWebView.loadDataWithBaseURL("file:///android_asset/", mHtml, "text/html", "UTF-8", null);
     mWebView.setOnScrollChangedListener((MyWebView.OnScrollChangedListener) getParentFragment());
   }
 
@@ -153,27 +167,6 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     return sb.toString();
   }
 
-  private String highlightKeywords(String text, String keywords) {
-    if(keywords.trim().length() > 0) {
-      keywords = keywords.replace('+', ' ');
-      String [] tokens = keywords.split("\\s+");
-      Arrays.sort(tokens, new StringLengthComparator());
-      Collections.reverse(Arrays.asList(tokens));
-      int count = 0;
-      for(String token: tokens) {
-        text = text.replace(token,
-            String.format("<span style='color:#0000FF;' id=\"keywords\">-:*%d*:-</span>", count));
-        count++;
-      }
-      count = 0;
-      for(String token: tokens) {
-        text = text.replace(String.format("-:*%d*:-", count), token);
-        count++;
-      }
-    }
-    return text;
-  }
-
   @Override
   public boolean onTouch(View v, MotionEvent event) {
     if (v.getId() == R.id.webview && event.getAction() == MotionEvent.ACTION_DOWN){
@@ -226,15 +219,4 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     }, 800);
   }
 
-  private class StringLengthComparator implements Comparator<String> {
-    public int compare(String o1, String o2) {
-      if (o1.length() < o2.length()) {
-        return -1;
-      } else if (o1.length() > o2.length()) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }
 }

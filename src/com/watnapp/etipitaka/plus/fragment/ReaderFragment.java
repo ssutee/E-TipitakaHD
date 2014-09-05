@@ -70,6 +70,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
 
   private E_TipitakaApplication application;
   private String mKeywords;
+  private boolean mIsBuddhawaj;
   private BookDatabaseHelper.Language mLanguage;
   private int mVolume;
   private int mPage;
@@ -94,12 +95,12 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   }
 
   public static ReaderFragment newInstance(Language language, int volume, int page,
-                                           String keywords) {
-    return ReaderFragment.newInstance(language, volume, page, keywords, false);
+                                           String keywords, boolean isBuddhawaj) {
+    return ReaderFragment.newInstance(language, volume, page, keywords, isBuddhawaj, false);
   }
 
   public static ReaderFragment newInstance(Language language, int volume, int page,
-                                           String keywords, boolean compareButton) {
+                                           String keywords, boolean isBuddhawaj, boolean compareButton) {
     ReaderFragment fragment = new ReaderFragment();
     Bundle args = new Bundle();
     args.putInt(Constants.LANGUAGE_KEY, language.getCode());
@@ -107,6 +108,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     args.putInt(Constants.PAGE_KEY, page);
     args.putString(Constants.KEYWORDS_KEY, keywords);
     args.putBoolean(Constants.BUTTON_KEY, compareButton);
+    args.putBoolean(Constants.BUDDHAWAJ_KEY, isBuddhawaj);
     fragment.setArguments(args);
     return fragment;
   }
@@ -122,6 +124,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     }
 
     mKeywords = savedInstanceState.getString(Constants.KEYWORDS_KEY);
+    mIsBuddhawaj = savedInstanceState.getBoolean(Constants.BUDDHAWAJ_KEY);
     mVolume = savedInstanceState.getInt(Constants.VOLUME_KEY);
     mPage = savedInstanceState.getInt(Constants.PAGE_KEY);
     mLanguage = BookDatabaseHelper.Language.values()[savedInstanceState.getInt(Constants.LANGUAGE_KEY)];
@@ -140,8 +143,10 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     outState.putString(Constants.KEYWORDS_KEY, mKeywords);
+    outState.putBoolean(Constants.BUDDHAWAJ_KEY, mIsBuddhawaj);
     outState.putInt(Constants.VOLUME_KEY, mVolume);
     outState.putInt(Constants.PAGE_KEY, mPage);
+    outState.putBoolean(Constants.BUTTON_KEY, mShowButtons);
     outState.putInt(Constants.LANGUAGE_KEY, mLanguage.getCode());
   }
 
@@ -164,8 +169,13 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       public Bundle buildArguments(Cursor cursor) {
         Bundle args = new Bundle();
         args.putString(Constants.KEYWORDS_KEY, mKeywords);
+        Log.d(TAG, "buildArguments = " + mIsBuddhawaj);
+        args.putBoolean(Constants.BUDDHAWAJ_KEY, mIsBuddhawaj);
         String content = StringUtils.strip(cursor.getString(cursor.getColumnIndex(dataModel.getContentColumn())), "\n");
         args.putString(Constants.CONTENT_KEY, content);
+        if (dataModel.hasHtmlContent()) {
+          args.putString(Constants.HTML_CONTENT_KEY, cursor.getString(cursor.getColumnIndex("html")));
+        }
         args.putInt(Constants.NUMBER_KEY, dataModel.getPageNumber(cursor));
         if (dataModel.hasFooter()) {
           args.putString(Constants.FOOTER_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getFooterColumn())).trim());
@@ -249,7 +259,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       }
     });
 
-    openBook(mLanguage, mVolume, mPage, mKeywords);
+    openBook(mLanguage, mVolume, mPage, mKeywords, mIsBuddhawaj);
 
   }
 
@@ -269,7 +279,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     mViewPager.setCurrentItem(page - 1, smoothScroll);
   }
 
-  public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords) {
+  public void openBook(BookDatabaseHelper.Language language, int volume, int page, String keywords, boolean isBuddhawaj) {
     if (mLanguage != language) {
       if (dataModel != null) {
         dataModel.closeDatabase();
@@ -282,6 +292,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     page = page - dataModel.getMinimumPageNumber(volume) + 1;
     mKeywords = keywords;
     mVolume = volume;
+    mIsBuddhawaj = isBuddhawaj;
     Cursor cursor = dataModel.read(volume);
     Log.d(TAG, "total = " + cursor.getCount() + "");
     Log.d(TAG, "page = " + page);
@@ -293,18 +304,12 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       mViewPager.setCurrentItem(page-1, false);
       mSeekBar.setMax(cursor.getCount() - 1);
       mSeekBar.setProgress(page - 1);
-      if (keywords != null && keywords.length() > 0) {
-        PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
-        if (fragment != null) {
-          fragment.scrollToKeywords();
-        }
-      }
       updateSubtitle(volume, page);
     }
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, int item) {
-    openBook(language, volume, page, "");
+    openBook(language, volume, page, "", false);
     PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
     if (fragment != null && item > 0) {
       fragment.scrollToItem(item);
@@ -312,7 +317,7 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page) {
-    openBook(language, volume, page, "");
+    openBook(language, volume, page, "", false);
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume) {

@@ -29,11 +29,12 @@
     <string name="query_hint">ป้อนคำค้นหาที่ต้องการ</string>
     <string name="searching">กำลังค้นหาข้อมูล</string>
     <string name="please_wait">กรุณารอซักครู่</string>
-    <string name="please_select_category">โปรดเลือกหมวดหมู่ที่ต้องการค้นหา</string>
+    <string name="please_select_category">เลือกหมวดหมู่ที่ต้องการค้นหา</string>
     <string name="please_enter_keywords">กรุณาป้อนคำค้นหา</string>
     <string name="search_result_summary">พบคำว่า \"%1$s\" ทั้งหมด %2$s หน้า</string>
     <string name="found_n_pages">พบ %1$s หน้า</string>
     <string name="n_volume_n_page">พระไตรปิฎก เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="buddhawaj_n_volume_n_page">พุทธวจนปิฎก เล่มที่ %1$s หน้าที่ %2$s</string>
     <string name="n_volume_n_page_minimal">เล่มที่ %1$s หน้าที่ %2$s</string>
     <string name="search_result_not_found">ไม่พบคำว่า \"%1$s\"\nใน%2$s</string>
     <string name="abbr_section1">วิ.(%1$s)</string>
@@ -105,7 +106,17 @@
                 <style type=\"text/css\">
                     body { color:%4$s; background-color:%5$s; }
                     p { margin-bottom:0px; padding-bottom:0px; }
+                    span.level-1 { font-size: 110%%; }
+                    span.level-2 { color: #555555; font-size: 85%%; }
+                    span.level-3 { color: #888888; font-size: 75%%; }
+                    span.footnote { color: green; font-weight: normal; font-size: 75%%; }
+                    .keywords { color: #0000FF; background: yellow; }
                 </style>
+                <script type=\"text/javascript\" src=\"jquery-2.1.1.min.js\"></script>
+                <script type=\"text/javascript\" src=\"rangy-core.js\"></script>
+                <script type=\"text/javascript\" src=\"rangy-cssclassapplier.js\"></script>
+                <script type=\"text/javascript\" src=\"rangy-serializer.js\"></script>
+                <script type=\"text/javascript\" src=\"rangy-textrange.js\"></script>
                 <script>
                     function scrollToElement(theElement) {
                         var selectedPosX = 0;
@@ -117,16 +128,46 @@
                         }
                         window.scrollTo(selectedPosX,selectedPosY);
                     }
+
                     function scrollToKeywords() {
                         var keywords = document.getElementById(\"keywords\");
                         if (keywords) {
                             scrollToElement(keywords);
                         }
                     }
+
                     function scrollToItem(number) {
                         var item = document.getElementById(\"i_\" + number);
                         if (item) {
                             scrollToElement(item);
+                        }
+                    }
+
+                    function search(term, searchType) {
+                        var searchResultApplier = rangy.createClassApplier(\"keywords\",
+                            { elementProperties: { id: \"keywords\" } });
+                        var range = rangy.createRange();
+                        var searchScopeRange = rangy.createRange();
+                        searchScopeRange.selectNodeContents(document.body);
+
+                        var options = {
+                            caseSensitive: true,
+                            wholeWordsOnly: false,
+                            withinRange: searchScopeRange,
+                            direction: \"forward\"
+                        };
+
+                        range.selectNodeContents(document.body);
+                        searchResultApplier.undoToRange(range);
+
+                        term = new RegExp(term, \"g\");
+
+                        while (range.findText(term, options)) {
+                            var parentNode = range.startContainer.parentNode;
+                            if (searchType == 1 || (searchType == 2 && parentNode.hasAttributes() && parentNode.attributes[\"class\"] !== undefined && (parentNode.attributes[\"class\"].value == \"level-1\" || parentNode.attributes[\"class\"].value == \"level-2\"))) {
+                                searchResultApplier.applyToRange(range);
+                            }
+                            range.collapse(false);
                         }
                     }
                 </script>
@@ -203,4 +244,7 @@
     <string name="select_sorting_type">เลือกรูปแบบการเรียงลำดับ</string>
     <string name="select_ordering">เรียงลำดับจาก..</string>
     <string name="mark">สำคัญ</string>
+    <string name="thaiwn_full_name">พุทธวจนปิฎก ๓๓ เล่ม</string>
+    <string name="choose_search_type">เลือกรูปแบบการค้นหา</string>
+    <string name="buddhawaj">พุทธวจน</string>
 </resources>

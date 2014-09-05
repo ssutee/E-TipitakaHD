@@ -110,4 +110,9 @@ public class ETThaiMahaChulaDataModel extends ETThaiMahaDataModel {
     }
     return 0;
   }
+
+  @Override
+  public int getTotalVolumes() {
+    return 45;
+  }
 }

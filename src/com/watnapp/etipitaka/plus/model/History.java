@@ -19,6 +19,7 @@ public class History extends ModelBase {
   private int result3;
   private String content;
   private int score;
+  private boolean buddhawaj;
 
   public History() {
     super();
@@ -126,6 +127,14 @@ public class History extends ModelBase {
     this.score = score;
   }
 
+  public boolean isBuddhawaj() {
+    return buddhawaj;
+  }
+
+  public void setBuddhawaj(boolean buddhawaj) {
+    this.buddhawaj = buddhawaj;
+  }
+
   @Override
   public void fromCursor(Cursor cursor, Context context) {
     this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
@@ -139,6 +148,7 @@ public class History extends ModelBase {
     this.result3 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.RESULT3));
     this.score = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.SCORE));
     this.content = cursor.getString(cursor.getColumnIndex(HistoryTable.HistoryColumns.CONTENT));
+    this.buddhawaj = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.BUDDHAWAJ)) == 1;
     this.context = context;
   }
 
@@ -155,6 +165,7 @@ public class History extends ModelBase {
     values.put(HistoryTable.HistoryColumns.RESULT3, this.result3);
     values.put(HistoryTable.HistoryColumns.SCORE, this.score);
     values.put(HistoryTable.HistoryColumns.CONTENT, this.content);
+    values.put(HistoryTable.HistoryColumns.BUDDHAWAJ, this.buddhawaj);
     return values;
   }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          android:versionName="2.1.11"
-          android:versionCode="02111"
+          android:versionName="2.2.0"
+          android:versionCode="02200"
           package="com.watnapp.etipitaka.plus">
 
     <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="17"/>
@@ -36,7 +36,6 @@
                 <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
                 android:name=".activity.MainActivity"
                 android:theme="@style/Theme.Sherlock.Light"
@@ -61,7 +60,6 @@
                 android:theme="@style/Theme.Sherlock.Light"
                 android:label="@string/pali_dict">
         </activity>
-
         <provider
                 android:name=".model.DatabaseProvider"
                 android:authorities="com.watnapp.etipitaka.plus.model.contentprovider"

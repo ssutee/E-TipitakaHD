@@ -176,4 +176,9 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   public int getSectionBoundary(int index) {
     return 5;
   }
+
+  @Override
+  public int getTotalVolumes() {
+    return 5;
+  }
 }

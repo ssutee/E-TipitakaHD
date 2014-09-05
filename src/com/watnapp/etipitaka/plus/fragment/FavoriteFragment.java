@@ -226,7 +226,7 @@ public class FavoriteFragment extends RoboSherlockListFragment
   private void openNote(Favorite favorite) {
     MainActivity activity = (MainActivity) getActivity();
     Log.d(TAG, favorite.getVolume() + ":" + favorite.getPage());
-    activity.openBook(favorite.getLanguage(), favorite.getVolume(), favorite.getPage(), "", favorite.getItem());
+    activity.openBook(favorite.getLanguage(), favorite.getVolume(), favorite.getPage(), "", false, favorite.getItem());
   }
 
   @Override

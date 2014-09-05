@@ -36,23 +36,26 @@ public class HistoryDaoHelper extends DaoHelper {
   }
 
   public History get(String keywords, BookDatabaseHelper.Language language,
-                     SparseBooleanArray selectedSections) {
+                     SparseBooleanArray selectedSections, boolean isBuddhawaj) {
     List<ModelBase> result = get(HistoryTable.HistoryColumns.KEYWORDS + " LIKE ? AND "
         + HistoryTable.HistoryColumns.LANGUAGE + " = ? AND "
         + HistoryTable.HistoryColumns.SECTION1 + " = ? AND "
         + HistoryTable.HistoryColumns.SECTION2 + " = ? AND "
-        + HistoryTable.HistoryColumns.SECTION3 + " = ?",
+        + HistoryTable.HistoryColumns.SECTION3 + " = ? AND ("
+        + HistoryColumns.BUDDHAWAJ + " = ? OR " + HistoryColumns.BUDDHAWAJ + (isBuddhawaj ? " = 1)" : " is null)"),
         new String[]{keywords, language.getCode() + "",
             (selectedSections != null && selectedSections.get(0, false) ? "1" : "0"),
             (selectedSections != null && selectedSections.get(1, false) ? "1" : "0"),
-            (selectedSections != null && selectedSections.get(2, false) ? "1" : "0")});
+            (selectedSections != null && selectedSections.get(2, false) ? "1" : "0"),
+            isBuddhawaj ? "1" : "0"
+        });
 
     return result != null && result.size() > 0 ? (History) result.get(0) : null;
   }
 
   public boolean contains(String keywords, BookDatabaseHelper.Language language,
-                          SparseBooleanArray selectedSections) {
-    return get(keywords, language, selectedSections) != null;
+                          SparseBooleanArray selectedSections, boolean isBuddhawaj) {
+    return get(keywords, language, selectedSections, isBuddhawaj) != null;
   }
 
   public void restoreJSONArray(JSONArray jsonArray) {
@@ -67,7 +70,9 @@ public class HistoryDaoHelper extends DaoHelper {
         String keywords = jsonObject.getString(HistoryColumns.KEYWORDS);
         BookDatabaseHelper.Language language = BookDatabaseHelper
             .Language.values()[jsonObject.getInt(HistoryColumns.LANGUAGE)];
-        if (!contains(keywords, language, selectedSections)) {
+        boolean isBuddhawaj = jsonObject.has(HistoryColumns.BUDDHAWAJ)
+            ? jsonObject.getBoolean(HistoryColumns.BUDDHAWAJ) : false;
+        if (!contains(keywords, language, selectedSections, isBuddhawaj)) {
           int result1 = jsonObject.getInt(HistoryColumns.RESULT1);
           int result2 = jsonObject.getInt(HistoryColumns.RESULT2);
           int result3 = jsonObject.getInt(HistoryColumns.RESULT3);
@@ -84,6 +89,7 @@ public class HistoryDaoHelper extends DaoHelper {
           history.setSection1(selectedSections.get(0));
           history.setSection2(selectedSections.get(1));
           history.setSection3(selectedSections.get(2));
+          history.setBuddhawaj(isBuddhawaj);
           int historyId = insert(history);
           historyItemDaoHelper.restoreJSONArray(historyId,
               jsonObject.getJSONArray(HistoryItemTable.TABLE_NAME));
@@ -109,6 +115,7 @@ public class HistoryDaoHelper extends DaoHelper {
         jsonObject.put(HistoryColumns.SECTION2, history.isSection2());
         jsonObject.put(HistoryColumns.SECTION3, history.isSection3());
         jsonObject.put(HistoryColumns.SCORE, history.getScore());
+        jsonObject.put(HistoryColumns.BUDDHAWAJ, history.isBuddhawaj());
         jsonObject.put(HistoryItemTable.TABLE_NAME, historyItemDaoHelper.dumpJSONArray(history.getId()));
       } catch (JSONException e) {
         e.printStackTrace();

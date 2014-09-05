@@ -13,6 +13,7 @@ import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockListFra
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.E_TipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
+import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.activity.MainActivity;
 import com.watnapp.etipitaka.plus.adapter.BookListAdapter;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -90,6 +91,8 @@ public class BookListFragment extends RoboSherlockListFragment implements BookLi
       return R.array.thaimm_book_titles_with_numbers;
     } else if (application.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
       return R.array.thaibt_book_titles_with_numbers;
+    } else if (application.getLanguage() == BookDatabaseHelper.Language.THAIWN) {
+      return R.array.thaiwn_book_titles_with_number;
     }
     return R.array.book_titles_with_number;
   }
@@ -98,7 +101,7 @@ public class BookListFragment extends RoboSherlockListFragment implements BookLi
   public int getSectionsArrayId() {
     if (application.getLanguage() == BookDatabaseHelper.Language.PALI) {
       return R.array.pali_sections;
-    } else if (application.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
+    } else if (!Utils.isTipitaka(application.getLanguage())) {
       return 0;
     }
     return R.array.sections;

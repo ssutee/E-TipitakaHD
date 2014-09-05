@@ -33,6 +33,7 @@ public abstract class ETDataModel {
   abstract public void search(String keywords, BookDatabaseHelper.OnSearchListener listener, Integer[] volumes);
   abstract public void search(String keywords, BookDatabaseHelper.OnSearchListener listener);
   abstract public int getSectionBoundary(int index);
+  abstract public int getTotalVolumes();
 
   public ETDataModel(Context context) {
     this.mContext = context;
@@ -92,5 +93,13 @@ public abstract class ETDataModel {
 
   public int getPageByItem(int volume, int item, int section, boolean needConvertToSiamrat) {
     return getPageById(getPageIdByItem(volume, item, section));
+  }
+
+  public boolean hasHtmlContent() {
+    return false;
+  }
+
+  public void search(String keywords, BookDatabaseHelper.OnSearchListener listener, Integer[] volumes, BookDatabaseHelper.SearchType searchType) {
+    search(keywords, listener, volumes);
   }
 }

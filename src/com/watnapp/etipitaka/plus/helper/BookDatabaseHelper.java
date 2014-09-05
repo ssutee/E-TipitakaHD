@@ -323,8 +323,22 @@ public class BookDatabaseHelper {
 
   }
 
+  public enum SearchType {
+    ALL(1), BUDDHAWAJ(2);
+
+    private int code;
+
+    private SearchType(int code) {
+      this.code = code;
+    }
+
+    public int getCode() {
+      return this.code;
+    }
+  }
+
   public enum Language {
-    THAI(0), PALI(1), THAIMM(2), THAIMC(3), THAIBT(4);
+    THAI(0), PALI(1), THAIMM(2), THAIMC(3), THAIBT(4), THAIWN(5);
 
     private int code;
 
@@ -348,6 +362,8 @@ public class BookDatabaseHelper {
           return context.getString(R.string.thaimc_full_name);
         case 4:
           return context.getString(R.string.thaibt_full_name);
+        case 5:
+          return context.getString(R.string.thaiwn_full_name);
       }
       return null;
     }
@@ -364,6 +380,8 @@ public class BookDatabaseHelper {
           return "thaimc";
         case 4:
           return "thaibt";
+        case 5:
+          return "thaiwn";
       }
       return null;
     }
@@ -390,6 +408,7 @@ public class BookDatabaseHelper {
   static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiMMBookItems = null;
   static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiMMOriginBookItems = null;
   static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiMCBookItems = null;
+  static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiWNBookItems = null;
 
   private static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getBookItems(Context context, String filename) {
     try {
@@ -443,6 +462,14 @@ public class BookDatabaseHelper {
     return thaiMCBookItems;
   }
 
+  public static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getThaiWNBookItems(Context context) {
+    if (thaiWNBookItems != null) {
+      return thaiWNBookItems;
+    }
+    thaiWNBookItems = getBookItems(context, "book_item_thaiwn.json");
+    return thaiWNBookItems;
+  }
+
   public static int getSubItem(Context context, Language language, int volume, int page, int item) {
     Map<String,Map<String,Map<String,ArrayList<Integer>>>> bookItems = null;
     switch (language) {
@@ -457,6 +484,9 @@ public class BookDatabaseHelper {
         break;
       case THAIMC:
         bookItems = getThaiMCBookItems(context);
+        break;
+      case THAIWN:
+        bookItems = getThaiWNBookItems(context);
         break;
     }
 

@@ -49,8 +49,9 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
 
   @Override
   public int getItemViewType(int position) {
-    if (getLanguage() == BookDatabaseHelper.Language.THAIBT)
+    if (!Utils.isTipitaka(getLanguage())) {
       return TYPE_CONTENT;
+    }
     return (position <= 2) ? TYPE_HEAD : TYPE_CONTENT;
   }
 
@@ -99,8 +100,13 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
     } else if (getItemViewType(cursor.getPosition()) == TYPE_CONTENT) {
       int volume = getDataModel().getVolume(cursor);
       int page = getDataModel().getPageNumber(cursor);
-      viewHolder.text1.setText(context.getString(getLanguage() == BookDatabaseHelper.Language.THAIBT ?
-              R.string.n_volume_n_page_minimal : R.string.n_volume_n_page,
+      int stringId = R.string.n_volume_n_page;
+      if (getLanguage()  == BookDatabaseHelper.Language.THAIBT) {
+        stringId = R.string.n_volume_n_page_minimal;
+      } else if (getLanguage() == BookDatabaseHelper.Language.THAIWN) {
+        stringId = R.string.buddhawaj_n_volume_n_page;
+      }
+      viewHolder.text1.setText(context.getString(stringId,
           Utils.convertToThaiNumber(context, volume), Utils.convertToThaiNumber(context, page)));
       HistoryItem.Status status = getStatus(volume, page);
       if (status == HistoryItem.Status.READ) {
@@ -157,8 +163,7 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
 
   @Override
   public long getHeaderId(int position) {
-    if (getLanguage() == BookDatabaseHelper.Language.THAIBT ||
-        position <= 2 && getLanguage() != BookDatabaseHelper.Language.THAIBT) {
+    if (!Utils.isTipitaka(getLanguage()) || (position <= 2 && Utils.isTipitaka(getLanguage()))) {
       return ID_HEAD;
     }
 

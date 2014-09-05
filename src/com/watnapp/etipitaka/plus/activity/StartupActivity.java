@@ -80,7 +80,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity implements Fil
         if (new File(Constants.DATABASE_PATH).length()==Constants.DATABASE_SIZE
             && new File(Constants.MC_DATABASE_PATH).exists() && new File(Constants.MM_DATABASE_PATH).exists()
             && getThaiMCDatabaseVersion() == 3 && getThaiMMDatabaseVersion() == 2
-            && new File(Constants.BT_DATABASE_PATH).exists()) {
+            && new File(Constants.BT_DATABASE_PATH).exists()
+            && new File(Constants.WN_DATABASE_PATH).exists()) {
           mHandler.post(runnableOnSuccess);
         } else {
           mHandler.post(runnableOnFail);

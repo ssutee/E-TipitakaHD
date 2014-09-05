@@ -49,6 +49,9 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   @InjectExtra(Constants.KEYWORDS_KEY)
   private String mKeywords;
 
+  @InjectExtra(Constants.BUDDHAWAJ_KEY)
+  private boolean mIsBuddhawaj;
+
   @InjectExtra(Constants.PAGE_KEY)
   private int mPage;
 
@@ -78,12 +81,12 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
         : mComparingVolume;
     int page2 = mDataModel2.getPageByItem(volume, mItem, mSection, true);
 
-    mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, mKeywords, true);
+    mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, mKeywords, mIsBuddhawaj, true);
     getSupportFragmentManager().beginTransaction()
         .add(R.id.left_reader_fragment,
             mLeftFragment, "left").commit();
 
-    mRightFragment = ReaderFragment.newInstance(mLanguage2, volume, page2, "", true);
+    mRightFragment = ReaderFragment.newInstance(mLanguage2, volume, page2, "", mIsBuddhawaj, true);
     getSupportFragmentManager().beginTransaction()
         .add(R.id.right_reader_fragment,
             mRightFragment, "right").commit();
@@ -109,10 +112,6 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
     final ETDataModel sourceModel = language == mDataModel1.getLanguage() ? mDataModel1 : mDataModel2;
     final ETDataModel targetModel = language == mDataModel1.getLanguage() ? mDataModel2 : mDataModel1;
 
-    Log.d(TAG, language.toString());
-    Log.d(TAG, sourceModel.getLanguage().toString());
-    Log.d(TAG, targetModel.getLanguage().toString());
-
     if (sourceModel.getLanguage() == Language.THAIBT || targetModel.getLanguage() == Language.THAIBT) {
       return;
     }
@@ -137,7 +136,11 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
                     ReaderFragment targetFragment = (language.getCode() == mLanguageCode)
                         ? mRightFragment : mLeftFragment;
                     int volume2 = targetModel.convertVolume(sourceModel.getComparingVolume(volume, page), sections[which], items[which]);
+                    Log.d(TAG, "volume = " + volume2);
+                    Log.d(TAG, "item = " + items[which]);
+                    Log.d(TAG, "section = " + sections[which]);
                     int page2 = targetModel.getPageByItem(volume2, items[which], sections[which], true);
+                    Log.d(TAG, "page = " + page2);
                     targetFragment.openBook(targetLanguage, volume2, page2);
                     targetFragment.getCurrentPageFragment().scrollToItem(items[which]);
                   }

@@ -305,4 +305,9 @@ abstract public class ETSiamratDataModel extends ETDataModel {
     }
     return 45;
   }
+
+  @Override
+  public int getTotalVolumes() {
+    return 45;
+  }
 }

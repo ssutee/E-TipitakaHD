@@ -84,6 +84,11 @@ public class ETThaiMahaMakutDataModel extends ETThaiMahaDataModel {
 
   @Override
   public void getComparingItemsAtPage(int volume, int page, BookDatabaseHelper.OnGetItemsListener listener) {
-    getComparingItemsAtPage(volume, page, listener);
+    getItemsAtPage(volume, page, listener);
+  }
+
+  @Override
+  public int getTotalVolumes() {
+    return 91;
   }
 }

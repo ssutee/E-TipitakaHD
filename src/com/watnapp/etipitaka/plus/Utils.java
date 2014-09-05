@@ -64,4 +64,8 @@ public class Utils {
     return md5.toString();
   }
 
+  public static boolean isTipitaka(Language language) {
+    return language != Language.THAIBT && language != Language.THAIWN;
+  }
+
 }
