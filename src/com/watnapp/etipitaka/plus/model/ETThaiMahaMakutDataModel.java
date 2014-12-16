@@ -3,6 +3,7 @@ package com.watnapp.etipitaka.plus.model;
 import android.content.Context;
 import android.database.Cursor;
 import com.watnapp.etipitaka.plus.Constants;
+import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -91,4 +92,10 @@ public class ETThaiMahaMakutDataModel extends ETThaiMahaDataModel {
   public int getTotalVolumes() {
     return 91;
   }
+
+  @Override
+  public String getShortTitle() {
+    return mContext.getString(R.string.thaimm_short_name);
+  }
+
 }

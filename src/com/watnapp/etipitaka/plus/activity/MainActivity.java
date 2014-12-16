@@ -96,16 +96,30 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         if (uri.compareTo(Constants.LANGUAGE_CHANGE_URI) == 0) {
           dataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
         } else if (uri.compareTo(Constants.RESET_PAGE_URI) == 0) {
-          if (mLanguage == Language.THAIMM) {
-            mVolume = dataModel.getComparingVolume(mVolume, 1);
-          } else if (application.getLanguage() == Language.THAIMM) {
-            dataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
-            mVolume = dataModel.convertVolume(mVolume, 1, 1);
-          }
-          dataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
-          if (application.getLanguage() == Language.THAIBT || mLanguage == Language.THAIBT) {
-            mVolume = 1;
-          }
+
+          ETDataModel sourceDataModel = dataModel;
+          final ETDataModel targetDataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
+
+          sourceDataModel.convertToPivot(mVolume, 1, 1, new BookDatabaseHelper.OnConvertToPivotListener() {
+            @Override
+            public void onConvertToPivotFinish(int volume, int item, int section) {
+              targetDataModel.convertFromPivot(volume, item, section, new BookDatabaseHelper.OnConvertFromPivotListener() {
+                @Override
+                public void onConvertFromPivotFinish(int volume, int page) {
+                  mVolume = volume;
+                  dataModel = targetDataModel;
+                  mLanguage = application.getLanguage();
+                  mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                      getReaderFragment().openBook(mLanguage, mVolume, 1, "", false);
+                    }
+                  });
+                }
+              });
+            }
+          });
+
           getReaderFragment().openBook(application.getLanguage(), mVolume, 1, "", false);
           mLanguage = application.getLanguage();
         }
@@ -268,7 +282,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_GOTO_ITEM:
         if (mLanguage == Language.THAIMC) {
           showItemsIndexSystemDialog();
-        } else if (mLanguage != Language.THAIBT) {
+        } else if (mLanguage != Language.THAIBT && mLanguage != Language.THAIPB) {
           mItemIndexSystem = 1;
           showGotoItemDialog();
         }
@@ -417,7 +431,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   private void chooseLanguage() {
     final ArrayList<Pair<String, Pair<Integer, Integer>>> references = new ArrayList<Pair<String, Pair<Integer, Integer>>>();
 
-    if (dataModel.getLanguage() == Language.THAIBT) {
+    if (dataModel.getLanguage() == Language.THAIBT || dataModel.getLanguage() == Language.THAIPB) {
       Pattern pattern = Pattern.compile(Constants.REFS_PATTERN);
       Matcher matcher = pattern.matcher(getReaderFragment().getCurrentPageFragment().getContent());
       while (matcher.find()) {
@@ -598,7 +612,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   private void showItemsIndexSystemDialog() {
     new AlertDialog.Builder(this).setTitle(R.string.choose_items_index_system)
-        .setItems(new String[]{getString(R.string.siamrat), getString(R.string.mahachula)},
+        .setItems(new String[]{getString(R.string.siamrat), dataModel.getShortTitle()},
             new DialogInterface.OnClickListener() {
               @Override
               public void onClick(DialogInterface dialog, int which) {

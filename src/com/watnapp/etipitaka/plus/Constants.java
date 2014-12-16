@@ -43,7 +43,7 @@ public class Constants {
 
   public static final Uri LANGUAGE_CHANGE_URI = Uri.parse("content://etipitaka.com/language_change");
   public static final Uri RESET_PAGE_URI = Uri.parse("content://etipitaka.com/reset_page");
-  public static final String DATABASE_URL = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v8.zip";
+  public static final String DATABASE_URL = "http://download.watnapahpong.org/data/etipitaka/android/etipitaka_plus_v9.zip";
 
   public static final String DATABASE_FOLDER    = Environment.getExternalStorageDirectory().getPath() + "/ETPK";
   public static final String DATABASE_PATH      = DATABASE_FOLDER + "/etipitaka_plus.db";
@@ -51,7 +51,10 @@ public class Constants {
   public static final String MC_DATABASE_PATH   = DATABASE_FOLDER + "/thaimc.db";
   public static final String BT_DATABASE_PATH   = DATABASE_FOLDER + "/thaibt.db";
   public static final String WN_DATABASE_PATH   = DATABASE_FOLDER + "/thaiwn.db";
-  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v8.zip";
+  public static final String PB_DATABASE_PATH   = DATABASE_FOLDER + "/thaipb.db";
+  public static final String CT_DATABASE_PATH   = DATABASE_FOLDER + "/romanct.db";
+
+  public static final String DATABASE_ZIP_PATH  = DATABASE_FOLDER + "/etipitaka_plus_v9.zip";
   public static final long DATABASE_SIZE        = 185511936;
 
   public static final String LANGUAGE_KEY           = "language";

@@ -77,9 +77,9 @@ public class PaliDictActivity extends RoboSherlockFragmentActivity {
         String content = mDatabaseHelper.getContentById(cursor.getInt(cursor.getColumnIndex("_id")));
         String headword = cursor.getString(cursor.getColumnIndex("headword"));
         WebView webView = (WebView) getLayoutInflater().inflate(R.layout.dialog_dict_message, null);
+        String fontFamily = getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old);
         webView.loadDataWithBaseURL("http://etipitaka.com",
-            getString(R.string.html_dict_template, headword, content.trim(), 28,
-                getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old)),
+            getString(R.string.html_dict_template, headword, content.trim(), 28, fontFamily),
             "text/html", "UTF-8", null);
         AlertDialog dialog = new AlertDialog.Builder(PaliDictActivity.this)
             .setView(webView).create();

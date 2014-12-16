@@ -28,8 +28,6 @@ public final class HistoryItemTable {
     }
 
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + HistoryItemTable.TABLE_NAME);
-        HistoryItemTable.onCreate(db);
     }
 
 

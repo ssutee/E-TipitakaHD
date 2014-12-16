@@ -323,6 +323,14 @@ public class BookDatabaseHelper {
 
   }
 
+  public interface OnConvertToPivotListener {
+    public void onConvertToPivotFinish(int volume, int item, int section);
+  }
+
+  public interface OnConvertFromPivotListener {
+    public void onConvertFromPivotFinish(int volume, int page);
+  }
+
   public enum SearchType {
     ALL(1), BUDDHAWAJ(2);
 
@@ -338,7 +346,7 @@ public class BookDatabaseHelper {
   }
 
   public enum Language {
-    THAI(0), PALI(1), THAIMM(2), THAIMC(3), THAIBT(4), THAIWN(5);
+    THAI(0), PALI(1), THAIMM(2), THAIMC(3), THAIBT(4), THAIWN(5), THAIPB(6), ROMANCT(7);
 
     private int code;
 
@@ -364,6 +372,10 @@ public class BookDatabaseHelper {
           return context.getString(R.string.thaibt_full_name);
         case 5:
           return context.getString(R.string.thaiwn_full_name);
+        case 6:
+          return context.getString(R.string.thaipb_full_name);
+        case 7:
+          return context.getString(R.string.romanct_full_name);
       }
       return null;
     }
@@ -382,6 +394,10 @@ public class BookDatabaseHelper {
           return "thaibt";
         case 5:
           return "thaiwn";
+        case 6:
+          return "thaipb";
+        case 7:
+          return "romanct";
       }
       return null;
     }
@@ -409,17 +425,82 @@ public class BookDatabaseHelper {
   static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiMMOriginBookItems = null;
   static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiMCBookItems = null;
   static Map<String,Map<String,Map<String,ArrayList<Integer>>>> thaiWNBookItems = null;
+  static Map<String,Map<String,Map<String,Integer>>> romanPageIndex = null;
+  static Map<String,Map<String,ArrayList<ArrayList<Integer>>>> romanItems = null;
+  static Map<String, Map<String, ArrayList<ArrayList<Integer>>>> romanMappingTable = null;
+  static Map<String, Map<String, Map<String, ArrayList<Integer>>>> romanReverseMappingTable = null;
 
   private static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getBookItems(Context context, String filename) {
     try {
       BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename), "UTF-8"));
-      Map<String,Map<String,Map<String,ArrayList<Integer>>>> result = new Gson().fromJson(reader, new TypeToken<Map<String,Map<String,Map<String,ArrayList<Integer>>>>>(){}.getType());
+      Map<String,Map<String,Map<String,ArrayList<Integer>>>> result = new Gson().fromJson(reader,
+          new TypeToken<Map<String,Map<String,Map<String,ArrayList<Integer>>>>>(){}.getType());
       reader.close();
       return result;
     } catch (IOException e) {
       e.printStackTrace();
     }
     return null;
+  }
+
+  public static Map<String, Map<String, Map<String, ArrayList<Integer>>>> getRomanReverseMappingTable(Context context) {
+    if (romanReverseMappingTable != null) {
+      return romanReverseMappingTable;
+    }
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open("map_cst_r.json"), "UTF-8"));
+      romanReverseMappingTable = new Gson().fromJson(reader,
+          new TypeToken<Map<String, Map<String, Map<String, ArrayList<Integer>>>>>(){}.getType());
+      reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return romanReverseMappingTable;
+  }
+
+  public static Map<String, Map<String, ArrayList<ArrayList<Integer>>>> getRomanMappingTable(Context context) {
+    if (romanMappingTable != null) {
+      return romanMappingTable;
+    }
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open("map_cst.json"), "UTF-8"));
+      romanMappingTable = new Gson().fromJson(reader,
+          new TypeToken<Map<String, Map<String, ArrayList<ArrayList<Integer>>>>>() {
+          }.getType());
+      reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return romanMappingTable;
+  }
+
+  public static Map<String,Map<String,Map<String,Integer>>> getRomanPageIndex(Context context) {
+    if (romanPageIndex != null) {
+      return romanPageIndex;
+    }
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open("roman_page_index.json"), "UTF-8"));
+      romanPageIndex = new Gson().fromJson(reader, new TypeToken<Map<String,Map<String,Map<String,Integer>>>>(){}.getType());
+      reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return romanPageIndex;
+  }
+
+  public static Map<String,Map<String,ArrayList<ArrayList<Integer>>>> getRomanItems(Context context) {
+    if (romanItems != null) {
+      return romanItems;
+    }
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open("roman_items.json"), "UTF-8"));
+      romanItems = new Gson().fromJson(reader, new TypeToken<Map<String,Map<String,ArrayList<ArrayList<Integer>>>>>(){}.getType());
+      reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return romanItems;
+
   }
 
   public static Map<String,Map<String,Map<String,ArrayList<Integer>>>> getThaiBookItems(Context context) {
@@ -488,6 +569,10 @@ public class BookDatabaseHelper {
       case THAIWN:
         bookItems = getThaiWNBookItems(context);
         break;
+    }
+
+    if (bookItems == null) {
+      return 1;
     }
 
     for (String section : bookItems.get(volume+"").keySet()) {

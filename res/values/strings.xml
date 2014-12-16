@@ -44,6 +44,7 @@
     <string name="seq_thai_numbers">๐๑๒๓๔๕๖๗๘๙</string>
     <string name="regex_item_number_1">^(\\s*)(\\{[๐๑๒๓๔๕๖๗๘๙]+\\})*(\\s*)\\[([๐๑๒๓๔๕๖๗๘๙-]+)\\]</string>
     <string name="regex_item_number_2">^(\\s*)\\{([๐๑๒๓๔๕๖๗๘๙]+)\\}</string>
+    <string name="regex_item_number_3">\\{([0-9:\\.]+)\\}</string>
     <string name="select_item">เลือกข้อที่ต้องการ</string>
     <string name="select_page">เลือกหน้าที่ต้องการ</string>
     <string name="font_family_new">
@@ -172,7 +173,7 @@
                     }
                 </script>
             </head>
-            <body style=\"font-size:%2$s; font-family:\'TH SarabunPSK\'\">
+            <body style=\"font-size:%2$s; %7$s\">
                 <p style=\"white-space: pre-wrap;\">%1$s</p>
                 <div style=\"white-space: pre-wrap; font-size:80%%; color:green;\">%6$s</div>
             </body>
@@ -247,4 +248,14 @@
     <string name="thaiwn_full_name">พุทธวจนปิฎก ๓๓ เล่ม</string>
     <string name="choose_search_type">เลือกรูปแบบการค้นหา</string>
     <string name="buddhawaj">พุทธวจน</string>
+    <string name="thaipb_full_name">พุทธวจนหมวดธรรม</string>
+    <string name="romanct_full_name">Tipitaka Roman Script</string>
+    <string name="thai_short_name">ฉบับหลวง</string>
+    <string name="pali_short_name">บาลีสยามรัฐ</string>
+    <string name="thaimm_short_name">มหามกุฏฯ</string>
+    <string name="thaimc_short_name">มหาจุฬาฯ</string>
+    <string name="thaiwn_short_name">พุทธวจนปิฎก</string>
+    <string name="thaipb_short_name">หมวดธรรม</string>
+    <string name="thaibt_short_name">ชุดห้าเล่ม</string>
+    <string name="romanct_short_name">Roman Script</string>
 </resources>

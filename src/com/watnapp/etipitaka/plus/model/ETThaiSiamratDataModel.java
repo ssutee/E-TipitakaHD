@@ -1,6 +1,7 @@
 package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
+import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 /**
@@ -17,5 +18,8 @@ public class ETThaiSiamratDataModel extends ETSiamratDataModel {
     return BookDatabaseHelper.Language.THAI;
   }
 
-
+  @Override
+  public String getShortTitle() {
+    return mContext.getString(R.string.thai_short_name);
+  }
 }

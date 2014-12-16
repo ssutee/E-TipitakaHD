@@ -210,7 +210,8 @@ public class SearchFragment extends RoboSherlockFragment implements BookDatabase
   private void startSearch() {
     if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIBT) {
       search(createTotalVolumesArray(dataModel.getTotalVolumes()));
-    } else if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIWN) {
+    } else if (dataModel.getLanguage() == BookDatabaseHelper.Language.THAIWN ||
+        dataModel.getLanguage() == BookDatabaseHelper.Language.THAIPB) {
       showBuddhawajDialog();
     } else {
       showBookCategorySelectionDialog();

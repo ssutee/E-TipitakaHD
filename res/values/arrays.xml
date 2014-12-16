@@ -3,11 +3,23 @@
     <string-array name="full_languages">
         <item>" ภาษาไทย ฉบับหลวง "</item>
         <item>" ภาษาบาลี ฉบับสยามรัฐ "</item>
+        <item>" พุทธวจนปิฎก ๓๓ เล่ม "</item>
         <item>" ภาษาไทย ฉบับมหามกุฏฯ "</item>
         <item>" ภาษาไทย ฉบับมหาจุฬาฯ "</item>
+        <item>" พุทธวจนหมวดธรรม "</item>
         <item>" ชุดห้าเล่มจากพระโอษฐ์ "</item>
-        <item>" พุทธวจนปิฎก ๓๓ เล่ม "</item>
+        <item>" Roman Script "</item>
     </string-array>
+    <integer-array name="full_languages_code">
+        <item>0</item>
+        <item>1</item>
+        <item>5</item>
+        <item>2</item>
+        <item>3</item>
+        <item>6</item>
+        <item>4</item>
+        <item>7</item>
+    </integer-array>
     <string-array name="book_titles">
         <item>" วินัยปิฎก มหาวิภังค์ ภาค ๑ "</item>
         <item>" วินัยปิฎก มหาวิภังค์ ภาค ๒ "</item>
@@ -279,6 +291,85 @@
         <item>" ๓๒. วินัยปิฎก จุลวรรค ภาค ๒ "</item>
         <item>" ๓๓. วินัยปิฎก ปริวาร "</item>
     </string-array>
+    <string-array name="thaipb_book_titles_with_number">
+        <item>" ๑. พุทธวจน ตามรอยธรรม "</item>
+        <item>" ๒. พุทธวจน คู่มือโสดาบัน "</item>
+        <item>" ๓. พุทธวจน ก้าวย่างอย่างพุทธะ "</item>
+        <item>" ๔. พุทธวจน มรรควิธีที่ง่าย "</item>
+        <item>" ๕. พุทธวจน แก้กรรม "</item>
+        <item>" ๖. พุทธวจน อานาปานสติ "</item>
+        <item>" ๗. พุทธวจน ฆารวาสชั้นเลิศ "</item>
+        <item>" ๘. พุทธวจน อินทรียสังวร "</item>
+        <item>" ๙. พุทธวจน ปฐมธรรม "</item>
+        <item>" ๑๐. พุทธวจน สาธยายธรรม "</item>
+        <item>" ๑๑. พุทธวจน ภพภูมิ "</item>
+        <item>" ๑๒. พุทธวจน เดรัจฉานวิชา "</item>
+        <item>" ๑๓. พุทธวจน ทาน "</item>
+    </string-array>
+    <string-array name="romanct_book_titles_with_number">
+        <item>" 1. Pārājikapāḷi "</item>
+        <item>" 2. Pācittiyapāḷi "</item>
+        <item>" 3. Mahāvaggapāḷi "</item>
+        <item>" 4. Cūḷavaggapāḷi "</item>
+        <item>" 5. Parivārapāḷi "</item>
+        <item>" 6. Sīlakkhandhavaggapāḷi "</item>
+        <item>" 7. Mahāvaggapāḷi "</item>
+        <item>" 8. Pāthikavaggapāḷi "</item>
+        <item>" 9. Mūlapaṇṇāsapāḷi "</item>
+        <item>" 10. Majjhimapaṇṇāsapāḷi "</item>
+        <item>" 11. Uparipaṇṇāsapāḷi "</item>
+        <item>" 12. Sagāthāvaggapāḷi "</item>
+        <item>" 13. Nidānavaggapāḷi "</item>
+        <item>" 14. Khandhavaggapāḷi "</item>
+        <item>" 15. Saḷāyatanavaggapāḷi "</item>
+        <item>" 16. Mahāvaggapāḷi "</item>
+        <item>" 17. Ekakanipātapāḷi "</item>
+        <item>" 18. Dukanipātapāḷi "</item>
+        <item>" 19. Tikanipātapāḷi "</item>
+        <item>" 20. Catukkanipātapāḷi "</item>
+        <item>" 21. Pañcakanipātapāḷi "</item>
+        <item>" 22. Chakkanipātapāḷi "</item>
+        <item>" 23. Sattakanipātapāḷi "</item>
+        <item>" 24. Aṭṭhakādinipātapāḷi "</item>
+        <item>" 25. Navakanipātapāḷi "</item>
+        <item>" 26. Dasakanipātapāḷi "</item>
+        <item>" 27. Ekādasakanipātapāḷi "</item>
+        <item>" 28. Khuddakapāṭhapāḷi "</item>
+        <item>" 29. Dhammapadapāḷi "</item>
+        <item>" 30. Udānapāḷi "</item>
+        <item>" 31. Itivuttakapāḷi "</item>
+        <item>" 32. Suttanipātapāḷi "</item>
+        <item>" 33. Vimānavatthupāḷi "</item>
+        <item>" 34. Petavatthupāḷi "</item>
+        <item>" 35. Theragāthāpāḷi "</item>
+        <item>" 36. Therīgāthāpāḷi "</item>
+        <item>" 37. Apadānapāḷi-1 "</item>
+        <item>" 38. Apadānapāḷi-2 "</item>
+        <item>" 39. Buddhavaṃsapāḷi "</item>
+        <item>" 40. Cariyāpiṭakapāḷi "</item>
+        <item>" 41. Jātakapāḷi-1 "</item>
+        <item>" 42. Jātakapāḷi-2 "</item>
+        <item>" 43. Mahāniddesapāḷi "</item>
+        <item>" 44. Cūḷaniddesapāḷi "</item>
+        <item>" 45. Paṭisambhidāmaggapāḷi "</item>
+        <item>" 46. Nettippakaraṇapāḷi "</item>
+        <item>" 47. Milindapañhapāḷi "</item>
+        <item>" 48. Peṭakopadesapāḷi "</item>
+        <item>" 49. Dhammasaṅgaṇīpāḷi "</item>
+        <item>" 50. Vibhaṅgapāḷi "</item>
+        <item>" 51. Dhātukathāpāḷi "</item>
+        <item>" 52. Puggalapaññattipāḷi "</item>
+        <item>" 53. Kathāvatthupāḷi "</item>
+        <item>" 54. Yamakapāḷi-1 "</item>
+        <item>" 55. Yamakapāḷi-2 "</item>
+        <item>" 56. Yamakapāḷi-3 "</item>
+        <item>" 57. Paṭṭhānapāḷi-1 "</item>
+        <item>" 58. Paṭṭhānapāḷi-2 "</item>
+        <item>" 59. Paṭṭhānapāḷi-3 "</item>
+        <item>" 60. Paṭṭhānapāḷi-4 "</item>
+        <item>" 61. Paṭṭhānapāḷi-5 "</item>
+    </string-array>
+
     <string-array name="sections">
         <item>"วินัยปิฎก "</item>
         <item>"สุตตันตปิฎก "</item>

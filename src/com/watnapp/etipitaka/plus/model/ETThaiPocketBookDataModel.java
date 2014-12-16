@@ -2,7 +2,6 @@ package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
@@ -11,22 +10,22 @@ import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import java.util.ArrayList;
 
 /**
- * Created by sutee on 16/6/14.
+ * Created by sutee on 12/12/14.
  */
-public class ETThaiFiveBooksDataModel extends ETDataModel {
+public class ETThaiPocketBookDataModel extends ETDataModel {
 
-  public ETThaiFiveBooksDataModel(Context context) {
+  public ETThaiPocketBookDataModel(Context context) {
     super(context);
   }
 
   @Override
   protected String getDatabasePath() {
-    return Constants.BT_DATABASE_PATH;
+    return Constants.PB_DATABASE_PATH;
   }
 
   @Override
   public BookDatabaseHelper.Language getLanguage() {
-    return BookDatabaseHelper.Language.THAIBT;
+    return BookDatabaseHelper.Language.THAIPB;
   }
 
   @Override
@@ -40,22 +39,7 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   }
 
   @Override
-  public String getVolumeColumn() {
-    return "book";
-  }
-
-  @Override
-  public int getVolume(Cursor cursor) {
-    return cursor.getInt(cursor.getColumnIndex(getVolumeColumn()));
-  }
-
-  @Override
-  public int getPageNumber(Cursor cursor) {
-    return cursor.getInt(cursor.getColumnIndex(getPageNumberColumn()));
-  }
-
-  @Override
-  public void getItemsAtPage(int volume, int page, BookDatabaseHelper.OnGetItemsListener listener) {
+  public void getItemsAtPage(final int volume, final int page, final BookDatabaseHelper.OnGetItemsListener listener) {
     listener.onGetItemsFinish(null, null);
   }
 
@@ -67,7 +51,7 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "book=?",
+    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=?",
         new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
     if (page > 0 && page <= cursor.getCount()) {
@@ -78,25 +62,12 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
 
   @Override
   public int getMaximumPageNumber(int volume) {
-    switch (volume) {
-      case 1:
-        return 466;
-      case 2:
-        return 817;
-      case 3:
-        return 1572;
-      case 4:
-        return 813;
-      case 5:
-        return 614;
-      default:
-        return 0;
-    }
-  }
-
-  @Override
-  public int getMinimumPageNumber(int volume) {
-    return volume == 3 ? 818 : 1;
+    openDatabase();
+    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume = ?",
+        new String[] { String.valueOf(volume) }, null, null, "page");
+    int page = cursor.getCount();
+    cursor.close();
+    return page;
   }
 
   @Override
@@ -117,7 +88,8 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   @Override
   public int getPageById(int pageId) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
+    Cursor cursor = db.query(getLanguage().getStringCode(), null, "_id = ?",
+        new String[] {String.valueOf(pageId)}, null, null, null);
     cursor.moveToFirst();
     int page = cursor.getInt(cursor.getColumnIndex("page"));
     cursor.close();
@@ -130,7 +102,13 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   }
 
   @Override
-  public void search(final String keywords, final BookDatabaseHelper.OnSearchListener listener, final Integer[] volumes) {
+  public boolean hasHtmlContent() {
+    return true;
+  }
+
+  @Override
+  public void search(final String keywords, final BookDatabaseHelper.OnSearchListener listener,
+                     final Integer[] volumes, final BookDatabaseHelper.SearchType searchType) {
     openDatabase();
     new Thread(new Runnable() {
       @Override
@@ -141,12 +119,13 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
         for (int i=0; i < volumes.length; ++i) {
           int volume = volumes[i];
 
-          String selection = "book = ?";
+          String selection = "volume = ?";
           ArrayList<String> selectionArgs = new ArrayList<String>();
           selectionArgs.add(String.valueOf(volume));
 
           for (String keyword : keywords.split("\\s+")) {
-            selection += " AND content LIKE ?";
+            selection += String.format(" AND %s LIKE ?",
+                searchType == BookDatabaseHelper.SearchType.ALL ? "content" : "buddhawaj");
             selectionArgs.add("%" + keyword.replace('+', ' ') + "%");
           }
 
@@ -169,19 +148,27 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   }
 
   @Override
+  public void search(String keywords, BookDatabaseHelper.OnSearchListener listener, Integer[] volumes) {
+    search(keywords, listener, volumes, BookDatabaseHelper.SearchType.ALL);
+  }
+
+  @Override
   public void search(String keywords, BookDatabaseHelper.OnSearchListener listener) {
-    search(keywords, listener, new Integer[] {1,2,3,4,5});
+    search(keywords, listener, new Integer[] {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+    });
   }
 
   @Override
   public int getSectionBoundary(int index) {
-    return 5;
+    return 13;
   }
 
   @Override
   public int getTotalVolumes() {
-    return 5;
+    return 13;
   }
+
 
   @Override
   public void convertToPivot(int volume, int page, int item, BookDatabaseHelper.OnConvertToPivotListener listener) {
@@ -195,6 +182,7 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
 
   @Override
   public String getShortTitle() {
-    return mContext.getString(R.string.thaibt_short_name);
+    return mContext.getString(R.string.thaipb_short_name);
   }
+
 }

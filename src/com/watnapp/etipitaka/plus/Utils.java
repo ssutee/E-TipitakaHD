@@ -65,7 +65,7 @@ public class Utils {
   }
 
   public static boolean isTipitaka(Language language) {
-    return language != Language.THAIBT && language != Language.THAIWN;
+    return language != Language.THAIBT && language != Language.THAIWN && language != Language.THAIPB;
   }
 
 }

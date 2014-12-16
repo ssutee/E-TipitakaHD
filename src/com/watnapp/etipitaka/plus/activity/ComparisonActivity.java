@@ -69,34 +69,46 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    int page1 = mPage;
     mLanguage1 = Language.values()[mLanguageCode];
     mLanguage2 = Language.values()[mComparingLanguageCode];
 
     mDataModel1 = ETDataModelCreator.create(mLanguage1, this);
     mDataModel2 = ETDataModelCreator.create(mLanguage2, this);
 
-    int volume = mComparingVolume == 0
-        ? mDataModel2.convertVolume(mDataModel1.getComparingVolume(mVolume, mPage), mSection, mItem)
-        : mComparingVolume;
-    int page2 = mDataModel2.getPageByItem(volume, mItem, mSection, true);
-
-    mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, page1, mKeywords, mIsBuddhawaj, true);
-    getSupportFragmentManager().beginTransaction()
-        .add(R.id.left_reader_fragment,
-            mLeftFragment, "left").commit();
-
-    mRightFragment = ReaderFragment.newInstance(mLanguage2, volume, page2, "", mIsBuddhawaj, true);
-    getSupportFragmentManager().beginTransaction()
-        .add(R.id.right_reader_fragment,
-            mRightFragment, "right").commit();
-
-    mHandler.postDelayed(new Runnable() {
+    mDataModel1.convertToPivot(mVolume, mPage, mItem, new BookDatabaseHelper.OnConvertToPivotListener() {
       @Override
-      public void run() {
-        mRightFragment.getPageFragment(mRightFragment.getCurrentPage()).scrollToItem(mItem);
+      public void onConvertToPivotFinish(int volume, int item, int section) {
+        mDataModel2.convertFromPivot(mComparingVolume == 0 ? volume : mComparingVolume, item, section,
+            new BookDatabaseHelper.OnConvertFromPivotListener() {
+          @Override
+          public void onConvertFromPivotFinish(final int volume, final int page) {
+
+            mHandler.post(new Runnable() {
+              @Override
+              public void run() {
+                mLeftFragment = ReaderFragment.newInstance(mLanguage1, mVolume, mPage, mKeywords, mIsBuddhawaj, true);
+                getSupportFragmentManager().beginTransaction()
+                    .add(R.id.left_reader_fragment,
+                        mLeftFragment, "left").commit();
+
+                mRightFragment = ReaderFragment.newInstance(mLanguage2, volume, page, "", mIsBuddhawaj, true);
+                getSupportFragmentManager().beginTransaction()
+                    .add(R.id.right_reader_fragment,
+                        mRightFragment, "right").commit();
+
+                mHandler.postDelayed(new Runnable() {
+                  @Override
+                  public void run() {
+                    mRightFragment.getPageFragment(mRightFragment.getCurrentPage()).scrollToItem(mItem);
+                  }
+                }, 500);
+
+              }
+            });
+          }
+        });
       }
-    }, 500);
+    });
 
   }
 
@@ -130,19 +142,29 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
             new AlertDialog.Builder(ComparisonActivity.this).setTitle(R.string.select_item)
                 .setItems(choices, new DialogInterface.OnClickListener() {
                   @Override
-                  public void onClick(DialogInterface dialog, int which) {
-                    Language targetLanguage = (language.getCode() == mLanguageCode)
+                  public void onClick(DialogInterface dialog, final int which) {
+                    final Language targetLanguage = (language.getCode() == mLanguageCode)
                         ? mLanguage2 : mLanguage1;
-                    ReaderFragment targetFragment = (language.getCode() == mLanguageCode)
+                    final ReaderFragment targetFragment = (language.getCode() == mLanguageCode)
                         ? mRightFragment : mLeftFragment;
-                    int volume2 = targetModel.convertVolume(sourceModel.getComparingVolume(volume, page), sections[which], items[which]);
-                    Log.d(TAG, "volume = " + volume2);
-                    Log.d(TAG, "item = " + items[which]);
-                    Log.d(TAG, "section = " + sections[which]);
-                    int page2 = targetModel.getPageByItem(volume2, items[which], sections[which], true);
-                    Log.d(TAG, "page = " + page2);
-                    targetFragment.openBook(targetLanguage, volume2, page2);
-                    targetFragment.getCurrentPageFragment().scrollToItem(items[which]);
+
+                    sourceModel.convertToPivot(volume, page, items[which], new BookDatabaseHelper.OnConvertToPivotListener() {
+                      @Override
+                      public void onConvertToPivotFinish(int aVolume, int aItem, int aSection) {
+                        targetModel.convertFromPivot(aVolume, aItem, aSection, new BookDatabaseHelper.OnConvertFromPivotListener() {
+                          @Override
+                          public void onConvertFromPivotFinish(final int aVolume, final int aPage) {
+                            mHandler.post(new Runnable() {
+                              @Override
+                              public void run() {
+                                targetFragment.openBook(targetLanguage, aVolume, aPage);
+                                targetFragment.getCurrentPageFragment().scrollToItem(items[which]);
+                              }
+                            });
+                          }
+                        });
+                      }
+                    });
                   }
                 }).create().show();
           }

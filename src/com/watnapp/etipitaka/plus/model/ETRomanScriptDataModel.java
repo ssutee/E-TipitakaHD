@@ -2,7 +2,9 @@ package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.MergeCursor;
+import android.util.Log;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -11,22 +13,24 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Created by sutee on 31/8/14.
+ * Created by sutee on 16/12/14.
  */
-public class ETThaiWatnaDataModel extends ETDataModel {
+public class ETRomanScriptDataModel extends ETDataModel {
 
-  public ETThaiWatnaDataModel(Context context) {
+  protected static final String TAG = "ETRomanScriptDataModel";
+
+  public ETRomanScriptDataModel(Context context) {
     super(context);
   }
 
   @Override
   protected String getDatabasePath() {
-    return Constants.WN_DATABASE_PATH;
+    return Constants.CT_DATABASE_PATH;
   }
 
   @Override
   public BookDatabaseHelper.Language getLanguage() {
-    return BookDatabaseHelper.Language.THAIWN;
+    return BookDatabaseHelper.Language.ROMANCT;
   }
 
   @Override
@@ -41,32 +45,19 @@ public class ETThaiWatnaDataModel extends ETDataModel {
 
   @Override
   public void getItemsAtPage(final int volume, final int page, final BookDatabaseHelper.OnGetItemsListener listener) {
-    openDatabase();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=? AND page=?",
-            new String[]{String.valueOf(volume), String.valueOf(page)}, null, null, null);
-        if (cursor.getCount() == 0) {
-          listener.onGetItemsFinish(new Integer[] {}, new Integer[] {});
-        } else {
-          cursor.moveToFirst();
-          String[] tokens = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
-          ArrayList<Integer> items = new ArrayList<Integer>();
-          for (int i=0; i<tokens.length; ++i) {
-            items.add(Integer.parseInt(tokens[i]));
-          }
-          int section = BookDatabaseHelper.getSubItem(mContext, getLanguage(), volume, page, Integer.parseInt(tokens[0]));
-          ArrayList<Integer> sections = new ArrayList<Integer>();
-          for (int i=0; i<tokens.length; ++i) {
-            sections.add(section);
-          }
-          listener.onGetItemsFinish(items.toArray(new Integer[items.size()]), sections.toArray(new Integer[sections.size()]));
-        }
+    Map<String, Map<String, ArrayList<ArrayList<Integer>>>> romanItems = BookDatabaseHelper.getRomanItems(mContext);
 
+    ArrayList<Integer> items = new ArrayList<Integer>();
+    ArrayList<Integer> sections = new ArrayList<Integer>();
+
+    if (romanItems.get(volume+"") != null && romanItems.get(volume+"").get(page+"") != null) {
+      for (ArrayList<Integer> pair : romanItems.get(volume+"").get(page+"")) {
+        items.add(pair.get(0));
+        sections.add(pair.get(1));
       }
-    }).start();
+    }
 
+    listener.onGetItemsFinish(items.toArray(new Integer[items.size()]), sections.toArray(new Integer[sections.size()]));
   }
 
   @Override
@@ -94,6 +85,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
     int page = cursor.getCount();
     cursor.close();
     return page;
+
   }
 
   @Override
@@ -130,10 +122,10 @@ public class ETThaiWatnaDataModel extends ETDataModel {
   @Override
   public int getPageIdByItem(int volume, int item, int section) {
     openDatabase();
-    if (BookDatabaseHelper.getThaiWNBookItems(mContext).get(volume + "") == null) {
+    if (BookDatabaseHelper.getRomanPageIndex(mContext).get(volume + "") == null) {
       return 0;
     }
-    int page = BookDatabaseHelper.getThaiWNBookItems(mContext).get(volume + "").get(section+"").get(item+"").get(0);
+    int page = BookDatabaseHelper.getRomanPageIndex(mContext).get(volume + "").get(item+"").get(section+"");
     Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=? AND page=?",
         new String[] {String.valueOf(volume), String.valueOf(page) }, null, null, null);
     cursor.moveToFirst();
@@ -158,67 +150,33 @@ public class ETThaiWatnaDataModel extends ETDataModel {
 
   @Override
   public Integer[] getPagesByItem(int volume, int item) {
-    Map<String, Map<String, Map<String, ArrayList<Integer>>>> bookItems = BookDatabaseHelper.getThaiWNBookItems(mContext);
+    Map<String, Map<String, Map<String, Integer>>> pageIndex = BookDatabaseHelper.getRomanPageIndex(mContext);
     ArrayList<Integer> pages = new ArrayList<Integer>();
-    for (String section : bookItems.get(volume + "").keySet()) {
-      if (bookItems.get(volume + "").get(section).containsKey(item+"")) {
-        pages.add(bookItems.get(volume + "").get(section).get(item + "").get(0));
+    if (pageIndex.get(volume+"") != null && pageIndex.get(volume+"").get(item+"") != null) {
+      for (String section : pageIndex.get(volume+"").get(item+"").keySet()) {
+        int page = pageIndex.get(volume+"").get(item+"").get(section);
+        pages.add(page);
       }
     }
     return pages.toArray(new Integer[pages.size()]);
   }
 
   @Override
-  public boolean hasHtmlContent() {
-    return true;
-  }
-
-  @Override
-  public int getSectionBoundary(int index) {
-    return 33;
-  }
-
-  @Override
-  public int getTotalVolumes() {
-    return 33;
-  }
-
-  @Override
-  public int convertVolume(int volume, int section, int item) {
-    if (volume <= 8) {
-      return volume + 25;
-    }
-    return volume - 8;
-  }
-
-  @Override
-  public int getComparingVolume(int volume, int page) {
-    if (volume <= 25) {
-      return volume + 8;
-    }
-    return volume - 25;
-  }
-
-  @Override
-  public void search(final String keywords, final BookDatabaseHelper.OnSearchListener listener,
-                     final Integer[] volumes, final BookDatabaseHelper.SearchType searchType) {
+  public void search(final String keywords, final BookDatabaseHelper.OnSearchListener listener, final Integer[] volumes) {
     openDatabase();
     new Thread(new Runnable() {
       @Override
       public void run() {
-        Cursor[] cursors = new Cursor[volumes.length];
-        int totalPages[] = new int[1];
-
+        Cursor[] cursors = new Cursor[volumes.length+1];
+        int totalPages[] = new int[3];
         for (int i=0; i < volumes.length; ++i) {
           int volume = volumes[i];
-
           String selection = "volume = ?";
           ArrayList<String> selectionArgs = new ArrayList<String>();
-          selectionArgs.add(String.valueOf(volume));
+          selectionArgs.add(String.format("%d", volume));
 
           for (String keyword : keywords.split("\\s+")) {
-            selection += String.format(" AND %s LIKE ?",
-                searchType == BookDatabaseHelper.SearchType.ALL ? "content" : "buddhawaj");
+            selection += " AND content LIKE ?";
             selectionArgs.add("%" + keyword.replace('+', ' ') + "%");
           }
 
@@ -228,35 +186,86 @@ public class ETThaiWatnaDataModel extends ETDataModel {
           if (listener != null) {
             listener.onSearchProgress(keywords, volume, i+1, cursor);
           }
-          totalPages[0] += cursor.getCount();
-          cursors[i] = cursor;
+
+          if (volume >= 1 && volume <= getSectionBoundary(0)) {
+            totalPages[0] += cursor.getCount();
+            Log.d(TAG, "1:" + volume + ":" + cursor.getCount());
+          } else if (volume >= getSectionBoundary(0)+1 && volume <= getSectionBoundary(1)) {
+            totalPages[1] += cursor.getCount();
+            Log.d(TAG, "2:" + volume + ":" + cursor.getCount());
+          } else {
+            totalPages[2] += cursor.getCount();
+            Log.d(TAG, "3:" + volume + ":" + cursor.getCount());
+          }
+
+          cursors[i+1] = cursor;
+
         }
 
+        MatrixCursor headerCursor = new MatrixCursor(new String[] { "_id", "total" });
+        headerCursor.addRow(new Object[] {10001, totalPages[0]});
+        headerCursor.addRow(new Object[] {10002, totalPages[1]});
+        headerCursor.addRow(new Object[] {10003, totalPages[2]});
+        cursors[0] = headerCursor;
         if (listener != null) {
           listener.onSearchFinish(keywords, new MergeCursor(cursors), totalPages);
         }
-
       }
     }).start();
   }
 
   @Override
-  public void search(String keywords, BookDatabaseHelper.OnSearchListener listener, Integer[] volumes) {
-    search(keywords, listener, volumes, BookDatabaseHelper.SearchType.ALL);
+  public void search(String keywords, BookDatabaseHelper.OnSearchListener listener) {
+    search(keywords, listener,
+        new Integer[] {
+            1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+            11,12,13,14,15,16,17,18,19,20,
+            21,22,23,24,25,26,27,28,29,30,
+            31,32,33,34,35,36,37,38,39,40,
+            41,42,43,44,45,46,47,48,49,50,
+            51,52,53,54,55,56,57,58,59,60,
+            61
+        }
+    );
+
   }
 
   @Override
-  public void search(String keywords, BookDatabaseHelper.OnSearchListener listener) {
-    search(keywords, listener, new Integer[] {
-         1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-        11,12,13,14,15,16,17,18,19,20,
-        21,22,23,24,25,26,27,28,29,30,
-        31,32,33});
+  public int getSectionBoundary(int index) {
+    if (index == 0) {
+      return 5;
+    }
+    if (index == 1) {
+      return 48;
+    }
+    return 61;
+  }
+
+  @Override
+  public int getTotalVolumes() {
+    return 61;
+  }
+
+  @Override
+  public void convertToPivot(int volume, int page, int item, BookDatabaseHelper.OnConvertToPivotListener listener) {
+    Map<String, Map<String, ArrayList<ArrayList<Integer>>>> table = BookDatabaseHelper.getRomanMappingTable(mContext);
+    ArrayList<ArrayList<Integer>> results = table.get(volume + "").get(page + "");
+    int rVolume = results.get(0).get(0);
+    int rItem = results.get(0).get(1);
+    int rSection = results.get(0).get(2);
+    listener.onConvertToPivotFinish(rVolume, rItem, rSection);
+  }
+
+  @Override
+  public void convertFromPivot(int volume, int item, int section, BookDatabaseHelper.OnConvertFromPivotListener listener) {
+    Map<String, Map<String, Map<String, ArrayList<Integer>>>> table = BookDatabaseHelper.getRomanReverseMappingTable(mContext);
+    ArrayList<Integer> result = table.get(volume + "").get(item + "").get(section + "");
+    listener.onConvertFromPivotFinish(result.get(0), result.get(1));
   }
 
   @Override
   public String getShortTitle() {
-    return mContext.getString(R.string.thaiwn_short_name);
+    return mContext.getString(R.string.romanct_short_name);
   }
 
 }

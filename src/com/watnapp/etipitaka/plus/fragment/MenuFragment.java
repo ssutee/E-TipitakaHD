@@ -71,12 +71,21 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
         R.array.full_languages, android.R.layout.simple_spinner_item);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(adapter);
-    spinner.setSelection(application.getLanguage().getCode());
+
+    int selection = 0;
+    for (int code : getResources().getIntArray(R.array.full_languages_code)) {
+      if (code == application.getLanguage().getCode()) {
+        break;
+      }
+      selection += 1;
+    }
+    spinner.setSelection(selection);
     spinner.setTag(R.id.pos, -1);
     spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        application.setLanguage(BookDatabaseHelper.Language.values()[position]);
+        int code = getResources().getIntArray(R.array.full_languages_code)[position];
+        application.setLanguage(BookDatabaseHelper.Language.values()[code]);
         getActivity().getContentResolver().notifyChange(Constants.LANGUAGE_CHANGE_URI, null);
         if ((Integer)spinner.getTag(R.id.pos) != position) {
           getActivity().getContentResolver().notifyChange(Constants.RESET_PAGE_URI, null);

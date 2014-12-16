@@ -6,6 +6,7 @@ import android.util.Log;
 import android.util.Pair;
 import com.touchsi.widget.ClearableAutoCompleteTextView;
 import com.watnapp.etipitaka.plus.Constants;
+import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -115,4 +116,11 @@ public class ETThaiMahaChulaDataModel extends ETThaiMahaDataModel {
   public int getTotalVolumes() {
     return 45;
   }
+
+
+  @Override
+  public String getShortTitle() {
+    return mContext.getString(R.string.thaimc_short_name);
+  }
+
 }

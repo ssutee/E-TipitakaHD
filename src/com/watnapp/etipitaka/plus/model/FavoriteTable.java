@@ -32,8 +32,6 @@ public final class FavoriteTable {
   }
 
   public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    db.execSQL("DROP TABLE IF EXISTS " + FavoriteTable.TABLE_NAME);
-    FavoriteTable.onCreate(db);
   }
 
 

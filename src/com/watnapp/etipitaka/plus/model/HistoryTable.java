@@ -35,14 +35,19 @@ public final class HistoryTable {
     sb.append(HistoryColumns.RESULT2 + " INTEGER, ");
     sb.append(HistoryColumns.RESULT3 + " INTEGER, ");
     sb.append(HistoryColumns.SCORE + " INTEGER, ");
+    sb.append(HistoryColumns.BUDDHAWAJ + " BOOLEAN, ");
     sb.append(HistoryColumns.CONTENT + " TEXT");
     sb.append(");");
     db.execSQL(sb.toString());
   }
 
   public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    if (oldVersion == 1 && newVersion == 2) {
-      db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + HistoryColumns.BUDDHAWAJ + " BOOLEAN;");
+    if ((oldVersion == 1 || oldVersion == 2) && (newVersion == 2 || newVersion == 3)) {
+      try {
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + HistoryColumns.BUDDHAWAJ + " BOOLEAN;");
+      } catch (RuntimeException e) {
+        e.printStackTrace();
+      }
     }
   }
 

@@ -180,6 +180,8 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
         if (dataModel.hasFooter()) {
           args.putString(Constants.FOOTER_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getFooterColumn())).trim());
         }
+
+        args.putInt(Constants.LANGUAGE_KEY, dataModel.getLanguage().getCode());
         return args;
       }
     };

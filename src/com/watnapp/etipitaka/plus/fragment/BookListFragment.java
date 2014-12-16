@@ -93,6 +93,10 @@ public class BookListFragment extends RoboSherlockListFragment implements BookLi
       return R.array.thaibt_book_titles_with_numbers;
     } else if (application.getLanguage() == BookDatabaseHelper.Language.THAIWN) {
       return R.array.thaiwn_book_titles_with_number;
+    } else if (application.getLanguage() == BookDatabaseHelper.Language.THAIPB) {
+      return R.array.thaipb_book_titles_with_number;
+    } else if (application.getLanguage() == BookDatabaseHelper.Language.ROMANCT) {
+      return R.array.romanct_book_titles_with_number;
     }
     return R.array.book_titles_with_number;
   }

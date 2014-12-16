@@ -16,6 +16,7 @@ import android.webkit.WebViewClient;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
+import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.widget.MyWebView;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
@@ -44,6 +45,7 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
   private String mFontColor = Constants.DEFAULT_FONT_COLOR;
   private String mBackgroundColor = Constants.DEFAULT_BACKGROUND_COLOR;
   private String mText, mHtml, mFooter, mKeywords;
+  private BookDatabaseHelper.Language mLanguage;
   private boolean mIsBuddhawaj;
 
   @InjectView(R.id.webview)
@@ -66,6 +68,7 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     mFooter = getArguments().containsKey(Constants.FOOTER_KEY) ? getArguments().getString(Constants.FOOTER_KEY) : "";
     mKeywords = getArguments().getString(Constants.KEYWORDS_KEY);
     mIsBuddhawaj = getArguments().getBoolean(Constants.BUDDHAWAJ_KEY);
+    mLanguage = BookDatabaseHelper.Language.values()[getArguments().getInt(Constants.LANGUAGE_KEY)];
     mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
     mWebView.setOnTouchListener(this);
     mWebView.setWebViewClient(new WebViewClient() {
@@ -94,11 +97,13 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     int fontSize = prefs.getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     String fontColor = prefs.getString(Constants.FONT_COLOR_KEY, Constants.DEFAULT_FONT_COLOR);
     String backgroundColor = prefs.getString(Constants.BACKGROUND_COLOR_KEY, Constants.DEFAULT_BACKGROUND_COLOR);
+    String fontFamily = getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old);
     mHtml = getString(R.string.html_text_template,
         highlightItemNumbers(mText),
         String.format("%dpt", fontSize),
-        getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old),
-        fontColor, backgroundColor, mFooter);
+        fontFamily,
+        fontColor, backgroundColor, mFooter,
+        mLanguage != BookDatabaseHelper.Language.ROMANCT ? "font-family:'TH SarabunPSK'" : "");
     mHtml = mHtml.replace("\t", "&#9;");
     mWebView.loadDataWithBaseURL("file:///android_asset/", mHtml, "text/html", "UTF-8", null);
     mWebView.setOnScrollChangedListener((MyWebView.OnScrollChangedListener) getParentFragment());
@@ -149,6 +154,7 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     for (String line  : text.split("\\r?\\n")) {
       Matcher matcher1 = Pattern.compile(getString(R.string.regex_item_number_1), Pattern.MULTILINE).matcher(line);
       Matcher matcher2 = Pattern.compile(getString(R.string.regex_item_number_2), Pattern.MULTILINE).matcher(line);
+      Matcher matcher3 = Pattern.compile(getString(R.string.regex_item_number_3), Pattern.MULTILINE).matcher(line);
       if (matcher1.find()) {
         if (matcher1.groupCount() == 4 && matcher1.group(2) != null) {
           line = matcher1.replaceFirst(String.format("%s<span style='color:#89C200;' id=\"i2_%s\">%s</span>%s<span style='color:#EE00EE;' id=\"i_%s\">[%s]</span>",
@@ -161,6 +167,16 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
       } else if (matcher2.find()) {
         line = matcher2.replaceFirst(String.format("<span style='color:#89C200;' id=\"i2_%s\">%s{%s}</span>",
             Utils.convertToArabicNumber(getActivity(), matcher2.group(2)), matcher2.group(1), matcher2.group(2)));
+      } else if (matcher3.find()) {
+        String mark = matcher3.group(1);
+        if (mark.contains(":")) {
+          mark = mark.split(":")[1];
+          if (mark.contains(".")) {
+            mark = mark.split("\\.")[0];
+          }
+        }
+        line = matcher3.replaceFirst(String.format("<span style='color:#89C200;' id=\"i2_%s\">{%s}</span>",
+            mark, matcher3.group(1)));
       }
       sb.append(line+"\n");
     }
