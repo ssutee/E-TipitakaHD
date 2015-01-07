@@ -250,17 +250,26 @@ public class ETRomanScriptDataModel extends ETDataModel {
   public void convertToPivot(int volume, int page, int item, BookDatabaseHelper.OnConvertToPivotListener listener) {
     Map<String, Map<String, ArrayList<ArrayList<Integer>>>> table = BookDatabaseHelper.getRomanMappingTable(mContext);
     ArrayList<ArrayList<Integer>> results = table.get(volume + "").get(page + "");
-    int rVolume = results.get(0).get(0);
-    int rItem = results.get(0).get(1);
-    int rSection = results.get(0).get(2);
-    listener.onConvertToPivotFinish(rVolume, rItem, rSection);
+    if (table.get(volume+"") == null || table.get(volume+"").get(page+"") == null) {
+      listener.onConvertToPivotFinish(volume, 1, 1);
+    } else {
+      int rVolume = results.get(0).get(0);
+      int rItem = results.get(0).get(1);
+      int rSection = results.get(0).get(2);
+      listener.onConvertToPivotFinish(rVolume, rItem, rSection);
+    }
   }
 
   @Override
   public void convertFromPivot(int volume, int item, int section, BookDatabaseHelper.OnConvertFromPivotListener listener) {
     Map<String, Map<String, Map<String, ArrayList<Integer>>>> table = BookDatabaseHelper.getRomanReverseMappingTable(mContext);
-    ArrayList<Integer> result = table.get(volume + "").get(item + "").get(section + "");
-    listener.onConvertFromPivotFinish(result.get(0), result.get(1));
+    if (table.get(volume+"") == null || table.get(volume+"").get(item+"") == null
+        || table.get(volume+"").get(item+"").get(section+"") == null) {
+      listener.onConvertFromPivotFinish(volume, 1);
+    } else {
+      ArrayList<Integer> result = table.get(volume + "").get(item + "").get(section + "");
+      listener.onConvertFromPivotFinish(result.get(0), result.get(1));
+    }
   }
 
   @Override

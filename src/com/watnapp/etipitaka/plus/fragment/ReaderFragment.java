@@ -203,19 +203,23 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
           mHistoryItemDaoHelper.insertOrUpdate(application.getHistory().getId(), mVolume,
               position + 1, HistoryItem.Status.SKIMMED);
         }
+
         SharedPreferences prefs = getActivity()
             .getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE);
         PageFragment fragment = getPageFragment(position+1);
         int fontSize = prefs.getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
+
         if (fragment != null && fontSize != fragment.getFontSize()) {
           fragment.setFontSize(fontSize);
         }
+
         String fontColor = prefs.getString(Constants.FONT_COLOR_KEY, Constants.DEFAULT_FONT_COLOR);
         String backgroundColor = prefs.getString(Constants.BACKGROUND_COLOR_KEY, Constants.DEFAULT_BACKGROUND_COLOR);
         if (fragment != null && !fontColor.equalsIgnoreCase(fragment.getFontColor())
             && !backgroundColor.equalsIgnoreCase(fragment.getBackgroundColor())) {
           fragment.setColor(fontColor, backgroundColor);
         }
+
       }
 
       @Override
@@ -290,12 +294,12 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       mLanguage = language;
     }
 
-    Log.d(TAG, "page = " + page);
     page = page - dataModel.getMinimumPageNumber(volume) + 1;
     mKeywords = keywords;
     mVolume = volume;
     mIsBuddhawaj = isBuddhawaj;
     Cursor cursor = dataModel.read(volume);
+    Log.d(TAG, "open book");
     Log.d(TAG, "total = " + cursor.getCount() + "");
     Log.d(TAG, "page = " + page);
 

@@ -111,6 +111,11 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
 
   public void setFontSize(int size) {
     mFontSize = size;
+
+    if (getActivity() == null) {
+      return;
+    }
+
     SharedPreferences prefs = getActivity()
         .getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
@@ -130,6 +135,10 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
   public void setColor(String font, String background) {
     mFontColor = font;
     mBackgroundColor = background;
+
+    if (getActivity() == null) {
+      return;
+    }
     SharedPreferences prefs = getActivity()
         .getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();

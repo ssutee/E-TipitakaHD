@@ -84,7 +84,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   private boolean mIsBuddhawaj;
   private Language mLanguage;
   private ContentObserver mContentObserver;
-  private ETDataModel dataModel;
+  private ETDataModel dataModel, previousDataModel;
   private int mItemIndexSystem = 1;
 
   public void onCreate(Bundle savedInstanceState) {
@@ -94,11 +94,16 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       @Override
       public void onChange(boolean selfChange, Uri uri) {
         if (uri.compareTo(Constants.LANGUAGE_CHANGE_URI) == 0) {
+          previousDataModel = dataModel;
           dataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
         } else if (uri.compareTo(Constants.RESET_PAGE_URI) == 0) {
 
-          ETDataModel sourceDataModel = dataModel;
-          final ETDataModel targetDataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
+          ETDataModel sourceDataModel = previousDataModel;
+          final ETDataModel targetDataModel = dataModel;
+
+          if (sourceDataModel.getLanguage() == targetDataModel.getLanguage()) {
+            return;
+          }
 
           sourceDataModel.convertToPivot(mVolume, 1, 1, new BookDatabaseHelper.OnConvertToPivotListener() {
             @Override
@@ -120,7 +125,6 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
             }
           });
 
-          getReaderFragment().openBook(application.getLanguage(), mVolume, 1, "", false);
           mLanguage = application.getLanguage();
         }
       }
@@ -162,6 +166,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     editor.putInt(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
     editor.putInt(Constants.VOLUME_KEY, mVolume);
     editor.putInt(Constants.PAGE_KEY, getReaderFragment().getCurrentPage());
+    Log.d(TAG, "save page = " + getReaderFragment().getCurrentPage());
     editor.commit();
     super.onDestroy();
   }
@@ -172,6 +177,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     application.setLanguage(language);
     mVolume = prefs.getInt(Constants.VOLUME_KEY, 1);
     int page = prefs.getInt(Constants.PAGE_KEY, 1);
+    Log.d(TAG, "load page = " + page);
     mKeywords = "";
     getSupportFragmentManager()
         .beginTransaction()
