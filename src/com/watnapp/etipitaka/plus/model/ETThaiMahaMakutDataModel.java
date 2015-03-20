@@ -67,7 +67,7 @@ public class ETThaiMahaMakutDataModel extends ETThaiMahaDataModel {
   @Override
   public int getComparingVolume(int volume, int page) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), new String[] {"volume_orig"}, "volume=? AND page=?",
+    Cursor cursor = db.query("main", new String[] {"volume_orig"}, "volume=? AND page=?",
         new String[] { String.format("%02d", volume), String.format("%04d", page)}, null, null, null);
     int comparingVolume = volume;
     cursor.moveToFirst();

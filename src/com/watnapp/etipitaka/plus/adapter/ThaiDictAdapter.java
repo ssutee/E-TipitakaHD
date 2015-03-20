@@ -1,33 +1,23 @@
 package com.watnapp.etipitaka.plus.adapter;
 
-import android.R;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Typeface;
-import android.support.v4.widget.CursorAdapter;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import com.google.inject.Inject;
 
 /**
- * Created with IntelliJ IDEA.
- * User: sutee
- * Date: 15/7/2013
- * Time: 14:27
+ * Created by sutee on 20/3/58.
  */
-
-public class PaliDictAdapter extends DictAdapter {
+public class ThaiDictAdapter extends DictAdapter {
 
   @Inject
-  public PaliDictAdapter(Context context) {
+  public ThaiDictAdapter(Context context) {
     super(context);
   }
 
   @Override
   public String getHeadWordColumn() {
-    return "headword";
+    return "head";
   }
 
   @Override
@@ -36,5 +26,4 @@ public class PaliDictAdapter extends DictAdapter {
     textView.setTypeface(font);
     textView.setTextSize(26);
   }
-
 }

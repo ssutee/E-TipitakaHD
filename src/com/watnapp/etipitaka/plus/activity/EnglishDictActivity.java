@@ -1,30 +1,27 @@
 package com.watnapp.etipitaka.plus.activity;
 
-import android.os.Build;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.adapter.DictAdapter;
-import com.watnapp.etipitaka.plus.adapter.PaliDictAdapter;
+import com.watnapp.etipitaka.plus.adapter.EnglishDictAdapter;
 import com.watnapp.etipitaka.plus.helper.DictDatabaseHelper;
-import com.watnapp.etipitaka.plus.helper.PaliDictDatabaseHelper;
+import com.watnapp.etipitaka.plus.helper.EnglishDictDatabaseHelper;
 import roboguice.inject.ContentView;
 
 /**
- * Created with IntelliJ IDEA.
- * User: sutee
- * Date: 15/7/2013
- * Time: 14:05
+ * Created by sutee on 20/3/58.
  */
 
+
 @ContentView(R.layout.activity_dict)
-public class PaliDictActivity extends DictActivity {
-  protected static final String TAG = "PaliDictActivity";
+public class EnglishDictActivity extends DictActivity {
+  protected static final String TAG = "EnglishDictActivity";
 
   @Inject
-  private PaliDictDatabaseHelper mDatabaseHelper;
+  private EnglishDictAdapter mAdapter;
 
   @Inject
-  private PaliDictAdapter mAdapter;
+  private EnglishDictDatabaseHelper mDatabaseHelper;
 
   @Override
   public DictDatabaseHelper getDictDatabaseHelper() {
@@ -38,16 +35,17 @@ public class PaliDictActivity extends DictActivity {
 
   @Override
   public String getFontFamily() {
-    return "font-family:'TH SarabunPSK'";
+    return "";
   }
 
   @Override
   public String getFontFaces() {
-    return getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old);
+    return "";
   }
 
   @Override
   public int getFontSize() {
-    return 28;
+    return 18;
   }
+
 }

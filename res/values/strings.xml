@@ -111,6 +111,7 @@
                     span.level-2 { color: #555555; font-size: 85%%; }
                     span.level-3 { color: #888888; font-size: 75%%; }
                     span.footnote { color: green; font-weight: normal; font-size: 75%%; }
+                    span.reference { color: grey; font-weight: normal; font-size: 75%%; }
                     .keywords { color: #0000FF; background: yellow; }
                 </style>
                 <script type=\"text/javascript\" src=\"jquery-2.1.1.min.js\"></script>
@@ -190,7 +191,7 @@
                     hr { margin: 5px 0px 5px 0px; padding: 0px; }
                 </style>
             </head>
-            <body style=\"font-size:%3$s; font-family:\'TH SarabunPSK\'\">
+            <body style=\"font-size:%3$s; %5$s\">
                 <p style=\"white-space: pre-wrap;\"><span style=\"color:blue;\">%1$s</span><hr/>%2$s</p>
             </body>
         </html>
@@ -227,6 +228,8 @@
     <string name="no_internet_connection">ไม่สามารถเชื่อมต่ออินเทอร์เน็ต</string>
     <string name="uncompressing_database">กำลังขยายฐานข้อมูล</string>
     <string name="pali_dict">พจนานุกรม บาลี-ไทย</string>
+    <string name="thai_dict">พจนานุกรม ไทย-ไทย</string>
+    <string name="english_dict">พจนานุกรม บาลี-อังกฤษ</string>
     <string name="adjust_font_size">เปลี่ยนขนาดอักษร</string>
     <string name="manage_data">จัดการข้อมูล</string>
     <string name="adjust_font_color">เปลี่ยนสีอักษร</string>

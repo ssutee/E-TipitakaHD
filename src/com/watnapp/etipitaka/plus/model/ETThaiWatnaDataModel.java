@@ -45,7 +45,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=? AND page=?",
+        Cursor cursor = db.query("main", null, "volume=? AND page=?",
             new String[]{String.valueOf(volume), String.valueOf(page)}, null, null, null);
         if (cursor.getCount() == 0) {
           listener.onGetItemsFinish(new Integer[] {}, new Integer[] {});
@@ -77,7 +77,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=?",
+    Cursor cursor = db.query("main", null, "volume=?",
         new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
     if (page > 0 && page <= cursor.getCount()) {
@@ -89,7 +89,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
   @Override
   public int getMaximumPageNumber(int volume) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume = ?",
+    Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { String.valueOf(volume) }, null, null, "page");
     int page = cursor.getCount();
     cursor.close();
@@ -99,7 +99,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
   @Override
   public int getMinimumItemNumber(int volume) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume = ?",
+    Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { String.valueOf(volume) }, null, null, "page");
     cursor.moveToFirst();
     String[] items = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
@@ -110,7 +110,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
   @Override
   public int getMaximumItemNumber(int volume) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume = ?",
+    Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { String.valueOf(volume) }, null, null, "page");
     cursor.moveToFirst();
     int maxItem = 0;
@@ -134,7 +134,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
       return 0;
     }
     int page = BookDatabaseHelper.getThaiWNBookItems(mContext).get(volume + "").get(section+"").get(item+"").get(0);
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=? AND page=?",
+    Cursor cursor = db.query("main", null, "volume=? AND page=?",
         new String[] {String.valueOf(volume), String.valueOf(page) }, null, null, null);
     cursor.moveToFirst();
     int pageId = cursor.getInt(cursor.getColumnIndex("_id"));
@@ -145,7 +145,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
   @Override
   public int getPageById(int pageId) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
+    Cursor cursor = db.query("main", null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
     if (cursor.getCount() == 0) {
       cursor.close();
       return 0;
@@ -222,7 +222,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
             selectionArgs.add("%" + keyword.replace('+', ' ') + "%");
           }
 
-          Cursor cursor = db.query(getLanguage().getStringCode(), null, selection, selectionArgs.toArray(new String[selectionArgs.size()]),
+          Cursor cursor = db.query("main", null, selection, selectionArgs.toArray(new String[selectionArgs.size()]),
               null, null, null);
 
           if (listener != null) {

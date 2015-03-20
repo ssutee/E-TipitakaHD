@@ -4,27 +4,24 @@ import android.os.Build;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.adapter.DictAdapter;
-import com.watnapp.etipitaka.plus.adapter.PaliDictAdapter;
+import com.watnapp.etipitaka.plus.adapter.ThaiDictAdapter;
 import com.watnapp.etipitaka.plus.helper.DictDatabaseHelper;
-import com.watnapp.etipitaka.plus.helper.PaliDictDatabaseHelper;
+import com.watnapp.etipitaka.plus.helper.ThaiDictDatabaseHelper;
 import roboguice.inject.ContentView;
 
 /**
- * Created with IntelliJ IDEA.
- * User: sutee
- * Date: 15/7/2013
- * Time: 14:05
+ * Created by sutee on 20/3/58.
  */
 
 @ContentView(R.layout.activity_dict)
-public class PaliDictActivity extends DictActivity {
-  protected static final String TAG = "PaliDictActivity";
+public class ThaiDictActivity extends DictActivity {
+  protected static final String TAG = "ThaiDictActivity";
 
   @Inject
-  private PaliDictDatabaseHelper mDatabaseHelper;
+  private ThaiDictDatabaseHelper mDatabaseHelper;
 
   @Inject
-  private PaliDictAdapter mAdapter;
+  private ThaiDictAdapter mAdapter;
 
   @Override
   public DictDatabaseHelper getDictDatabaseHelper() {

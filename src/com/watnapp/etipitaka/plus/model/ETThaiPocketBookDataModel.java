@@ -51,7 +51,7 @@ public class ETThaiPocketBookDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume=?",
+    Cursor cursor = db.query("main", null, "volume=?",
         new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
     if (page > 0 && page <= cursor.getCount()) {
@@ -63,7 +63,7 @@ public class ETThaiPocketBookDataModel extends ETDataModel {
   @Override
   public int getMaximumPageNumber(int volume) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "volume = ?",
+    Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { String.valueOf(volume) }, null, null, "page");
     int page = cursor.getCount();
     cursor.close();
@@ -88,7 +88,7 @@ public class ETThaiPocketBookDataModel extends ETDataModel {
   @Override
   public int getPageById(int pageId) {
     openDatabase();
-    Cursor cursor = db.query(getLanguage().getStringCode(), null, "_id = ?",
+    Cursor cursor = db.query("main", null, "_id = ?",
         new String[] {String.valueOf(pageId)}, null, null, null);
     cursor.moveToFirst();
     int page = cursor.getInt(cursor.getColumnIndex("page"));
@@ -129,7 +129,7 @@ public class ETThaiPocketBookDataModel extends ETDataModel {
             selectionArgs.add("%" + keyword.replace('+', ' ') + "%");
           }
 
-          Cursor cursor = db.query(getLanguage().getStringCode(), null, selection, selectionArgs.toArray(new String[selectionArgs.size()]),
+          Cursor cursor = db.query("main", null, selection, selectionArgs.toArray(new String[selectionArgs.size()]),
               null, null, null);
 
           if (listener != null) {

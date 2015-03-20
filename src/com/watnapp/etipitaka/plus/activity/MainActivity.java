@@ -264,6 +264,12 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_PALI_DICT,
         Menu.NONE, R.string.pali_dict)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_THAI_DICT,
+        Menu.NONE, R.string.thai_dict)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    preferencesMenu.add(Menu.NONE, Constants.MENU_ITEM_ENG_DICT,
+        Menu.NONE, R.string.english_dict)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
     preferencesMenu.setIcon(android.R.drawable.ic_menu_preferences);
     preferencesMenu.getItem().setIcon(android.R.drawable.ic_menu_preferences)
@@ -302,6 +308,12 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
       case Constants.MENU_ITEM_PALI_DICT:
         showPaliDict();
         return true;
+      case Constants.MENU_ITEM_THAI_DICT:
+        showThaiDict();
+        return true;
+      case Constants.MENU_ITEM_ENG_DICT:
+        showEnglishDict();
+        return true;
       case Constants.MENU_ITEM_EXPORT_DATA:
         exportData();
         return true;
@@ -337,6 +349,14 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
   private void showPaliDict() {
     startActivity(new Intent(this, PaliDictActivity.class));
+  }
+
+  private void showThaiDict() {
+    startActivity(new Intent(this, ThaiDictActivity.class));
+  }
+
+  private void showEnglishDict() {
+    startActivity(new Intent(this, EnglishDictActivity.class));
   }
 
   private void exportData() {

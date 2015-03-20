@@ -63,6 +63,16 @@ public class StartupActivity extends RoboSherlockFragmentActivity implements Fil
     return version;
   }
 
+  private int getRomanCTDatabaseVersion() {
+    SQLiteDatabase db = SQLiteDatabase.openDatabase(Constants.CT_DATABASE_PATH, null, 0);
+    Cursor cursor = db.rawQuery("pragma user_version", null);
+    cursor.moveToFirst();
+    int version = Integer.parseInt(cursor.getString(0));
+    cursor.close();
+    db.close();
+    return version;
+  }
+
   private int getThaiMMDatabaseVersion() {
     SQLiteDatabase db = SQLiteDatabase.openDatabase(Constants.MM_DATABASE_PATH, null, 0);
     Cursor cursor = db.rawQuery("pragma user_version", null);
@@ -78,12 +88,15 @@ public class StartupActivity extends RoboSherlockFragmentActivity implements Fil
       @Override
       public void run() {
         if (new File(Constants.DATABASE_PATH).length()==Constants.DATABASE_SIZE
-            && new File(Constants.MC_DATABASE_PATH).exists() && new File(Constants.MM_DATABASE_PATH).exists()
-            && getThaiMCDatabaseVersion() == 3 && getThaiMMDatabaseVersion() == 2
+            && new File(Constants.MC_DATABASE_PATH).exists()
+            && new File(Constants.MM_DATABASE_PATH).exists()
             && new File(Constants.BT_DATABASE_PATH).exists()
             && new File(Constants.WN_DATABASE_PATH).exists()
             && new File(Constants.PB_DATABASE_PATH).exists()
-            && new File(Constants.CT_DATABASE_PATH).exists()) {
+            && new File(Constants.CT_DATABASE_PATH).exists()
+            && getThaiMCDatabaseVersion() == 4
+            && getThaiMMDatabaseVersion() == 3
+            && getRomanCTDatabaseVersion() == 2) {
           mHandler.post(runnableOnSuccess);
         } else {
           mHandler.post(runnableOnFail);

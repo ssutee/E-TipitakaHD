@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          android:versionName="2.2.5"
-          android:versionCode="02205"
+          android:versionName="2.3.0"
+          android:versionCode="02300"
           package="com.watnapp.etipitaka.plus">
 
-    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="17"/>
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="22"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+            android:allowBackup="true"
             android:icon="@drawable/icon"
             android:label="@string/app_name"
             android:theme="@style/Theme.Sherlock.Light"
@@ -60,6 +61,19 @@
                 android:theme="@style/Theme.Sherlock.Light"
                 android:label="@string/pali_dict">
         </activity>
+        <activity
+                android:name=".activity.ThaiDictActivity"
+                android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
+                android:theme="@style/Theme.Sherlock.Light"
+                android:label="@string/thai_dict">
+        </activity>
+        <activity
+                android:name=".activity.EnglishDictActivity"
+                android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
+                android:theme="@style/Theme.Sherlock.Light"
+                android:label="@string/english_dict">
+        </activity>
+
         <provider
                 android:name=".model.DatabaseProvider"
                 android:authorities="com.watnapp.etipitaka.plus.model.contentprovider"

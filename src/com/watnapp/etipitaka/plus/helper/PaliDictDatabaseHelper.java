@@ -18,45 +18,26 @@ import java.io.File;
   */
 
 @Singleton
-public class PaliDictDatabaseHelper extends SQLiteAssetHelper {
+public class PaliDictDatabaseHelper extends DictDatabaseHelper {
 
   private static final String DATABASE_NAME = "p2t_dict";
   private static final int DATABASE_VERSION = 1;
 
-  private SQLiteDatabase db;
-
-  private Context mContext;
-
   @Inject
   public PaliDictDatabaseHelper(Context context) {
-    super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    super(context, DATABASE_NAME, DATABASE_VERSION);
     mContext = context;
   }
 
-  public void openDatabase() {
-    if ((db == null || !db.isOpen())) {
-      db = getReadableDatabase();
-    }
-  }
-
-  public void closeDatabase() {
-    if (db != null && db.isOpen()) {
-      db.close();
-    }
-  }
-
-  public Cursor queryHeadWords(String selection, String[] selectionArgs) {
-    openDatabase();
+  @Override
+  public Cursor doQueryHeadWords(String selection, String[] selectionArgs) {
     return db.query("p2t", new String[] { "_id", "headword" }, selection, selectionArgs, null, null, "headword");
   }
 
-  public String getContentById(int id) {
-    openDatabase();
-    Cursor cursor = db.query("p2t", new String[]{ "content" }, "_id = ?",
+  @Override
+  public Cursor doQueryContentById(int id) {
+    return db.query("p2t", new String[]{ "content" }, "_id = ?",
         new String[]{ String.valueOf(id) }, null, null, null);
-    cursor.moveToFirst();
-    String content = cursor.getString(0);
-    cursor.close();
-    return content;
   }
+
 }
