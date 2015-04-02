@@ -87,7 +87,7 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
         int code = getResources().getIntArray(R.array.full_languages_code)[position];
         application.setLanguage(BookDatabaseHelper.Language.values()[code]);
         getActivity().getContentResolver().notifyChange(Constants.LANGUAGE_CHANGE_URI, null);
-        if ((Integer)spinner.getTag(R.id.pos) != position) {
+        if (spinner.getTag() != null && (Integer)spinner.getTag(R.id.pos) != position) {
           getActivity().getContentResolver().notifyChange(Constants.RESET_PAGE_URI, null);
         }
         spinner.setTag(R.id.pos, position);

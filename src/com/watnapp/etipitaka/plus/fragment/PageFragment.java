@@ -121,7 +121,7 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(Constants.FONT_SIZE_KEY, size);
     editor.commit();
-    mWebView.loadUrl(String.format("javascript:(document.body.style.fontSize ='%dpt');", size));
+    mWebView.loadUrl(String.format("javascript:$('body').css('font-size','%dpt');", size));
   }
 
   public int getFontSize() {
@@ -145,9 +145,8 @@ public class PageFragment extends RoboFragment implements View.OnTouchListener, 
     editor.putString(Constants.FONT_COLOR_KEY, font);
     editor.putString(Constants.BACKGROUND_COLOR_KEY, background);
     editor.commit();
-    mWebView.loadUrl(String.format(
-        "javascript:(document.body.style.color ='%s'); (document.body.style.background ='%s');",
-        font, background));
+    mWebView.loadUrl(String.format("javascript:$('body').css('background-color','%s'); $('body').css('color','%s'); ",
+        background, font));
   }
 
   public String getFontColor() {

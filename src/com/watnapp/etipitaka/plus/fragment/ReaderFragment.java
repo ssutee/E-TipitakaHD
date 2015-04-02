@@ -127,6 +127,8 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     mIsBuddhawaj = savedInstanceState.getBoolean(Constants.BUDDHAWAJ_KEY);
     mVolume = savedInstanceState.getInt(Constants.VOLUME_KEY);
     mPage = savedInstanceState.getInt(Constants.PAGE_KEY);
+    Log.d(TAG, "restore volume = " + mVolume);
+    Log.d(TAG, "restore page = " + mPage);
     mLanguage = BookDatabaseHelper.Language.values()[savedInstanceState.getInt(Constants.LANGUAGE_KEY)];
     mShowButtons = savedInstanceState.getBoolean(Constants.BUTTON_KEY);
     dataModel = ETDataModelCreator.create(mLanguage, getActivity());
@@ -265,6 +267,9 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       }
     });
 
+    Log.d(TAG, "open volume = " + mVolume);
+    Log.d(TAG, "open page = " + mPage);
+
     openBook(mLanguage, mVolume, mPage, mKeywords, mIsBuddhawaj);
 
   }
@@ -300,7 +305,9 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     mIsBuddhawaj = isBuddhawaj;
     Cursor cursor = dataModel.read(volume);
     Log.d(TAG, "open book");
-    Log.d(TAG, "total = " + cursor.getCount() + "");
+    Log.d(TAG, dataModel.getLanguage().getStringCode());
+    Log.d(TAG, "volume = " + volume);
+    Log.d(TAG, "total pages = " + cursor.getCount() + "");
     Log.d(TAG, "page = " + page);
 
     cursor.moveToFirst();
@@ -310,8 +317,11 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
       mViewPager.setCurrentItem(page-1, false);
       mSeekBar.setMax(cursor.getCount() - 1);
       mSeekBar.setProgress(page - 1);
-      updateSubtitle(volume, page);
+      mSeekBar.setVisibility(View.VISIBLE);
+    } else {
+      mSeekBar.setVisibility(View.GONE);
     }
+    updateSubtitle(volume, page);
   }
 
   public void openBook(BookDatabaseHelper.Language language, int volume, int page, int item) {
@@ -331,10 +341,9 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
   }
 
   private void updateNonItemSubtitle(int volume, int page) {
+    String fullName = dataModel.getLanguage().getFullName(getActivity());
     mTextSubtitle.setText(getString(R.string.non_item_subtitle_template,
-        getString(mLanguage == BookDatabaseHelper.Language.THAI
-            ? R.string.thai_full_name : R.string.pali_full_name),
-        Utils.convertToThaiNumber(getActivity(), volume),
+        fullName, Utils.convertToThaiNumber(getActivity(), volume),
         Utils.convertToThaiNumber(getActivity(), page)));
   }
 

@@ -48,20 +48,25 @@ public class ETThaiWatnaDataModel extends ETDataModel {
         Cursor cursor = db.query("main", null, "volume=? AND page=?",
             new String[]{String.valueOf(volume), String.valueOf(page)}, null, null, null);
         if (cursor.getCount() == 0) {
-          listener.onGetItemsFinish(new Integer[] {}, new Integer[] {});
+          listener.onGetItemsFinish(null, null);
         } else {
           cursor.moveToFirst();
-          String[] tokens = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
-          ArrayList<Integer> items = new ArrayList<Integer>();
-          for (int i=0; i<tokens.length; ++i) {
-            items.add(Integer.parseInt(tokens[i]));
+          String itemsColumn = cursor.getString(cursor.getColumnIndex("items"));
+          if (itemsColumn.trim().length() == 0) {
+            listener.onGetItemsFinish(null, null);
+          } else {
+            String[] tokens = itemsColumn.split("\\s+");
+            ArrayList<Integer> items = new ArrayList<Integer>();
+            for (int i=0; i<tokens.length; ++i) {
+              items.add(Integer.parseInt(tokens[i]));
+            }
+            int section = BookDatabaseHelper.getSubItem(mContext, getLanguage(), volume, page, Integer.parseInt(tokens[0]));
+            ArrayList<Integer> sections = new ArrayList<Integer>();
+            for (int i=0; i<tokens.length; ++i) {
+              sections.add(section);
+            }
+            listener.onGetItemsFinish(items.toArray(new Integer[items.size()]), sections.toArray(new Integer[sections.size()]));
           }
-          int section = BookDatabaseHelper.getSubItem(mContext, getLanguage(), volume, page, Integer.parseInt(tokens[0]));
-          ArrayList<Integer> sections = new ArrayList<Integer>();
-          for (int i=0; i<tokens.length; ++i) {
-            sections.add(section);
-          }
-          listener.onGetItemsFinish(items.toArray(new Integer[items.size()]), sections.toArray(new Integer[sections.size()]));
         }
 
       }

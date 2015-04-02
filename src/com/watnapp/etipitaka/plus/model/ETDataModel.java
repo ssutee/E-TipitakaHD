@@ -117,7 +117,7 @@ public abstract class ETDataModel {
       public void onGetItemsFinish(Integer[] items, Integer[] sections) {
         int section = 1;
         boolean found = false;
-        for (int i = 0; i < items.length; ++i) {
+        for (int i = 0; items != null && i < items.length; ++i) {
           if (items[i] == item) {
             section = sections[i];
             found = true;

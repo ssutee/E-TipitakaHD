@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -20,6 +21,8 @@ import com.watnapp.etipitaka.plus.R;
  */
 
 public class FontDialogFragment extends RoboSherlockDialogFragment {
+
+  static final String TAG = "FontDialogFragment";
 
   public interface FontDialogListener {
     public void onDialogPositiveClick(RoboSherlockDialogFragment dialog, int fontSize);
@@ -62,7 +65,7 @@ public class FontDialogFragment extends RoboSherlockDialogFragment {
     mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        mWebView.loadUrl(String.format("javascript:(document.body.style.fontSize ='%dpt');", progress < 1 ? 1 : progress));
+        mWebView.loadUrl(String.format("javascript:$('body').css('font-size','%dpt');", progress < 1 ? 1 : progress));
       }
 
       @Override
@@ -76,12 +79,12 @@ public class FontDialogFragment extends RoboSherlockDialogFragment {
 
     mWebView = (WebView) view.findViewById(R.id.webview);
     mWebView.getSettings().setJavaScriptEnabled(true);
-    mWebView.loadDataWithBaseURL("http://etipitaka.com", mDataSource.getContent(), "text/html", "UTF-8", null);
+    mWebView.loadDataWithBaseURL("file:///android_asset/", mDataSource.getContent(), "text/html", "UTF-8", null);
     mWebView.setWebViewClient(new WebViewClient() {
       @Override
       public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
-        mWebView.loadUrl(String.format("javascript:(document.body.style.fontSize ='%dpt');", mDataSource.getFontSize()));
+        mWebView.loadUrl(String.format("javascript:$('body').css('font-size','%dpt');", mDataSource.getFontSize()));
       }
     });
 

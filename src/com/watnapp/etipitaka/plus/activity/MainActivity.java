@@ -97,7 +97,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
           previousDataModel = dataModel;
           dataModel = ETDataModelCreator.create(application.getLanguage(), MainActivity.this);
         } else if (uri.compareTo(Constants.RESET_PAGE_URI) == 0) {
-
+          Log.d(TAG, "reset");
           ETDataModel sourceDataModel = previousDataModel;
           final ETDataModel targetDataModel = dataModel;
 
