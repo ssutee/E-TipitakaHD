@@ -472,8 +472,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
 
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     builder.setTitle(R.string.select_langauge);
-    builder.setItems(dataModel.getLanguage() == Language.THAIBT ?
-            Constants.LANGUAGE_TITLES_BT : Constants.LANGUAGE_TITLES,
+    builder.setItems(Constants.LANGUAGE_TITLES,
         new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, final int which) {
@@ -481,7 +480,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
         dataModel.getComparingItemsAtPage(mVolume, page, new BookDatabaseHelper.OnGetItemsListener() {
           @Override
           public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
-            if (dataModel.getLanguage() == Language.THAIBT) {
+            if (dataModel.getLanguage() == Language.THAIBT || dataModel.getLanguage() == Language.THAIPB) {
               compare(references, Language.values()[which]);
             } else {
               mHandler.post(new Runnable() {
@@ -515,7 +514,7 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     startActivityForResult(intent, COMPARE_REQ);
   }
 
-  private void startComparisonActivityForFiveBooks(int volume, int item, Language language) {
+  private void startComparisonActivityWithReference(int volume, int item, Language language) {
     Intent intent = new Intent(MainActivity.this, ComparisonActivity.class);
     intent.putExtra(Constants.LANGUAGE_KEY, application.getLanguage().getCode());
     intent.putExtra(Constants.COMPARING_LANGUAGE_KEY, language.getCode());
@@ -540,7 +539,11 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
     builder.setItems(choices, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        startComparisonActivityForFiveBooks(references.get(which).second.first,
+        Log.d(TAG, "compare to");
+        Log.d(TAG, references.get(which).first + "");
+        Log.d(TAG, references.get(which).second.first + "");
+        Log.d(TAG, references.get(which).second.second + "");
+        startComparisonActivityWithReference(references.get(which).second.first,
             references.get(which).second.second, language);
       }
     });
@@ -652,11 +655,18 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   public void onTextEntryDialogPositiveButtonClick(String text, int id) {
     switch (id) {
       case Constants.GOTO_PAGE_ID:
-        getReaderFragment().setCurrentPage(Integer.parseInt(text) - dataModel.getMinimumPageNumber(mVolume) + 1, true);
+        try {
+          getReaderFragment().setCurrentPage(Integer.parseInt(text) - dataModel.getMinimumPageNumber(mVolume) + 1, true);
+        } catch (NumberFormatException e) {
+          e.printStackTrace();
+        }
         break;
       case Constants.GOTO_ITEM_ID:
-        Log.d(TAG, "gotoItem");
-        gotoItem(Integer.parseInt(text));
+        try {
+          gotoItem(Integer.parseInt(text));
+        } catch (NumberFormatException e) {
+          e.printStackTrace();
+        }
         break;
       case Constants.TAKE_NOTE_ID:
         takeNote(application.getLanguage(), mVolume, mSelectedPage, mSelectedItem, text);
@@ -700,7 +710,11 @@ public class MainActivity extends RoboSherlockFragmentActivity implements
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == COMPARE_REQ && resultCode == RESULT_OK) {
-      Language language = Language.values()[data.getIntExtra(Constants.LANGUAGE_KEY, Language.THAI.getCode())];
+
+      int code = data.getIntExtra(Constants.LANGUAGE_KEY, Language.THAI.getCode());
+      Language language = Language.values()[code];
+      Log.d(TAG, language.getStringCode());
+
       mMenuFragment.setRadioButton(language);
 
       Log.d(TAG, language.toString() + ":" + data.getIntExtra(Constants.VOLUME_KEY, mVolume) +

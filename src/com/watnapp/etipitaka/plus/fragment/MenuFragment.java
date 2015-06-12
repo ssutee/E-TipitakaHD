@@ -102,7 +102,8 @@ public class MenuFragment extends RoboSherlockFragment implements HistoryFragmen
 
   public void setRadioButton(BookDatabaseHelper.Language language) {
     spinner.setTag(R.id.pos, language.getCode());
-    spinner.setSelection(language.getCode(), false);
+    int position = getResources().getIntArray(R.array.full_languages_position)[language.getCode()];
+    spinner.setSelection(position, false);
   }
 
   @Override

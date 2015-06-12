@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          android:versionName="2.3.2"
-          android:versionCode="02302"
+          android:versionName="2.3.10"
+          android:versionCode="02310"
+          android:installLocation="auto"
           package="com.watnapp.etipitaka.plus">
 
     <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="22"/>

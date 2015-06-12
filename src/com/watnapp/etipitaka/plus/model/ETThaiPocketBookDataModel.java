@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
+import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class ETThaiPocketBookDataModel extends ETDataModel {
 
   @Override
   protected String getDatabasePath() {
-    return Constants.PB_DATABASE_PATH;
+    return Utils.getDatabasePath(BookDatabaseHelper.Language.THAIPB);
   }
 
   @Override
@@ -172,7 +173,7 @@ public class ETThaiPocketBookDataModel extends ETDataModel {
 
   @Override
   public void convertToPivot(int volume, int page, int item, BookDatabaseHelper.OnConvertToPivotListener listener) {
-    listener.onConvertToPivotFinish(1,1,1);
+    listener.onConvertToPivotFinish(1, item, 1);
   }
 
   @Override

@@ -1,12 +1,8 @@
 package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.util.Log;
-import android.util.Pair;
-import com.touchsi.widget.ClearableAutoCompleteTextView;
-import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
+import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -16,7 +12,7 @@ import java.util.Map;
 /**
  * Created by sutee on 19/2/14.
  */
-public class ETThaiMahaChulaDataModel extends ETThaiMahaDataModel {
+public class ETThaiMahaChulaDataModel extends ETBasicDataModel {
 
   protected static final String TAG = "ETThaiMahaChulaDataModel";
 
@@ -26,7 +22,7 @@ public class ETThaiMahaChulaDataModel extends ETThaiMahaDataModel {
 
   @Override
   protected String getDatabasePath() {
-    return Constants.MC_DATABASE_PATH;
+    return Utils.getDatabasePath(BookDatabaseHelper.Language.THAIMC);
   }
 
   @Override

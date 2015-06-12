@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
+import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class ETThaiWatnaDataModel extends ETDataModel {
 
   @Override
   protected String getDatabasePath() {
-    return Constants.WN_DATABASE_PATH;
+    return Utils.getDatabasePath(BookDatabaseHelper.Language.THAIWN);
   }
 
   @Override

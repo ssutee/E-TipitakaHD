@@ -91,17 +91,24 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
                     .add(R.id.left_reader_fragment,
                         mLeftFragment, "left").commit();
 
+                Log.d(TAG, "volume = " + volume);
+                Log.d(TAG, "page = " + page);
+
                 mRightFragment = ReaderFragment.newInstance(mLanguage2, volume, page, "", mIsBuddhawaj, true);
                 getSupportFragmentManager().beginTransaction()
                     .add(R.id.right_reader_fragment,
                         mRightFragment, "right").commit();
 
-                mHandler.postDelayed(new Runnable() {
-                  @Override
-                  public void run() {
-                    mRightFragment.getPageFragment(mRightFragment.getCurrentPage()).scrollToItem(mItem);
-                  }
-                }, 500);
+                if (page > 0) {
+                  mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                      mRightFragment.getPageFragment(mRightFragment.getCurrentPage()).scrollToItem(mItem);
+                    }
+                  }, 500);
+                } else {
+                  finish();
+                }
 
               }
             });
@@ -124,7 +131,8 @@ public class ComparisonActivity extends RoboSherlockFragmentActivity
     final ETDataModel sourceModel = language == mDataModel1.getLanguage() ? mDataModel1 : mDataModel2;
     final ETDataModel targetModel = language == mDataModel1.getLanguage() ? mDataModel2 : mDataModel1;
 
-    if (sourceModel.getLanguage() == Language.THAIBT || targetModel.getLanguage() == Language.THAIBT) {
+    if (sourceModel.getLanguage() == Language.THAIBT || targetModel.getLanguage() == Language.THAIBT ||
+        sourceModel.getLanguage() == Language.THAIPB || targetModel.getLanguage() == Language.THAIPB) {
       return;
     }
 

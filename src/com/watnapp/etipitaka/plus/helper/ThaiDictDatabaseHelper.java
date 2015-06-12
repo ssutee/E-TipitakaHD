@@ -24,12 +24,12 @@ public class ThaiDictDatabaseHelper extends DictDatabaseHelper {
 
   @Override
   public Cursor doQueryHeadWords(String selection, String[] selectionArgs) {
-    return db.query("english", new String[] { "_id", "head" }, selection, selectionArgs, null, null, "head");
+    return db.query("thai", new String[] { "_id", "head" }, selection, selectionArgs, null, null, "head");
   }
 
   @Override
   public Cursor doQueryContentById(int id) {
-    return db.query("english", new String[]{ "translation" }, "_id = ?",
+    return db.query("thai", new String[]{ "translation" }, "_id = ?",
         new String[]{ String.valueOf(id) }, null, null, null);
   }
 }

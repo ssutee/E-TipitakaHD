@@ -1,6 +1,7 @@
 package com.watnapp.etipitaka.plus;
 
 import android.app.Application;
+import android.content.Context;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.model.History;
 
@@ -15,6 +16,7 @@ public class E_TipitakaApplication extends Application {
 
   private BookDatabaseHelper.Language language = BookDatabaseHelper.Language.THAI;
   private History history;
+  private static Context context;
 
   public BookDatabaseHelper.Language getLanguage() {
     return language;
@@ -31,4 +33,14 @@ public class E_TipitakaApplication extends Application {
   public void setHistory(History history) {
     this.history = history;
   }
+
+  public void onCreate(){
+    super.onCreate();
+    E_TipitakaApplication.context = getApplicationContext();
+  }
+
+  public static Context getAppContext() {
+    return E_TipitakaApplication.context;
+  }
+
 }

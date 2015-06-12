@@ -35,6 +35,10 @@ abstract public class DictDatabaseHelper extends SQLiteAssetHelper {
     }
   }
 
+  public String prepareQueryString(String query) {
+    return query;
+  }
+
   public Cursor queryHeadWords(String selection, String[] selectionArgs) {
     openDatabase();
     return doQueryHeadWords(selection, selectionArgs);

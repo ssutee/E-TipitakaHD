@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
+import com.watnapp.etipitaka.plus.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,8 +45,8 @@ public class BookDatabaseHelper {
   private Context mContext;
 
   public void openDatabase() {
-    if ((db == null || !db.isOpen()) && (new File(Constants.DATABASE_PATH)).exists()) {
-      db = SQLiteDatabase.openDatabase(Constants.DATABASE_PATH, null, 0);
+    if ((db == null || !db.isOpen()) && (new File(Utils.getDatabasePath(Language.THAI))).exists()) {
+      db = SQLiteDatabase.openDatabase(Utils.getDatabasePath(Language.THAI), null, 0);
     }
   }
 

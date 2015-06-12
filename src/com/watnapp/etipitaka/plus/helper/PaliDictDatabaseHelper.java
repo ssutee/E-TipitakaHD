@@ -40,4 +40,9 @@ public class PaliDictDatabaseHelper extends DictDatabaseHelper {
         new String[]{ String.valueOf(id) }, null, null, null);
   }
 
+  @Override
+  public String prepareQueryString(String query) {
+    return query.replace("\u0e0d", "\uf70f").replace("\u0e4d", "\uf711")
+        .replace("\u0e10", "\uf700").replace("\u0e0d", "\uf70f").replace("\u0e4d", "\uf711");
+  }
 }

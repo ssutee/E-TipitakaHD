@@ -2,8 +2,8 @@ package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
 import android.database.Cursor;
-import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
+import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Created by sutee on 13/2/14.
  */
-public class ETThaiMahaMakutDataModel extends ETThaiMahaDataModel {
+public class ETThaiMahaMakutDataModel extends ETBasicDataModel {
 
   protected static final String TAG = "ETThaiMahaMakutDataModel";
 
@@ -22,7 +22,7 @@ public class ETThaiMahaMakutDataModel extends ETThaiMahaDataModel {
 
   @Override
   protected String getDatabasePath() {
-    return Constants.MM_DATABASE_PATH;
+    return Utils.getDatabasePath(BookDatabaseHelper.Language.THAIMM);
   }
 
   @Override

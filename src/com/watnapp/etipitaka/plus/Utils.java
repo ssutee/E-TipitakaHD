@@ -1,7 +1,12 @@
 package com.watnapp.etipitaka.plus;
 
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -12,6 +17,12 @@ import java.math.BigInteger;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -66,6 +77,60 @@ public class Utils {
 
   public static boolean isTipitaka(Language language) {
     return language != Language.THAIBT && language != Language.THAIWN && language != Language.THAIPB;
+  }
+
+  public static String getDatabasePath(Language language) {
+    String databaseDir = Utils.getDatabaseDirectory();
+    switch (language) {
+      case THAIMC:
+        return databaseDir + "/" + "thaimc.db";
+      case THAIMM:
+        return databaseDir + "/" + "thaimm.db";
+      case THAIBT:
+        return databaseDir + "/" + "thaibt.db";
+      case THAIPB:
+        return databaseDir + "/" + "thaipb.db";
+      case THAIWN:
+        return databaseDir + "/" + "thaiwn.db";
+      case ROMANCT:
+        return databaseDir + "/" + "romanct.db";
+      case THAI:
+        return databaseDir + "/" + "thai.db";
+      case PALI:
+        return databaseDir + "/" + "pali.db";
+      default:
+        return databaseDir + "/" + "thai.db";
+    }
+  }
+
+  public static String getDatabaseDirectory() {
+    return E_TipitakaApplication.getAppContext().getExternalFilesDir(null).getPath();
+  }
+
+  public static String floatForm (double d)
+  {
+    return new DecimalFormat("#.##").format(d);
+  }
+
+
+  public static String bytesToHuman (long size)
+  {
+    long Kb = 1  * 1024;
+    long Mb = Kb * 1024;
+    long Gb = Mb * 1024;
+    long Tb = Gb * 1024;
+    long Pb = Tb * 1024;
+    long Eb = Pb * 1024;
+
+    if (size <  Kb)                 return floatForm(        size     ) + " byte";
+    if (size >= Kb && size < Mb)    return floatForm((double)size / Kb) + " Kb";
+    if (size >= Mb && size < Gb)    return floatForm((double)size / Mb) + " Mb";
+    if (size >= Gb && size < Tb)    return floatForm((double)size / Gb) + " Gb";
+    if (size >= Tb && size < Pb)    return floatForm((double)size / Tb) + " Tb";
+    if (size >= Pb && size < Eb)    return floatForm((double)size / Pb) + " Pb";
+    if (size >= Eb)                 return floatForm((double)size / Eb) + " Eb";
+
+    return "???";
   }
 
 }

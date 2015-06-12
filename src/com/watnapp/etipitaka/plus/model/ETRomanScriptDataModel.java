@@ -7,6 +7,7 @@ import android.database.MergeCursor;
 import android.util.Log;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
+import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class ETRomanScriptDataModel extends ETDataModel {
 
   @Override
   protected String getDatabasePath() {
-    return Constants.CT_DATABASE_PATH;
+    return Utils.getDatabasePath(BookDatabaseHelper.Language.ROMANCT);
   }
 
   @Override

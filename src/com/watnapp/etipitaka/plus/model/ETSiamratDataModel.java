@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import com.watnapp.etipitaka.plus.Constants;
+import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ abstract public class ETSiamratDataModel extends ETDataModel {
 
   @Override
   protected String getDatabasePath() {
-    return Constants.DATABASE_PATH;
+    return Utils.getDatabasePath(BookDatabaseHelper.Language.THAI);
   }
 
   protected int getPageId(int volume, int page) {

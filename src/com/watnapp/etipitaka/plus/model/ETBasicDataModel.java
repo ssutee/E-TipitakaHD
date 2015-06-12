@@ -13,11 +13,11 @@ import java.util.Map;
 /**
  * Created by sutee on 19/2/14.
  */
-public abstract class ETThaiMahaDataModel extends ETDataModel {
+public abstract class ETBasicDataModel extends ETDataModel {
 
   protected static final String TAG = "ETThaiMahaDataModel";
 
-  public ETThaiMahaDataModel(Context context) {
+  public ETBasicDataModel(Context context) {
     super(context);
   }
 

@@ -89,8 +89,12 @@ abstract public class DictActivity extends RoboSherlockFragmentActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        String selection = headword != null ? getDictAdapter().getHeadWordColumn()+" LIKE ?" : null;
-        String[] selectionArgs = headword != null ? new String[] { headword + "%" } : null;
+        String query = headword != null ? getDictDatabaseHelper().prepareQueryString(headword) : null;
+        String headwordColumn = getDictAdapter().getHeadWordColumn();
+        String selection = query != null ? headwordColumn+" LIKE ? OR " + headwordColumn+" LIKE ? OR "
+            + headwordColumn+" LIKE ?" : null;
+        String[] selectionArgs = query != null ?
+            new String[] { query + "%", "%," + query + "%", "%, " + query + "%" } : null;
         final Cursor cursor = getDictDatabaseHelper().queryHeadWords(selection, selectionArgs);
         cursor.moveToFirst();
         mListView.post(new Runnable() {

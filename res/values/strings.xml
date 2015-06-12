@@ -197,6 +197,7 @@
         </html>
     ]]>
     </string>
+    <string name="space_error">โปรแกรมต้องการเนื้อที่อย่างน้อย %1$s แต่คุณมีเพียง %2$s</string>
     <string name="font_size">ขนาดอักษร</string>
     <string name="increase_font_size">เพิ่มขนาดอักษร</string>
     <string name="decrease_font_size">ลดขนาดอักษร</string>
@@ -261,4 +262,7 @@
     <string name="thaipb_short_name">หมวดธรรม</string>
     <string name="thaibt_short_name">ชุดห้าเล่ม</string>
     <string name="romanct_short_name">Roman Script</string>
+    <string name="close">ปิด</string>
+    <string name="no_space_left">เนื้อที่ไม่เพียงพอ</string>
+    <string name="move_old_files">กำลังย้ายไฟล์</string>
 </resources>
