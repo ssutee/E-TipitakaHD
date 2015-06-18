@@ -61,6 +61,16 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
 
     Log.d(TAG, String.format("free = %d", freeMemory));
 
+    final ProgressDialog unzipDialog = new ProgressDialog(this);
+    unzipDialog.setMessage(getString(R.string.uncompressing_database));
+    unzipDialog.setCancelable(false);
+
+    final ProgressDialog downloadDialog = new ProgressDialog(this);
+    downloadDialog.setCancelable(false);
+    downloadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+    downloadDialog.setMax(100);
+    downloadDialog.setMessage(getString(R.string.downloading_database));
+
     final bolts.Capture<String> host = new bolts.Capture<String>(Constants.THAI_HOST);
     if (freeMemory < minimumSpace && !new File(Utils.getDatabasePath(Language.THAI)).exists()) {
       new AlertDialog.Builder(this)
@@ -93,47 +103,23 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
             host.set(Constants.S3_HOST);
           }
           Log.d(TAG, "isThaiClient finished");
-          return downloadDatabases(host.get());
+          return downloadDatabases(host.get(), downloadDialog, unzipDialog);
         }
       }).continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
         @Override
-        public Task<Boolean> then(Task<Boolean> task) throws Exception {
-          return updateDatabase(Language.THAI, host.get());
-        }
-      }).continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
-        @Override
-        public Task<Boolean> then(Task<Boolean> task) throws Exception {
-          return updateDatabase(Language.PALI, host.get());
-        }
-      }).continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
-        @Override
-        public Task<Boolean> then(Task<Boolean> task) throws Exception {
-          return updateDatabase(Language.THAIMM, host.get());
-        }
-      }).continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
-        @Override
-        public Task<Boolean> then(Task<Boolean> task) throws Exception {
-          return updateDatabase(Language.THAIMC, host.get());
-        }
-      }).continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
-        @Override
-        public Task<Boolean> then(Task<Boolean> task) throws Exception {
-          return updateDatabase(Language.THAIWN, host.get());
-        }
-      }).continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
-        @Override
-        public Task<Boolean> then(Task<Boolean> task) throws Exception {
-          return updateDatabase(Language.THAIPB, host.get());
-        }
-      }).continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
-        @Override
-        public Task<Boolean> then(Task<Boolean> task) throws Exception {
-          return updateDatabase(Language.THAIBT, host.get());
-        }
-      }).continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
-        @Override
-        public Task<Boolean> then(Task<Boolean> task) throws Exception {
-          return updateDatabase(Language.ROMANCT, host.get());
+        public Task<Boolean> then(Task<Boolean> result) throws Exception {
+          Task<Boolean> task = Task.forResult(null);
+          for (final Language code : new Language[]
+              {Language.THAI, Language.PALI, Language.THAIMM, Language.THAIMC,
+                  Language.THAIWN, Language.THAIBT, Language.THAIPB, Language.ROMANCT} ) {
+            task = task.continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
+              @Override
+              public Task<Boolean> then(Task<Boolean> ignored) throws Exception {
+                return updateDatabase(code, host.get(), downloadDialog, unzipDialog);
+              }
+            });
+          }
+          return task;
         }
       }).continueWith(new Continuation<Boolean, Object>() {
         @Override
@@ -144,9 +130,12 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
               errorExit(null);
             }
           });
+          dismissDialog(downloadDialog);
+          dismissDialog(unzipDialog);
           return null;
         }
       });
+
     }
   }
 
@@ -208,6 +197,12 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
 
   private bolts.Task<Void> updateDatabasesInfo() {
     final Task<Void>.TaskCompletionSource source = Task.create();
+
+    if (!isNetworkConnected()) {
+      source.setResult(null);
+      return source.getTask();
+    }
+
     Ion.with(this)
         .load(Constants.UPDATE_URL)
         .asJsonObject()
@@ -230,6 +225,7 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
               editor.commit();
               source.setResult(null);
             } else {
+              e.printStackTrace();
               source.setError(e);
             }
           }
@@ -238,6 +234,9 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
   }
 
   private int getLocalDatabaseVersion(BookDatabaseHelper.Language language) {
+    if (!new File(Utils.getDatabasePath(language)).exists()) {
+      return 0;
+    }
     SQLiteDatabase db = SQLiteDatabase.openDatabase(Utils.getDatabasePath(language), null, 0);
     Cursor cursor = db.rawQuery("pragma user_version", null);
     cursor.moveToFirst();
@@ -245,6 +244,18 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
     cursor.close();
     db.close();
     return version == 0 ? 1 : version;
+  }
+
+  private bolts.Task<Integer> getLocalDatabaseVersionTask(final Language language) {
+    Log.d(TAG, "getLocalDatabaseVersionTask");
+    final Task<Integer>.TaskCompletionSource source = Task.create();
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        source.setResult(getLocalDatabaseVersion(language));
+      }
+    }).start();
+    return source.getTask();
   }
 
   private void checkDatabases(final Runnable runnableOnSuccess, final Runnable runnableOnFail) {
@@ -309,6 +320,12 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
 
   private bolts.Task<Boolean> isThaiClient() {
     final Task<Boolean>.TaskCompletionSource source = Task.create();
+
+    if (!isNetworkConnected()) {
+      source.setResult(true);
+      return source.getTask();
+    }
+
     Ion.with(this)
         .load("http://media1.watnapahpong.org/geo.php")
         .asJsonObject()
@@ -326,29 +343,29 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
     return source.getTask();
   }
 
-  private bolts.Task<Boolean> downloadDatabases(final String host) {
-    final ProgressDialog unzipDialog = new ProgressDialog(this);
-    unzipDialog.setMessage(getString(R.string.uncompressing_database));
-    unzipDialog.setCancelable(false);
-
-    final ProgressDialog downloadDialog = new ProgressDialog(this);
-    downloadDialog.setCancelable(false);
-    downloadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-    downloadDialog.setMax(100);
-    downloadDialog.setMessage(getString(R.string.downloading_database));
-
+  private bolts.Task<Boolean> downloadDatabases(final String host,
+                                                final ProgressDialog downloadDialog,
+                                                final ProgressDialog unzipDialog) {
     final Task<Boolean>.TaskCompletionSource source = Task.create();
     if (isNetworkConnected() && !new File(Utils.getDatabasePath(Language.THAI)).exists()) {
       Log.d(TAG, "downloadDatabases");
-      downloadDatabase(getDatabaseFile(), host, downloadDialog)
-          .onSuccessTask(new Continuation<String, Task<String>>() {
+      showDialog(downloadDialog);
+      downloadDatabase(getDatabaseFile(), host, new OnDownloadProgressListener() {
+        @Override
+        public void onDownloadProgress(int progress) {
+          setDialogProgress(downloadDialog, progress);
+        }
+      }).continueWithTask(new Continuation<String, Task<String>>() {
             @Override
             public Task<String> then(Task<String> task) throws Exception {
-              return unzipDatabase(task.getResult(), unzipDialog);
+              hideDialog(downloadDialog);
+              showDialog(unzipDialog);
+              return unzipDatabase(task.getResult());
             }
           }).continueWith(new Continuation<String, Void>() {
         @Override
         public Void then(Task<String> task) throws Exception {
+          hideDialog(unzipDialog);
           source.setResult(true);
           return null;
         }
@@ -359,125 +376,164 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
     return source.getTask();
   }
 
-  private bolts.Task<Boolean> updateDatabase(final Language language, final String host) {
-    Log.d(TAG, "update: " + language.getStringCode());
-    final ProgressDialog unzipDialog = new ProgressDialog(this);
-    unzipDialog.setMessage(getString(R.string.uncompressing_database));
-    unzipDialog.setCancelable(false);
+  private void showDialog(final ProgressDialog dialog) {
+    mHandler.post(new Runnable() {
+      @Override
+      public void run() {
+        dialog.show();
+      }
+    });
+  }
 
-    final ProgressDialog downloadDialog = new ProgressDialog(this);
-    downloadDialog.setCancelable(false);
-    downloadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-    downloadDialog.setMax(100);
-    downloadDialog.setMessage(getString(R.string.downloading_database));
+  private void hideDialog(final ProgressDialog dialog) {
+    mHandler.post(new Runnable() {
+      @Override
+      public void run() {
+        dialog.hide();
+      }
+    });
+  }
 
+  private void dismissDialog(final ProgressDialog dialog) {
+    mHandler.post(new Runnable() {
+      @Override
+      public void run() {
+        dialog.dismiss();
+      }
+    });
+  }
+
+  private void setDialogProgress(final ProgressDialog dialog, final int progress) {
+    mHandler.post(new Runnable() {
+      @Override
+      public void run() {
+        dialog.setProgress(progress);
+      }
+    });
+  }
+
+  private bolts.Task<Boolean> updateDatabase(final Language language, final String host,
+                                             final ProgressDialog downloadDialog,
+                                             final ProgressDialog unzipDialog) {
     final Task<Boolean>.TaskCompletionSource source = Task.create();
-    int remoteVersion = getRemoteDatabaseVersion(language.getStringCode());
-    if (!new File(Utils.getDatabasePath(language)).exists() ||
-        getLocalDatabaseVersion(language) != remoteVersion) {
-      downloadDatabase(language, host, downloadDialog)
-          .onSuccessTask(new Continuation<String, Task<String>>() {
-            @Override
-            public Task<String> then(Task<String> task) throws Exception {
-              return unzipDatabase(task.getResult(), unzipDialog);
-            }
-          }).continueWith(new Continuation<String, Void>() {
-        @Override
-        public Void then(Task<String> task) throws Exception {
-          source.setResult(true);
-          return null;
-        }
-      });
-    } else {
+
+    if (!isNetworkConnected()) {
       source.setResult(false);
+      return source.getTask();
     }
+
+    final int remoteVersion = getRemoteDatabaseVersion(language.getStringCode());
+
+    Log.d(TAG, "completed = " + source.getTask().isCompleted());
+    Log.d(TAG, "update: " + language.getStringCode());
+
+    getLocalDatabaseVersionTask(language)
+        .continueWithTask(new Continuation<Integer, Task<String>>() {
+          @Override
+          public Task<String> then(Task<Integer> task) throws Exception {
+            Log.d(TAG, "version = " + task.getResult());
+            if (new File(Utils.getDatabasePath(language)).exists() &&
+                task.getResult() == remoteVersion) {
+              return null;
+            } else {
+              setDialogProgress(downloadDialog, 0);
+              showDialog(downloadDialog);
+              return downloadDatabase(language, host, new OnDownloadProgressListener() {
+                @Override
+                public void onDownloadProgress(int progress) {
+                  setDialogProgress(downloadDialog, progress);
+                }
+              });
+            }
+          }
+        })
+        .continueWithTask(new Continuation<String, Task<String>>() {
+          @Override
+          public Task<String> then(Task<String> task) throws Exception {
+            hideDialog(downloadDialog);
+            if (task.isFaulted()) {
+              errorExit(task.getError());
+              return null;
+            } else {
+              Log.d(TAG, "start unzip");
+              Log.d(TAG, task.getResult());
+              showDialog(unzipDialog);
+              return unzipDatabase(task.getResult());
+            }
+          }
+        })
+        .continueWith(new Continuation<String, Void>() {
+          @Override
+          public Void then(Task<String> task) throws Exception {
+            Log.d(TAG, "update: finish");
+            source.setResult(true);
+            hideDialog(unzipDialog);
+            return null;
+          }
+        });
+
     return source.getTask();
   }
 
-  private bolts.Task<String> unzipDatabase(final String path, final ProgressDialog dialog) {
+  private bolts.Task<String> unzipDatabase(final String path) {
     final Task<String>.TaskCompletionSource source = Task.create();
-    if (dialog != null) {
-      dialog.show();
-    }
     new Thread(new Runnable() {
       @Override
       public void run() {
         try {
           UnzipUtility.unzip(path, Utils.getDatabaseDirectory());
           source.setResult(path);
-          mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-              if (dialog != null) {
-                dialog.dismiss();
-              }
-            }
-          });
         } catch (final IOException e) {
           source.setError(e);
-          mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-              if (dialog != null) {
-                dialog.dismiss();
-              }
-              errorExit(e);
-            }
-          });
         }
       }
     }).start();
     return source.getTask();
   }
 
+  private interface OnDownloadProgressListener {
+    void onDownloadProgress(int progress);
+  }
+
   private bolts.Task<String> downloadDatabase(final String filename, final String host,
-                                              final ProgressDialog dialog) {
+                                              final OnDownloadProgressListener listener) {
     final Task<String>.TaskCompletionSource source = Task.create();
     String url = host + "/" + filename;
     final String path = Utils.getDatabaseDirectory() + "/" + filename;
-
+    Log.d(TAG, "download url : " + url);
     FileDownloader fileDownloader = new FileDownloader();
     fileDownloader.setOnFileDownloadListener(new FileDownloader.OnFileDownloadListener() {
       @Override
       public void onTotalFileSizeChange(FileDownloader downloader, String url, String path, int fileId, long size) {
+
       }
 
       @Override
       public void onProgressUpdate(FileDownloader downloader, String url, String path, int fileId, int progress) {
-        if (dialog != null) {
-          dialog.setProgress(progress);
-        }
+        listener.onDownloadProgress(progress);
       }
 
       @Override
       public void onDownloadingFinish(FileDownloader downloader, int fileId, boolean success) {
+        Log.d(TAG, "set result = " + path);
         source.setResult(path);
-        if (dialog != null) {
-          dialog.dismiss();
-        }
       }
 
       @Override
       public void onDownloadingFinishWithError(FileDownloader downloader, int fileId, int errorResMessage) {
-        source.setError(new Exception("error code = " + errorResMessage));
-        if (dialog != null) {
-          dialog.dismiss();
-        }
+        source.setError(new Exception("response: " + errorResMessage));
       }
     });
-
-    if (dialog != null) {
-      dialog.setProgress(0);
-      dialog.show();
-    }
     fileDownloader.startDownload(null, url, path, 1);
 
     return source.getTask();
   }
 
-  private bolts.Task<String> downloadDatabase(Language language, final String host, final ProgressDialog dialog) {
+  private bolts.Task<String> downloadDatabase(Language language, final String host,
+                                              final OnDownloadProgressListener listener) {
     String filename = String.format("%s.zip", language.getStringCode());
-    return downloadDatabase(filename, host, dialog);
+    Log.d(TAG, filename);
+    return downloadDatabase(filename, host, listener);
   }
 
 }
