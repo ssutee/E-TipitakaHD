@@ -46,8 +46,8 @@ public class Constants {
   public static final Uri LANGUAGE_CHANGE_URI = Uri.parse("content://etipitaka.com/language_change");
   public static final Uri RESET_PAGE_URI = Uri.parse("content://etipitaka.com/reset_page");
 
-  public static final String S3_HOST = "https://s3.amazonaws.com/watnapahpong/android/";
-  public static final String THAI_HOST = "http://download.watnapahpong.org/data/etipitaka/android/";
+  public static final String S3_HOST = "https://s3.amazonaws.com/watnapahpong/android";
+  public static final String THAI_HOST = "http://download.watnapahpong.org/data/etipitaka/android";
   public static final String UPDATE_URL = "http://etipitaka.com/update/android.json";
 
   public static final String LANGUAGE_KEY           = "language";

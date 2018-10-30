@@ -222,6 +222,7 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
               editor.putInt("thaiwn", jsonObject.get("thaiwn").getAsInt());
               editor.putInt("thaipb", jsonObject.get("thaipb").getAsInt());
               editor.putInt("romanct", jsonObject.get("romanct").getAsInt());
+              editor.putInt("thaivn", jsonObject.get("thaivn").getAsInt());
               editor.commit();
               source.setResult(null);
             } else {
@@ -270,6 +271,7 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
             && new File(Utils.getDatabasePath(Language.THAIWN)).exists()
             && new File(Utils.getDatabasePath(Language.THAIPB)).exists()
             && new File(Utils.getDatabasePath(Language.ROMANCT)).exists()
+            && new File(Utils.getDatabasePath(Language.THAIVN)).exists()
             && getLocalDatabaseVersion(Language.THAI) == getRemoteDatabaseVersion("thai")
             && getLocalDatabaseVersion(Language.PALI) == getRemoteDatabaseVersion("pali")
             && getLocalDatabaseVersion(Language.THAIMC) == getRemoteDatabaseVersion("thaimc")
@@ -277,7 +279,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
             && getLocalDatabaseVersion(Language.ROMANCT) == getRemoteDatabaseVersion("romanct")
             && getLocalDatabaseVersion(Language.THAIBT) == getRemoteDatabaseVersion("thaibt")
             && getLocalDatabaseVersion(Language.THAIWN) == getRemoteDatabaseVersion("thaiwn")
-            && getLocalDatabaseVersion(Language.THAIPB) == getRemoteDatabaseVersion("thaipb")) {
+            && getLocalDatabaseVersion(Language.THAIPB) == getRemoteDatabaseVersion("thaipb")
+            && getLocalDatabaseVersion(Language.THAIVN) == getRemoteDatabaseVersion("thaivn")) {
           mHandler.post(runnableOnSuccess);
         } else {
           mHandler.post(runnableOnFail);

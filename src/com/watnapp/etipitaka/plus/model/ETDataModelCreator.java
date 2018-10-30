@@ -26,6 +26,8 @@ public class ETDataModelCreator {
         return new ETThaiPocketBookDataModel(context);
       case ROMANCT:
         return new ETRomanScriptDataModel(context);
+      case THAIVN:
+        return new ETThaiVinayaDataModel(context);
     }
     return null;
   }

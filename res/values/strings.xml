@@ -265,4 +265,8 @@
     <string name="close">ปิด</string>
     <string name="no_space_left">เนื้อที่ไม่เพียงพอ</string>
     <string name="move_old_files">กำลังย้ายไฟล์</string>
+    <string name="thaivn_full_name">อริยวินัย</string>
+    <string name="thaims_full_name">พระไตรปิฎกไทย (ฉบับเฉลิมพระเกียรติ)</string>
+    <string name="thaivn_short_name">อริยวินัย</string>
+    <string name="no_data">ฐานข้อมูลยังเตรียมไม่เสร็จ</string>
 </resources>

@@ -8,6 +8,7 @@
         <item>" ภาษาไทย ฉบับมหาจุฬาฯ "</item>
         <item>" พุทธวจนหมวดธรรม "</item>
         <item>" ชุดห้าเล่มจากพระโอษฐ์ "</item>
+        <item>" อริยวินัย "</item>
         <item>" Roman Script "</item>
     </string-array>
     <integer-array name="full_languages_code">
@@ -18,17 +19,19 @@
         <item>3</item>
         <item>6</item>
         <item>4</item>
+        <item>8</item>
         <item>7</item>
     </integer-array>
     <integer-array name="full_languages_position">
-        <item>0</item>
-        <item>1</item>
-        <item>3</item>
-        <item>4</item>
-        <item>6</item>
-        <item>2</item>
-        <item>5</item>
-        <item>7</item>
+        <item>0</item> <!-- THAI -->
+        <item>1</item> <!-- PALI -->
+        <item>3</item> <!-- THAIMM -->
+        <item>4</item> <!-- THAIMC -->
+        <item>6</item> <!-- THAIBT -->
+        <item>2</item> <!-- THAIWN -->
+        <item>5</item> <!-- THAIPB -->
+        <item>8</item> <!-- ROMANCT -->
+        <item>7</item> <!-- THAIVN -->
     </integer-array>
     <string-array name="book_titles">
         <item>" วินัยปิฎก มหาวิภังค์ ภาค ๑ "</item>
@@ -315,6 +318,24 @@
         <item>" ๑๑. พุทธวจน ภพภูมิ "</item>
         <item>" ๑๒. พุทธวจน เดรัจฉานวิชา "</item>
         <item>" ๑๓. พุทธวจน ทาน "</item>
+        <item>" ๑๔. พุทธวจน ตถาคต "</item>
+        <item>" ๑๕. พุทธวจน สมถะ วิปัสสนา "</item>
+        <item>" ๑๖. พุทธวจน อนาคามี "</item>
+        <item>" ๑๗. พุทธวจน จิต มโนวิญญาณ "</item>
+
+    </string-array>
+    <string-array name="thaivn_book_titles_with_number">
+        <item>" ๑. อริยวินัย สุตันตปิฎกเล่มที่ ๑ "</item>
+        <item>" ๒. อริยวินัย วินัยปิฎกเล่ม ๑ "</item>
+        <item>" ๓. อริยวินัย วินัยปิฎกเล่ม ๒ "</item>
+        <item>" ๔. อริยวินัย วินัยปิฎกเล่ม ๓ "</item>
+        <item>" ๕. อริยวินัย วินัยปิฎกเล่ม ๔ "</item>
+        <item>" ๖. อริยวินัย วินัยปิฎกเล่ม ๕ "</item>
+        <item>" ๗. อริยวินัย วินัยปิฎกเล่ม ๖ "</item>
+        <item>" ๘. อริยวินัย วินัยปิฎกเล่ม ๗ "</item>
+        <item>" ๙. อริยวินัย วินัยปิฎกเล่ม ๘ "</item>
+        <item>" ๑๐. อริยวินัย อริยวินัยที่มาในพระไตรปิฎกเล่มอื่นๆ "</item>
+        <item>" ๑๑. อริยวินัย ภาคพิเศษ เพื่อช่วยในการศึกษาค้นคว้านำมาปฏิบัติ "</item>
     </string-array>
     <string-array name="romanct_book_titles_with_number">
         <item>" 1. Pārājikapāḷi "</item>

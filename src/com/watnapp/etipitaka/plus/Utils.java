@@ -3,6 +3,7 @@ package com.watnapp.etipitaka.plus;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
+import android.graphics.Path;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -76,7 +77,10 @@ public class Utils {
   }
 
   public static boolean isTipitaka(Language language) {
-    return language != Language.THAIBT && language != Language.THAIWN && language != Language.THAIPB;
+    return language != Language.THAIBT &&
+        language != Language.THAIWN &&
+        language != Language.THAIVN &&
+        language != Language.THAIPB;
   }
 
   public static String getDatabasePath(Language language) {
@@ -98,6 +102,8 @@ public class Utils {
         return databaseDir + "/" + "thai.db";
       case PALI:
         return databaseDir + "/" + "pali.db";
+      case THAIVN:
+        return databaseDir + "/" + "thaivn.db";
       default:
         return databaseDir + "/" + "thai.db";
     }

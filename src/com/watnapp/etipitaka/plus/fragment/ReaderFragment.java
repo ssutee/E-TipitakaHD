@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockFragment;
 import com.google.inject.Inject;
 import com.meetup.adapter.CursorPagerAdapter;
@@ -174,10 +176,12 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
         Log.d(TAG, "buildArguments = " + mIsBuddhawaj);
         args.putBoolean(Constants.BUDDHAWAJ_KEY, mIsBuddhawaj);
         String content = StringUtils.strip(cursor.getString(cursor.getColumnIndex(dataModel.getContentColumn())), "\n");
+
         args.putString(Constants.CONTENT_KEY, content);
         if (dataModel.hasHtmlContent()) {
           args.putString(Constants.HTML_CONTENT_KEY, cursor.getString(cursor.getColumnIndex("html")));
         }
+
         args.putInt(Constants.NUMBER_KEY, dataModel.getPageNumber(cursor));
         if (dataModel.hasFooter()) {
           args.putString(Constants.FOOTER_KEY, cursor.getString(cursor.getColumnIndex(dataModel.getFooterColumn())).trim());
@@ -304,6 +308,11 @@ public class ReaderFragment extends RoboSherlockFragment implements MyWebView.On
     mVolume = volume;
     mIsBuddhawaj = isBuddhawaj;
     Cursor cursor = dataModel.read(volume);
+    if (cursor.getCount() == 0) {
+      Toast toast = Toast.makeText(this.getActivity(), R.string.no_data, Toast.LENGTH_LONG);
+      toast.setGravity(Gravity.CENTER, 0, 0);
+      toast.show();
+    }
     Log.d(TAG, "open book");
     Log.d(TAG, dataModel.getLanguage().getStringCode());
     Log.d(TAG, "volume = " + volume);

@@ -284,9 +284,7 @@ public class BookDatabaseHelper {
           } else {
             totalPages[2] += cursor.getCount();
           }
-
           cursors[i+1] = cursor;
-
         }
 
         MatrixCursor headerCursor = new MatrixCursor(new String[] { "_id", "total" });
@@ -347,7 +345,9 @@ public class BookDatabaseHelper {
   }
 
   public enum Language {
-    THAI(0), PALI(1), THAIMM(2), THAIMC(3), THAIBT(4), THAIWN(5), THAIPB(6), ROMANCT(7);
+    THAI(0), PALI(1), THAIMM(2),
+    THAIMC(3), THAIBT(4), THAIWN(5),
+    THAIPB(6), ROMANCT(7), THAIVN(8), THAIMS(9);
 
     private int code;
 
@@ -377,6 +377,10 @@ public class BookDatabaseHelper {
           return context.getString(R.string.thaipb_full_name);
         case 7:
           return context.getString(R.string.romanct_full_name);
+        case 8:
+          return context.getString(R.string.thaivn_full_name);
+        case 9:
+          return context.getString(R.string.thaims_full_name);
       }
       return null;
     }
@@ -399,6 +403,10 @@ public class BookDatabaseHelper {
           return "thaipb";
         case 7:
           return "romanct";
+        case 8:
+          return "thaivn";
+        case 9:
+          return "thaims";
       }
       return null;
     }
