@@ -2,6 +2,7 @@ package com.watnapp.etipitaka.plus;
 
 import android.net.Uri;
 import android.os.Environment;
+import com.watnapp.etipitaka.plus.helper.DummyContentProvider;
 
 /**
  * Created with IntelliJ IDEA.
@@ -43,8 +44,8 @@ public class Constants {
   public static final int HISTORY_LOADER    = 0;
   public static final int FAVORITE_LOADER   = 1;
 
-  public static final Uri LANGUAGE_CHANGE_URI = Uri.parse("content://etipitaka.com/language_change");
-  public static final Uri RESET_PAGE_URI = Uri.parse("content://etipitaka.com/reset_page");
+  public static final Uri LANGUAGE_CHANGE_URI = DummyContentProvider.getLanguageChangeUri();
+  public static final Uri RESET_PAGE_URI = DummyContentProvider.getResetPageUri();
 
   public static final String S3_HOST = "https://s3.amazonaws.com/watnapahpong/android";
   public static final String THAI_HOST = "http://download.watnapahpong.org/data/etipitaka/android";
