@@ -111,7 +111,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
           Task<Boolean> task = Task.forResult(null);
           for (final Language code : new Language[]
               {Language.THAI, Language.PALI, Language.THAIMM, Language.THAIMC,
-                  Language.THAIWN, Language.THAIBT, Language.THAIPB, Language.ROMANCT} ) {
+                  Language.THAIWN, Language.THAIBT, Language.THAIPB,
+                  Language.ROMANCT, Language.THAIVN} ) {
             task = task.continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
               @Override
               public Task<Boolean> then(Task<Boolean> ignored) throws Exception {
@@ -485,6 +486,10 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
       public void run() {
         try {
           UnzipUtility.unzip(path, Utils.getDatabaseDirectory());
+          File zipFile = new File(path);
+          if (zipFile.exists()) {
+            zipFile.delete();
+          }
           source.setResult(path);
         } catch (final IOException e) {
           source.setError(e);
@@ -503,6 +508,10 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
     final Task<String>.TaskCompletionSource source = Task.create();
     String url = host + "/" + filename;
     final String path = Utils.getDatabaseDirectory() + "/" + filename;
+    File zipFile = new File(path);
+    if (zipFile.exists()) {
+      zipFile.delete();
+    }
     Log.d(TAG, "download url : " + url);
     FileDownloader fileDownloader = new FileDownloader();
     fileDownloader.setOnFileDownloadListener(new FileDownloader.OnFileDownloadListener() {
