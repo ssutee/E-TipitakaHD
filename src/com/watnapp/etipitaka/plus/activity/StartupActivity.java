@@ -331,7 +331,7 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
     }
 
     Ion.with(this)
-        .load("http://media1.watnapahpong.org/geo.php")
+        .load(Constants.GEO_API)
         .asJsonObject()
         .setCallback(new FutureCallback<JsonObject>() {
           @Override

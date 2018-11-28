@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.activity;
 
+import android.graphics.Typeface;
 import android.os.Build;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.plus.R;
@@ -46,5 +47,10 @@ public class ThaiDictActivity extends DictActivity {
   @Override
   public int getFontSize() {
     return 28;
+  }
+
+  @Override
+  public Typeface getTypeface() {
+    return Typeface.createFromAsset(getAssets(), "fonts/THSarabun.ttf");
   }
 }

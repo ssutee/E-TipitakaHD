@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.activity;
 
+import android.graphics.Typeface;
 import android.os.Build;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.plus.R;
@@ -8,6 +9,8 @@ import com.watnapp.etipitaka.plus.adapter.PaliDictAdapter;
 import com.watnapp.etipitaka.plus.helper.DictDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.PaliDictDatabaseHelper;
 import roboguice.inject.ContentView;
+
+import java.lang.reflect.Type;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,5 +52,10 @@ public class PaliDictActivity extends DictActivity {
   @Override
   public int getFontSize() {
     return 28;
+  }
+
+  @Override
+  public Typeface getTypeface() {
+    return Typeface.createFromAsset(getAssets(), "fonts/THSarabun.ttf");
   }
 }

@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.activity;
 
+import android.graphics.Typeface;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.adapter.DictAdapter;
@@ -46,6 +47,11 @@ public class EnglishDictActivity extends DictActivity {
   @Override
   public int getFontSize() {
     return 18;
+  }
+
+  @Override
+  public Typeface getTypeface() {
+    return null;
   }
 
 }

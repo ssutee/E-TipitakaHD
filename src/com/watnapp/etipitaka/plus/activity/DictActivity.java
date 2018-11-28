@@ -2,15 +2,20 @@ package com.watnapp.etipitaka.plus.activity;
 
 import android.app.AlertDialog;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
 import com.google.inject.Inject;
 import com.watnapp.etipitaka.plus.R;
@@ -38,6 +43,7 @@ abstract public class DictActivity extends RoboSherlockFragmentActivity {
   public abstract String getFontFamily();
   public abstract String getFontFaces();
   public abstract int getFontSize();
+  public abstract Typeface getTypeface();
 
   @Override
   protected void onDestroy() {
@@ -72,14 +78,27 @@ abstract public class DictActivity extends RoboSherlockFragmentActivity {
         cursor.moveToPosition(position);
         String content = getDictDatabaseHelper().getContentById(cursor.getInt(cursor.getColumnIndex("_id")));
         String headword = cursor.getString(cursor.getColumnIndex(getDictAdapter().getHeadWordColumn()));
-        WebView webView = (WebView) getLayoutInflater().inflate(R.layout.dialog_dict_message, null);
-        webView.loadDataWithBaseURL("http://etipitaka.com",
-            getString(R.string.html_dict_template, headword, content.trim(),
-                getFontSize(), getFontFaces(), getFontFamily()),
-            "text/html", "UTF-8", null);
+
+        Typeface font = getTypeface();
+
+        TextView title = new TextView(DictActivity.this);
+        if (font != null) {
+          title.setTypeface(font);
+        }
+        title.setTextSize(getFontSize());
+        title.setTextColor(Color.BLUE);
+        title.setText("  " + headword);
         AlertDialog dialog = new AlertDialog.Builder(DictActivity.this)
-            .setView(webView).create();
+            .setCustomTitle(title).setMessage(content.trim()).create();
         dialog.show();
+
+        TextView message = (TextView) dialog.findViewById(android.R.id.message);
+        if (message != null) {
+          message.setTextSize(getFontSize());
+          if (font != null) {
+            message.setTypeface(font);
+          }
+        }
       }
     });
   }
