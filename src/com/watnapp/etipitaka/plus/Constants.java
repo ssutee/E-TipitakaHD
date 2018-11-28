@@ -50,6 +50,7 @@ public class Constants {
   public static final String S3_HOST = "https://s3.amazonaws.com/watnapahpong/android";
   public static final String THAI_HOST = "http://download.watnapahpong.org/data/etipitaka/android";
   public static final String UPDATE_URL = "http://etipitaka.com/update/android.json";
+  public static final String GEO_API = "http://media1.watnapahpong.org/geo.php";
 
   public static final String LANGUAGE_KEY           = "language";
   public static final String COMPARING_LANGUAGE_KEY = "comparing_language";
