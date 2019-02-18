@@ -1,12 +1,17 @@
 package com.watnapp.etipitaka.plus.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockListActivity;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
@@ -30,6 +35,8 @@ import java.util.Locale;
 
 @ContentView(R.layout.activity_file_explorer)
 public class FileExplorerActivity extends RoboSherlockListActivity {
+
+  private static final int REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION = 1;
 
   @InjectExtra(Constants.TITLE_KEY)
   private String mTitle;
@@ -65,8 +72,8 @@ public class FileExplorerActivity extends RoboSherlockListActivity {
     }
   };
 
-  private File mCurrentFolder = Environment.getExternalStorageDirectory();
-  private File[] mFiles = mCurrentFolder.listFiles(mJSFileFilter);
+  private File mCurrentFolder;
+  private File[] mFiles;
 
   private FileExplorerAdapter mAdapter;
   private int mLevel = 0;
@@ -89,9 +96,9 @@ public class FileExplorerActivity extends RoboSherlockListActivity {
     mAdapter.notifyDataSetChanged();
   }
 
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    mTxtTitle.setText(mTitle);
+  private void browseDir() {
+    mCurrentFolder = Environment.getExternalStorageDirectory();
+    mFiles = mCurrentFolder.listFiles(mJSFileFilter);
     Arrays.sort(mFiles, mFileComparator);
     mEditTextPath.setText(mCurrentFolder.getAbsolutePath());
     mAdapter = new FileExplorerAdapter(this) {
@@ -106,6 +113,39 @@ public class FileExplorerActivity extends RoboSherlockListActivity {
       }
     };
     setListAdapter(mAdapter);
+  }
+
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    mTxtTitle.setText(mTitle);
+
+    int writeExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    int readExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+    if(writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED ||
+        readExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+      ActivityCompat.requestPermissions(this,
+          new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+              Manifest.permission.READ_EXTERNAL_STORAGE},
+          REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION);
+    } else {
+      this.browseDir();
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    if (requestCode == REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION) {
+      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        this.browseDir();
+      } else {
+        Toast.makeText(this,
+            "The app was not allowed to write to your storage. " +
+                "Hence, it cannot function properly. Please consider granting it this permission",
+            Toast.LENGTH_LONG).show();
+      }
+    }
   }
 
   @Override
