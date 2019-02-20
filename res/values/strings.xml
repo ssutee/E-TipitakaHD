@@ -10,8 +10,10 @@
     <string name="pali">บาลี</string>
     <string name="thai_full_name"> พระไตรปิฎกไทย (ฉบับหลวง) </string>
     <string name="thaimm_full_name"> พระไตรปิฎกไทย (ฉบับมหามกุฏฯ) </string>
-    <string name="thaimc_full_name"> พระไตรปิฎกไทย (ฉบับมหาจุฬาฯ) </string>
-    <string name="pali_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ) </string>
+    <string name="thaimc_full_name"> พระไตรปิฎกไทย (ฉบับมหาจุฬาฯ ๑) </string>
+    <string name="thaimc2_full_name"> พระไตรปิฎกไทย (ฉบับมหาจุฬาฯ ๒) </string>
+    <string name="pali_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ พ.ศ.๒๕๓๘) </string>
+    <string name="palinew_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ พ.ศ. ๒๔๗๐) </string>
     <string name="subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s ข้อที่ %4$s</string>
     <string name="subtitle_noitem_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s</string>
     <string name="favorite_template">เล่มที่ %1$s หน้าที่ %2$s ข้อที่ %3$s</string>
@@ -112,6 +114,7 @@
                     span.level-3 { color: #888888; font-size: 75%%; }
                     span.footnote { color: green; font-weight: normal; font-size: 75%%; }
                     span.reference { color: grey; font-weight: normal; font-size: 75%%; }
+                    div.center { text-align: center; margin: 0; padding: 0; }
                     .keywords { color: #0000FF; background: yellow; }
                 </style>
                 <script type=\"text/javascript\" src=\"jquery-2.1.1.min.js\"></script>
@@ -255,9 +258,11 @@
     <string name="thaipb_full_name">พุทธวจนหมวดธรรม</string>
     <string name="romanct_full_name">Tipitaka Roman Script</string>
     <string name="thai_short_name">ฉบับหลวง</string>
-    <string name="pali_short_name">บาลีสยามรัฐ</string>
+    <string name="pali_short_name">บาลีสยามรัฐ ๒๕๓๘</string>
+    <string name="palinew_short_name">บาลีสยามรัฐ ๒๔๗๐</string>
     <string name="thaimm_short_name">มหามกุฏฯ</string>
-    <string name="thaimc_short_name">มหาจุฬาฯ</string>
+    <string name="thaimc_short_name">มหาจุฬาฯ (๑)</string>
+    <string name="thaimc2_short_name">มหาจุฬาฯ (๒)</string>
     <string name="thaiwn_short_name">พุทธวจนปิฎก</string>
     <string name="thaipb_short_name">หมวดธรรม</string>
     <string name="thaibt_short_name">ชุดห้าเล่ม</string>

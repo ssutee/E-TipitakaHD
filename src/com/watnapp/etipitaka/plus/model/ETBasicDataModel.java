@@ -15,10 +15,18 @@ import java.util.Map;
  */
 public abstract class ETBasicDataModel extends ETDataModel {
 
-  protected static final String TAG = "ETThaiMahaDataModel";
+  protected static final String TAG = "ETBasicDataModel";
 
   public ETBasicDataModel(Context context) {
     super(context);
+  }
+
+  public String pageFormat(int page) {
+    return String.format("%04d", page);
+  }
+
+  public String volumeFormat(int volume) {
+    return String.format("%02d", volume);
   }
 
   @Override
@@ -28,7 +36,7 @@ public abstract class ETBasicDataModel extends ETDataModel {
       @Override
       public void run() {
         Cursor cursor = db.query("main", null, "volume=? AND page=?",
-            new String[]{String.format("%02d", volume), String.format("%04d", page)}, null, null, null);
+            new String[]{volumeFormat(volume), pageFormat(page)}, null, null, null);
         cursor.moveToFirst();
         String[] tokens = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
         ArrayList<Integer> items = new ArrayList<Integer>();
@@ -49,7 +57,7 @@ public abstract class ETBasicDataModel extends ETDataModel {
   public Cursor read(int volume, int page) {
     openDatabase();
     Cursor cursor = db.query("main", null, "volume=?",
-        new String[] { String.format("%02d", volume) }, null, null, null);
+        new String[] { volumeFormat(volume) }, null, null, null);
     cursor.moveToFirst();
     if (page > 0 && page <= cursor.getCount()) {
       cursor.moveToPosition(page-1);
@@ -71,7 +79,7 @@ public abstract class ETBasicDataModel extends ETDataModel {
   public int getMaximumPageNumber(int volume) {
     openDatabase();
     Cursor cursor = db.query("main", null, "volume = ?",
-       new String[] { String.format("%02d", volume) }, null, null, "page");
+       new String[] { volumeFormat(volume) }, null, null, "page");
     int page = cursor.getCount();
     cursor.close();
     return page;
@@ -81,7 +89,7 @@ public abstract class ETBasicDataModel extends ETDataModel {
   public int getMinimumItemNumber(int volume) {
     openDatabase();
     Cursor cursor = db.query("main", null, "volume = ?",
-        new String[] { String.format("%02d", volume) }, null, null, "page");
+        new String[] { volumeFormat(volume) }, null, null, "page");
     cursor.moveToFirst();
     String[] items = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
     cursor.close();
@@ -92,7 +100,7 @@ public abstract class ETBasicDataModel extends ETDataModel {
   public int getMaximumItemNumber(int volume) {
     openDatabase();
     Cursor cursor = db.query("main", null, "volume = ?",
-        new String[] { String.format("%02d", volume) }, null, null, "page");
+        new String[] { volumeFormat(volume) }, null, null, "page");
     cursor.moveToFirst();
     int maxItem = 0;
     while (!cursor.isAfterLast()) {
@@ -113,7 +121,7 @@ public abstract class ETBasicDataModel extends ETDataModel {
     openDatabase();
     int page = getBookItems().get(volume + "").get(section+"").get(item+"").get(0);
     Cursor cursor = db.query("main", null, "volume=? AND page=?",
-        new String[] {String.format("%02d", volume), String.format("%04d", page) }, null, null, null);
+        new String[] { volumeFormat(volume), pageFormat(page) }, null, null, null);
     cursor.moveToFirst();
     int pageId = cursor.getInt(cursor.getColumnIndex("_id"));
     cursor.close();
@@ -153,7 +161,7 @@ public abstract class ETBasicDataModel extends ETDataModel {
           int volume = volumes[i];
           String selection = "volume = ?";
           ArrayList<String> selectionArgs = new ArrayList<String>();
-          selectionArgs.add(String.format("%02d", volume));
+          selectionArgs.add(volumeFormat(volume));
 
           for (String keyword : keywords.split("\\s+")) {
             selection += " AND content LIKE ?";

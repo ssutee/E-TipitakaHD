@@ -88,6 +88,8 @@ public class Utils {
     switch (language) {
       case THAIMC:
         return databaseDir + "/" + "thaimc.db";
+      case THAIMC2:
+        return databaseDir + "/" + "thaimc2.db";
       case THAIMM:
         return databaseDir + "/" + "thaimm.db";
       case THAIBT:
@@ -102,6 +104,8 @@ public class Utils {
         return databaseDir + "/" + "thai.db";
       case PALI:
         return databaseDir + "/" + "pali.db";
+      case PALINEW:
+        return databaseDir + "/" + "palinew.db";
       case THAIVN:
         return databaseDir + "/" + "thaivn.db";
       default:

@@ -28,6 +28,10 @@ public class ETDataModelCreator {
         return new ETRomanScriptDataModel(context);
       case THAIVN:
         return new ETThaiVinayaDataModel(context);
+      case PALINEW:
+        return new ETPaliSiamratNewDataModel(context);
+      case THAIMC2:
+        return new ETThaiMahaChula2DataModel(context);
     }
     return null;
   }

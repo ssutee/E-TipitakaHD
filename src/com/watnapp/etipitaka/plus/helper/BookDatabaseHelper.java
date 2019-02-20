@@ -347,7 +347,8 @@ public class BookDatabaseHelper {
   public enum Language {
     THAI(0), PALI(1), THAIMM(2),
     THAIMC(3), THAIBT(4), THAIWN(5),
-    THAIPB(6), ROMANCT(7), THAIVN(8), THAIMS(9);
+    THAIPB(6), ROMANCT(7), THAIVN(8),
+    THAIMS(9), PALINEW(10), THAIMC2(11);
 
     private int code;
 
@@ -381,6 +382,10 @@ public class BookDatabaseHelper {
           return context.getString(R.string.thaivn_full_name);
         case 9:
           return context.getString(R.string.thaims_full_name);
+        case 10:
+          return context.getString(R.string.palinew_full_name);
+        case 11:
+          return context.getString(R.string.thaimc2_full_name);
       }
       return null;
     }
@@ -407,6 +412,10 @@ public class BookDatabaseHelper {
           return "thaivn";
         case 9:
           return "thaims";
+        case 10:
+          return "palinew";
+        case 11:
+          return "thaimc2";
       }
       return null;
     }
@@ -567,12 +576,14 @@ public class BookDatabaseHelper {
         bookItems = getThaiBookItems(context);
         break;
       case PALI:
+      case PALINEW:
         bookItems = getPaliBookItems(context);
         break;
       case THAIMM:
         bookItems = getThaiMMBookItems(context);
         break;
       case THAIMC:
+      case THAIMC2:
         bookItems = getThaiMCBookItems(context);
         break;
       case THAIWN:

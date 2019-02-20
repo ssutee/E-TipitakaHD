@@ -112,7 +112,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
           for (final Language code : new Language[]
               {Language.THAI, Language.PALI, Language.THAIMM, Language.THAIMC,
                   Language.THAIWN, Language.THAIBT, Language.THAIPB,
-                  Language.ROMANCT, Language.THAIVN} ) {
+                  Language.ROMANCT, Language.THAIVN, Language.THAIMC2,
+                  Language.PALINEW} ) {
             task = task.continueWithTask(new Continuation<Boolean, Task<Boolean>>() {
               @Override
               public Task<Boolean> then(Task<Boolean> ignored) throws Exception {
@@ -224,6 +225,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
               editor.putInt("thaipb", jsonObject.get("thaipb").getAsInt());
               editor.putInt("romanct", jsonObject.get("romanct").getAsInt());
               editor.putInt("thaivn", jsonObject.get("thaivn").getAsInt());
+              editor.putInt("palinew", jsonObject.get("palinew").getAsInt());
+              editor.putInt("thaimc2", jsonObject.get("thaimc2").getAsInt());
               editor.commit();
               source.setResult(null);
             } else {
@@ -266,7 +269,9 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
       public void run() {
         if (new File(Utils.getDatabasePath(Language.THAI)).exists()
             && new File(Utils.getDatabasePath(Language.PALI)).exists()
+            && new File(Utils.getDatabasePath(Language.PALINEW)).exists()
             && new File(Utils.getDatabasePath(Language.THAIMC)).exists()
+            && new File(Utils.getDatabasePath(Language.THAIMC2)).exists()
             && new File(Utils.getDatabasePath(Language.THAIMM)).exists()
             && new File(Utils.getDatabasePath(Language.THAIBT)).exists()
             && new File(Utils.getDatabasePath(Language.THAIWN)).exists()
@@ -275,7 +280,9 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
             && new File(Utils.getDatabasePath(Language.THAIVN)).exists()
             && getLocalDatabaseVersion(Language.THAI) == getRemoteDatabaseVersion("thai")
             && getLocalDatabaseVersion(Language.PALI) == getRemoteDatabaseVersion("pali")
+            && getLocalDatabaseVersion(Language.PALINEW) == getRemoteDatabaseVersion("palinew")
             && getLocalDatabaseVersion(Language.THAIMC) == getRemoteDatabaseVersion("thaimc")
+            && getLocalDatabaseVersion(Language.THAIMC2) == getRemoteDatabaseVersion("thaimc2")
             && getLocalDatabaseVersion(Language.THAIMM) == getRemoteDatabaseVersion("thaimm")
             && getLocalDatabaseVersion(Language.ROMANCT) == getRemoteDatabaseVersion("romanct")
             && getLocalDatabaseVersion(Language.THAIBT) == getRemoteDatabaseVersion("thaibt")

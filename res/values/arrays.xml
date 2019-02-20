@@ -2,10 +2,12 @@
 <resources>
     <string-array name="full_languages">
         <item>" ภาษาไทย ฉบับหลวง "</item>
-        <item>" ภาษาบาลี ฉบับสยามรัฐ "</item>
+        <item>" ภาษาบาลี ฉบับสยามรัฐ พ.ศ. ๒๕๓๘ "</item>
+        <item>" ภาษาบาลี ฉบับสยามรัฐ พ.ศ. ๒๔๗๐ "</item>
         <item>" พุทธวจนปิฎก ๓๓ เล่ม "</item>
         <item>" ภาษาไทย ฉบับมหามกุฏฯ "</item>
-        <item>" ภาษาไทย ฉบับมหาจุฬาฯ "</item>
+        <item>" ภาษาไทย ฉบับมหาจุฬาฯ (๑) "</item>
+        <item>" ภาษาไทย ฉบับมหาจุฬาฯ (๒) "</item>
         <item>" พุทธวจนหมวดธรรม "</item>
         <item>" ชุดห้าเล่มจากพระโอษฐ์ "</item>
         <item>" อริยวินัย "</item>
@@ -14,24 +16,15 @@
     <integer-array name="full_languages_code">
         <item>0</item>
         <item>1</item>
+        <item>10</item>
         <item>5</item>
         <item>2</item>
         <item>3</item>
+        <item>11</item>
         <item>6</item>
         <item>4</item>
         <item>8</item>
         <item>7</item>
-    </integer-array>
-    <integer-array name="full_languages_position">
-        <item>0</item> <!-- THAI -->
-        <item>1</item> <!-- PALI -->
-        <item>3</item> <!-- THAIMM -->
-        <item>4</item> <!-- THAIMC -->
-        <item>6</item> <!-- THAIBT -->
-        <item>2</item> <!-- THAIWN -->
-        <item>5</item> <!-- THAIPB -->
-        <item>8</item> <!-- ROMANCT -->
-        <item>7</item> <!-- THAIVN -->
     </integer-array>
     <string-array name="book_titles">
         <item>" วินัยปิฎก มหาวิภังค์ ภาค ๑ "</item>
