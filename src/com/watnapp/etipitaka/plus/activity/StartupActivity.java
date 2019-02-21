@@ -13,7 +13,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
 import android.util.Log;
 import android.widget.Toast;
 import bolts.Continuation;
@@ -51,14 +50,11 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    final long minimumSpace = 734003200l;
+    final long minimumSpace = 800000000l;
 
     Log.d(TAG, Utils.getDatabaseDirectory());
-    StatFs stat = new StatFs(Utils.getDatabaseDirectory());
-    int availBlocks = stat.getAvailableBlocks();
-    int blockSize = stat.getBlockSize();
-    long freeMemory = (long)availBlocks * (long)blockSize;
 
+    long freeMemory = new File(this.getFilesDir().getAbsoluteFile().toString()).getFreeSpace();
     Log.d(TAG, String.format("free = %d", freeMemory));
 
     final ProgressDialog unzipDialog = new ProgressDialog(this);
@@ -488,21 +484,18 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
 
   private bolts.Task<String> unzipDatabase(final String path) {
     final Task<String>.TaskCompletionSource source = Task.create();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          UnzipUtility.unzip(path, Utils.getDatabaseDirectory());
-          File zipFile = new File(path);
-          if (zipFile.exists()) {
-            zipFile.delete();
-          }
-          source.setResult(path);
-        } catch (final IOException e) {
-          source.setError(e);
-        }
+
+    try {
+      UnzipUtility.unzip(path, Utils.getDatabaseDirectory());
+      File zipFile = new File(path);
+      if (zipFile.exists()) {
+        zipFile.delete();
       }
-    }).start();
+      source.setResult(path);
+    } catch (final IOException e) {
+      source.setError(e);
+    }
+
     return source.getTask();
   }
 
