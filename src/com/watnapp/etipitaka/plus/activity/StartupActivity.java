@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -165,7 +166,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
 
   private bolts.Task<Void> moveOldDataFiles() {
     final Task<Void>.TaskCompletionSource source = Task.create();
-    new Thread(new Runnable() {
+
+    AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
         File oldFilesDir = new File(Environment.getExternalStorageDirectory().getPath() + "/ETPK");
@@ -189,7 +191,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
         }
         source.setResult(null);
       }
-    }).start();
+    });
+
     return source.getTask();
   }
 
@@ -260,7 +263,7 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
   }
 
   private void checkDatabases(final Runnable runnableOnSuccess, final Runnable runnableOnFail) {
-    new Thread(new Runnable() {
+    AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
         if (new File(Utils.getDatabasePath(Language.THAI)).exists()
@@ -289,8 +292,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
         } else {
           mHandler.post(runnableOnFail);
         }
-    }
-    }).start();
+      }
+    });
   }
 
   private void errorExit(Exception e) {
@@ -484,17 +487,21 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
 
   private bolts.Task<String> unzipDatabase(final String path) {
     final Task<String>.TaskCompletionSource source = Task.create();
-
-    try {
-      UnzipUtility.unzip(path, Utils.getDatabaseDirectory());
-      File zipFile = new File(path);
-      if (zipFile.exists()) {
-        zipFile.delete();
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          UnzipUtility.unzip(path, Utils.getDatabaseDirectory());
+          File zipFile = new File(path);
+          if (zipFile.exists()) {
+            zipFile.delete();
+          }
+          source.setResult(path);
+        } catch (final IOException e) {
+          source.setError(e);
+        }
       }
-      source.setResult(path);
-    } catch (final IOException e) {
-      source.setError(e);
-    }
+    });
 
     return source.getTask();
   }

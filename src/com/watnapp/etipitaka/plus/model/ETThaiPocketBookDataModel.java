@@ -72,18 +72,18 @@ public class ETThaiPocketBookDataModel extends ETHandbookDataModel {
   @Override
   public void search(String keywords, BookDatabaseHelper.OnSearchListener listener) {
     search(keywords, listener, new Integer[] {
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
     });
   }
 
   @Override
   public int getSectionBoundary(int index) {
-    return 18;
+    return 19;
   }
 
   @Override
   public int getTotalVolumes() {
-    return 18;
+    return 19;
   }
 
 
