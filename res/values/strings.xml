@@ -52,22 +52,22 @@
     <string name="font_family_new">
     <![CDATA[
         <style type=\"text/css\">
-        \@font-face {
+        @font-face {
             font-family: \'TH SarabunPSK\';
             src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK\') format(\'svg\');
             font-weight: normal; font-style: normal;
         }
-        \@font-face {
+        @font-face {
             font-family: \'TH SarabunPSK\';
             src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-Bold\') format(\'svg\');
             font-weight: bold;
         }
-        \@font-face {
+        @font-face {
             font-family: \'TH SarabunPSK\';
             src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-Italic\') format(\'svg\');
             font-style: italic, oblique;
         }
-        \@font-face {
+        @font-face {
             font-family: \'TH SarabunPSK\';
             src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-BoldItalic\') format(\'svg\');
             font-weight: bold; font-style: italic, oblique;
@@ -274,4 +274,5 @@
     <string name="thaims_full_name">พระไตรปิฎกไทย (ฉบับเฉลิมพระเกียรติ)</string>
     <string name="thaivn_short_name">อริยวินัย</string>
     <string name="no_data">ฐานข้อมูลยังเตรียมไม่เสร็จ</string>
+    <string name="database_version_mismatched">โปรแกรมไม่สามารถอัพเดตฐานข้อมูลเป็นรุ่นล่าสุดได้ซึ่งอาจทำให้โปรแกรมทำงานผิดพลาดได้</string>
 </resources>

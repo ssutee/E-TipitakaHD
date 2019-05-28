@@ -32,9 +32,7 @@ import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.plus.helper.FileDownloader;
 import roboguice.inject.ContentView;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -81,10 +79,17 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
             }
           }).create().show();
     } else {
-      moveOldDataFiles().continueWithTask(new Continuation<Void, Task<Void>>() {
+      moveOldDataFiles().continueWithTask(new Continuation<Void, Task<String>>() {
         @Override
-        public Task<Void> then(Task<Void> task) throws Exception {
+        public Task<String> then(Task<Void> task) throws Exception {
           Log.d(TAG, "moveOldDataFiles finished");
+          showDialog(unzipDialog);
+          return unzipBundleDatabase();
+        }
+      }).continueWithTask(new Continuation<String, Task<Void>>() {
+        @Override
+        public Task<Void> then(Task<String> task) throws Exception {
+          dismissDialog(unzipDialog);
           return updateDatabasesInfo();
         }
       }).continueWithTask(new Continuation<Void, Task<Boolean>>() {
@@ -126,7 +131,7 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
           checkDatabases(new Runnable() {
             @Override
             public void run() {
-              errorExit(null);
+              alertDatabaseError();
             }
           });
           dismissDialog(downloadDialog);
@@ -134,8 +139,18 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
           return null;
         }
       });
-
     }
+  }
+
+  private void alertDatabaseError() {
+    new AlertDialog.Builder(this)
+        .setTitle(R.string.database_error)
+        .setMessage(getString(R.string.database_version_mismatched))
+        .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+          }
+        }).create().show();
   }
 
   private void clearCache() {
@@ -502,6 +517,49 @@ public class StartupActivity extends RoboSherlockFragmentActivity {
         }
       }
     });
+
+    return source.getTask();
+  }
+
+  private bolts.Task<String> unzipBundleDatabase() {
+    final Task<String>.TaskCompletionSource source = Task.create();
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          String outFileName = new File(Utils.getDatabaseDirectory(),
+              Constants.DATABASE_ZIP_FILE).toString();
+          File thaiDbFile = new File(Utils.getDatabasePath(Language.THAI));
+          if (!thaiDbFile.exists()) {
+            InputStream myInput = getAssets().open(Constants.DATABASE_ASSETS_PATH);
+            OutputStream myOutput = new FileOutputStream(outFileName);
+
+            //transfer bytes from the inputfile to the outputfile
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = myInput.read(buffer))>0){
+              myOutput.write(buffer, 0, length);
+            }
+
+            //Close the streams
+            myOutput.flush();
+            myOutput.close();
+            myInput.close();
+
+            UnzipUtility.unzip(outFileName, Utils.getDatabaseDirectory());
+
+            source.setResult(outFileName);
+          } else {
+            source.setResult(null);
+          }
+
+        } catch (IOException e) {
+          source.setError(e);
+          e.printStackTrace();
+        }
+      }
+    });
+
 
     return source.getTask();
   }

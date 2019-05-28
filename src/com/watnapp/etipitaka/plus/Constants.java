@@ -1,7 +1,6 @@
 package com.watnapp.etipitaka.plus;
 
 import android.net.Uri;
-import android.os.Environment;
 import com.watnapp.etipitaka.plus.helper.DummyContentProvider;
 
 /**
@@ -51,6 +50,8 @@ public class Constants {
   public static final String THAI_HOST = "http://download.watnapahpong.org/data/etipitaka/android";
   public static final String UPDATE_URL = "http://download.watnapahpong.org/data/etipitaka/android/android.json";
   public static final String GEO_API = "http://media1.watnapahpong.org/geo.php";
+  public static final String DATABASE_ZIP_FILE = "etipitaka_plus.zip";
+  public static final String DATABASE_ASSETS_PATH = "databases/" + DATABASE_ZIP_FILE;
 
   public static final String LANGUAGE_KEY           = "language";
   public static final String COMPARING_LANGUAGE_KEY = "comparing_language";
