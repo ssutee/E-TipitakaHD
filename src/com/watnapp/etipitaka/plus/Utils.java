@@ -1,29 +1,13 @@
 package com.watnapp.etipitaka.plus;
 
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.SharedPreferences;
-import android.graphics.Path;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.text.TextUtils;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 
 import java.io.*;
-import java.math.BigInteger;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.

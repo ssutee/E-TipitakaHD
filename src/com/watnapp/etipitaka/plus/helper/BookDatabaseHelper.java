@@ -5,27 +5,18 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
-import android.util.Log;
-import com.actionbarsherlock.internal.nineoldandroids.animation.ObjectAnimator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
