@@ -105,6 +105,8 @@ abstract public class SearchResultAdapter extends CursorAdapter implements Stick
         stringId = R.string.n_volume_n_page_minimal;
       } else if (getLanguage() == BookDatabaseHelper.Language.THAIWN) {
         stringId = R.string.buddhawaj_n_volume_n_page;
+      } else if (getLanguage() == BookDatabaseHelper.Language.THAIPB) {
+        stringId = R.string.thaipb_n_volume_n_page;
       }
       viewHolder.text1.setText(context.getString(stringId,
           Utils.convertToThaiNumber(context, volume), Utils.convertToThaiNumber(context, page)));

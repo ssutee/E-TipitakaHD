@@ -37,6 +37,7 @@
     <string name="found_n_pages">พบ %1$s หน้า</string>
     <string name="n_volume_n_page">พระไตรปิฎก เล่มที่ %1$s หน้าที่ %2$s</string>
     <string name="buddhawaj_n_volume_n_page">พุทธวจนปิฎก เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="thaipb_n_volume_n_page">พุทธวจนหมวดธรรม เล่มที่ %1$s หน้าที่ %2$s</string>
     <string name="n_volume_n_page_minimal">เล่มที่ %1$s หน้าที่ %2$s</string>
     <string name="search_result_not_found">ไม่พบคำว่า \"%1$s\"\nใน%2$s</string>
     <string name="abbr_section1">วิ.(%1$s)</string>

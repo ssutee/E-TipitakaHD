@@ -158,12 +158,12 @@ public class StartupActivity extends RoboSherlockFragmentActivity
                 /**
                  * First calculate the total compressed length
                  */
-                long totalCompressedLength = 0;
+                long totalUncompressedLength = 0;
                 for (ZipResourceFile.ZipEntryRO entry : entries) {
-                  totalCompressedLength += entry.mCompressedLength;
+                  totalUncompressedLength += entry.mUncompressedLength;
                 }
                 float averageVerifySpeed = 0;
-                long totalBytesRemaining = totalCompressedLength;
+                long totalBytesRemaining = totalUncompressedLength;
                 long timeRemaining;
                 /**
                  * Then calculate a CRC for every file in the
@@ -190,7 +190,7 @@ public class StartupActivity extends RoboSherlockFragmentActivity
                         length -= seek;
                         long currentTime = SystemClock.uptimeMillis();
                         long timePassed = currentTime - startTime;
-                        if (timePassed > 0) {
+                        if (timePassed >= 0) {
                           float currentSpeedSample = (float) seek
                               / (float) timePassed;
                           if (0 != averageVerifySpeed) {
@@ -205,8 +205,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity
                           timeRemaining = (long) (totalBytesRemaining / averageVerifySpeed);
                           this.publishProgress(
                               new DownloadProgressInfo(
-                                  totalCompressedLength,
-                                  totalCompressedLength
+                                  totalUncompressedLength,
+                                  totalUncompressedLength
                                       - totalBytesRemaining,
                                   timeRemaining,
                                   averageVerifySpeed)
@@ -493,7 +493,8 @@ public class StartupActivity extends RoboSherlockFragmentActivity
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
+//
+//
 //    initializeDownloadUI();
 //
 //    /**
@@ -506,8 +507,7 @@ public class StartupActivity extends RoboSherlockFragmentActivity
 //      if (Helpers.canWriteOBBFile(this)) {
 //        Log.d(TAG, "launchDownloader");
 //        launchDownloader();
-//      }
-//      else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //        // we need the write permission first
 //        Log.d(TAG, "requestStorageWritePermission");
 //        requestStorageWritePermission();
@@ -522,7 +522,6 @@ public class StartupActivity extends RoboSherlockFragmentActivity
 //    } else {
 //      validateXAPKZipFiles();
 //    }
-
 
     final long minimumSpace = 800000000l;
 
@@ -1112,6 +1111,26 @@ public class StartupActivity extends RoboSherlockFragmentActivity
   private static final int PERMISSION_STORAGE_READ_REQUEST_CODE = 1;
   private static final int PERMISSION_STORAGE_WRITE_REQUEST_CODE = 2;
 
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    switch(requestCode) {
+      case PERMISSION_STORAGE_READ_REQUEST_CODE:
+        if (grantResults.length > 0) {
+          validateXAPKZipFiles();
+        } else {
+          finish();
+        }
+        break;
+      case PERMISSION_STORAGE_WRITE_REQUEST_CODE:
+        if (grantResults.length > 0) {
+          launchDownloader();
+        } else {
+          finish();
+        }
+        break;
+    }
+  }
 
   /**
    * Requests the {@link android.Manifest.permission#CAMERA} permission.

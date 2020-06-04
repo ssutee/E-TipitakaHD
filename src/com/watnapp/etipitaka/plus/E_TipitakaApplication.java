@@ -40,7 +40,7 @@ public class E_TipitakaApplication extends Application {
   }
 
   public static Context getAppContext() {
-    return E_TipitakaApplication.context;
+    return ETipitakaApplication.context;
   }
 
 }
