@@ -68,7 +68,7 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
-    Cursor cursor = db.query("main", null, "book=?",
+    Cursor cursor = db.query("speech", null, "book=?",
         new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
     if (page > 0 && page <= cursor.getCount()) {

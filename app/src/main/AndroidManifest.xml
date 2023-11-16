@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.watnapp.etipitaka.plus">
@@ -23,6 +24,8 @@
             android:name=".activity.StartupActivity"
             android:configChanges="orientation|keyboardHidden|screenLayout|touchscreen|screenSize"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true"
+            tools:node="merge"
             android:label="E-Tipitaka+">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
