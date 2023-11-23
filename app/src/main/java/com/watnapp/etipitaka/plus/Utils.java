@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 
 import com.google.common.hash.HashCode;
@@ -135,7 +136,16 @@ public class Utils {
   }
 
   public static String getDatabaseDirectory(Context context) {
-    return context.getApplicationContext().getExternalFilesDir(null).getPath();
+    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
+      return context.getApplicationContext().getExternalFilesDir(null).getPath();
+    }
+    File downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    if (!downloadsDirectory.exists()) {
+      if (!downloadsDirectory.mkdir()) {
+        return null;
+      }
+    }
+    return downloadsDirectory.getAbsolutePath();
   }
 
   public static String floatForm (double d)

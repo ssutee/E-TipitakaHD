@@ -1,14 +1,13 @@
 package com.watnapp.etipitaka.plus.activity;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -27,8 +26,6 @@ import com.watnapp.etipitaka.plus.UnzipUtility;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.databinding.ActivityStartupBinding;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
-
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,44 +56,29 @@ public class StartupActivity extends AppCompatActivity
     binding = ActivityStartupBinding.inflate(getLayoutInflater());
     View view = binding.getRoot();
     setContentView(view);
-    requestStorageAccessPermission();
+    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
+      requestStorageAccessPermission();
+    } else {
+      startApp();
+    }
   }
 
   private void startApp() {
-    final long minimumSpace = 800000000L;
-    Log.d(TAG, Utils.getDatabaseDirectory(this));
-    long freeMemory = new File(this.getExternalFilesDir(null).getAbsoluteFile().toString()).getFreeSpace();
-    Log.d(TAG, String.format("free = %d", freeMemory));
-
     final ProgressDialog unzipDialog = new ProgressDialog(this);
     unzipDialog.setMessage(getString(R.string.uncompressing_database));
     unzipDialog.setCancelable(false);
 
-    final bolts.Capture<String> host = new bolts.Capture<String>(Constants.THAI_HOST);
-    if (freeMemory < minimumSpace && !new File(Utils.getDatabasePath(this, Language.THAI)).exists()) {
-      new AlertDialog.Builder(this)
-          .setTitle(R.string.no_space_left)
-          .setMessage(getString(R.string.space_error,
-              Utils.bytesToHuman(minimumSpace), Utils.bytesToHuman(freeMemory)))
-          .setPositiveButton(R.string.close, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              finish();
-            }
-          }).create().show();
-    } else {
-      moveOldDataFiles().continueWithTask(task -> {
-        runOnUiThread(unzipDialog::show);
-        return unzipBundleDatabase();
-      }).continueWithTask(task -> {
-        runOnUiThread(unzipDialog::dismiss);
-        return updateDatabasesInfo();
-      }).continueWithTask((Continuation<Void, Task<Boolean>>) task -> {
-        startActivity(new Intent(StartupActivity.this, MainActivity.class));
-        finish();
-        return null;
-      });
-    }
+    moveOldDataFiles().continueWithTask(task -> {
+      runOnUiThread(unzipDialog::show);
+      return unzipBundleDatabase();
+    }).continueWithTask(task -> {
+      runOnUiThread(unzipDialog::dismiss);
+      return updateDatabasesInfo();
+    }).continueWithTask((Continuation<Void, Task<Boolean>>) task -> {
+      startActivity(new Intent(StartupActivity.this, MainActivity.class));
+      finish();
+      return null;
+    });
   }
 
   private void clearCache() {
@@ -119,24 +101,8 @@ public class StartupActivity extends AppCompatActivity
   private bolts.Task<Void> moveOldDataFiles() {
     final TaskCompletionSource<Void> source = new TaskCompletionSource<>();
     AsyncTask.execute(() -> {
-      File oldFilesDir = new File(getExternalFilesDir(null).getPath(),"ETPK");
-      if (oldFilesDir.exists()) {
-        for (File file : oldFilesDir.listFiles(
-                (dir, filename) -> filename.endsWith(".db"))) {
-          File newFile = new File(Utils.getDatabaseDirectory(StartupActivity.this), file.getName());
-          if (!newFile.exists()) {
-            try {
-              FileUtils.moveFile(file, newFile);
-            } catch (IOException e) {
-              e.printStackTrace();
-            }
-          }
-        }
-        deleteRecursive(oldFilesDir);
-      }
       source.setResult(null);
     });
-
     return source.getTask();
   }
 
