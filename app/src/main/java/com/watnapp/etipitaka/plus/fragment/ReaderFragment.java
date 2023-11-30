@@ -16,6 +16,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.meetup.adapter.CursorPagerAdapter;
@@ -34,6 +35,7 @@ import com.watnapp.etipitaka.plus.model.HistoryItemDaoHelper;
 import com.watnapp.etipitaka.plus.widget.MyWebView;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Field;
 import java.util.Objects;
 
 /**
@@ -121,7 +123,6 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
     mLanguage = Language.values()[savedInstanceState.getInt(Constants.LANGUAGE_KEY)];
     mShowButtons = savedInstanceState.getBoolean(Constants.BUTTON_KEY);
     dataModel = ETDataModelCreator.create(mLanguage, getActivity());
-
   }
 
   @Override
@@ -161,6 +162,19 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
     if (!mShowButtons) {
       binding.layoutButtons.setVisibility(View.GONE);
     }
+
+    try {
+      final Field recyclerViewField = ViewPager2.class.getDeclaredField("mRecyclerView");
+      recyclerViewField.setAccessible(true);
+
+      final RecyclerView recyclerView = (RecyclerView) recyclerViewField.get(binding.viewpager);
+
+      final Field touchSlopField = RecyclerView.class.getDeclaredField("mTouchSlop");
+      touchSlopField.setAccessible(true);
+
+      final int touchSlop = (int) touchSlopField.get(recyclerView);
+      touchSlopField.set(recyclerView, touchSlop * 6);//6 is empirical value
+    } catch (Exception ignore) {}
 
     mPagerAdapter = createPagerAdapter(null);
     binding.viewpager.setAdapter(mPagerAdapter);

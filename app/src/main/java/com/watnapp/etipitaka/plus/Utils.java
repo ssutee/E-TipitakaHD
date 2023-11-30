@@ -139,7 +139,7 @@ public class Utils {
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
       return context.getApplicationContext().getExternalFilesDir(null).getPath();
     }
-    File downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    File downloadsDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
     if (!downloadsDirectory.exists()) {
       if (!downloadsDirectory.mkdir()) {
         return null;
