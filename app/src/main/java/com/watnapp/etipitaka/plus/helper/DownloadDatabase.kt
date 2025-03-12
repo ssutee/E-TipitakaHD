@@ -14,6 +14,7 @@ import com.watnapp.etipitaka.plus.Constants
 import com.watnapp.etipitaka.plus.R
 import com.watnapp.etipitaka.plus.UnzipUtility
 import com.watnapp.etipitaka.plus.Utils
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -95,6 +96,7 @@ suspend fun downloadDatabaseZipFile(activity: Activity, url: String, path: Strin
     fileDownloader.startDownload(null, url, path, 1)
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun update(activity: Activity,
            language: BookDatabaseHelper.Language,
            onCheckUpdateFinish : (needUpdate: Boolean) -> Unit) {
@@ -112,6 +114,7 @@ fun update(activity: Activity,
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun download(activity: Activity,
              language: BookDatabaseHelper.Language,
              progressBar: ProgressBar,

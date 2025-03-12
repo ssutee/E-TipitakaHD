@@ -42,7 +42,7 @@ open class ETThaiSupremeDataModel(context: Context) : ETBasicDataModel(context) 
             BookDatabaseHelper.getThaiMSBookItems(mContext)
 
     override fun getComparingItemsAtPage(volume: Int, page: Int, listener: BookDatabaseHelper.OnGetItemsListener?) {
-        val pair = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format("v%d-p%d", volume, page)] as List<Double>?
+        val pair = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format(Locale.getDefault(),"v%d-p%d", volume, page)] as List<*>?
         listener!!.onGetItemsFinish(arrayOf(pair!![0].toString().toFloat().roundToInt()),
                 arrayOf(pair[1].toString().toFloat().roundToInt()))
     }
@@ -52,7 +52,7 @@ open class ETThaiSupremeDataModel(context: Context) : ETBasicDataModel(context) 
             val pages = ArrayList<Int>()
             var section = 1
             while (true) {
-                val page = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format("v%d-%d-i%d", volume, section, item)]
+                val page = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format(Locale.getDefault(),"v%d-%d-i%d", volume, section, item)]
                 if (page != null) {
                     pages.add(Math.round(page.toString().toFloat()))
                     section += 1
@@ -69,7 +69,7 @@ open class ETThaiSupremeDataModel(context: Context) : ETBasicDataModel(context) 
         if (!needConvertToSiamrat) {
             return super.getPageByItem(volume, item, section, false)
         }
-        val page = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format("v%d-%d-i%d", volume, section, item)]
+        val page = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format(Locale.getDefault(),"v%d-%d-i%d", volume, section, item)]
         return page?.toString()?.toFloat()?.roundToInt() ?: 0
     }
 

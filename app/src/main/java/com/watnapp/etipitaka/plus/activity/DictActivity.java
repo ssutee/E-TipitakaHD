@@ -8,12 +8,15 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.adapter.DictAdapter;
@@ -46,22 +49,22 @@ abstract public class DictActivity extends AppCompatActivity {
     binding = ActivityDictBinding.inflate(getLayoutInflater());
     View view = binding.getRoot();
     setContentView(view);
-    binding.edtInput.setClearDrawable(R.drawable.ic_clear_holo_light);
-    binding.edtInput.addTextChangedListener(new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      }
-
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-      }
-
-      @Override
-      public void afterTextChanged(Editable s) {
-        Log.d(TAG, String.valueOf(s.toString().trim().length()));
-        search(s.toString().trim().length() == 0 ? null : s.toString());
-      }
-    });
+//    binding.edtInput.setClearDrawable(R.drawable.ic_clear_holo_light);
+//    binding.edtInput.addTextChangedListener(new TextWatcher() {
+//      @Override
+//      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//      }
+//
+//      @Override
+//      public void onTextChanged(CharSequence s, int start, int before, int count) {
+//      }
+//
+//      @Override
+//      public void afterTextChanged(Editable s) {
+//        Log.d(TAG, String.valueOf(s.toString().trim().length()));
+//        search(s.toString().trim().isEmpty() ? null : s.toString());
+//      }
+//    });
     search(null);
     binding.list.setAdapter(getDictAdapter());
     binding.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -117,5 +120,27 @@ abstract public class DictActivity extends AppCompatActivity {
         });
       }
     }).start();
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.dict_menu, menu);
+
+    MenuItem searchItem = menu.findItem(R.id.action_search);
+    SearchView searchView = (SearchView) searchItem.getActionView();
+      assert searchView != null;
+      searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      @Override
+      public boolean onQueryTextSubmit(String s) {
+        return false;
+      }
+
+      @Override
+      public boolean onQueryTextChange(String s) {
+        search(s.trim().isEmpty() ? null : s);
+        return true;
+      }
+    });
+    return true;
   }
 }

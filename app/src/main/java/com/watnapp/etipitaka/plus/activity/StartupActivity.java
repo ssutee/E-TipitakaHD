@@ -56,11 +56,11 @@ public class StartupActivity extends AppCompatActivity
     binding = ActivityStartupBinding.inflate(getLayoutInflater());
     View view = binding.getRoot();
     setContentView(view);
-    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
-      requestStorageAccessPermission();
-    } else {
+//    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
+//      requestStorageAccessPermission();
+//    } else {
       startApp();
-    }
+//    }
   }
 
   private void startApp() {

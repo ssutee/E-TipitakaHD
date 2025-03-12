@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 
-public class ClearableAutoCompleteTextView extends AutoCompleteTextView implements View.OnTouchListener,
+public class ClearableAutoCompleteTextView extends androidx.appcompat.widget.AppCompatAutoCompleteTextView implements View.OnTouchListener,
         View.OnFocusChangeListener {
 
     public ClearableAutoCompleteTextView(Context context) {
