@@ -1,22 +1,26 @@
 package com.watnapp.etipitaka.plus.activity;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -61,10 +65,6 @@ public class MainActivity extends AppCompatActivity implements
   protected static final String TAG = "MainActivity";
   private static final String READER_FRAG_TAG = "reader";
 
-  private static final int COMPARE_REQ = 0;
-  private static final int EXPORT_REQ = 1;
-  private static final int IMPORT_REQ = 2;
-
   private HistoryItemDaoHelper mHistoryItemDaoHelper;
   private FavoriteDaoHelper mFavoriteDaoHelper;
   private HistoryDaoHelper mHistoryDaoHelper;
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements
   private SlidingMenu mSlidingMenu;
   private MenuFragment mMenuFragment;
   private ETipitakaApplication application;
-  private Handler mHandler = new Handler();
+  private final Handler mHandler = new Handler(Looper.getMainLooper());
   private int mVolume, mSelectedPage, mSelectedItem;
   private String mKeywords;
   private boolean mIsBuddhawaj;
@@ -81,6 +81,39 @@ public class MainActivity extends AppCompatActivity implements
   private int mItemIndexSystem = 1;
   private ActivityMainBinding binding;
   private SharedViewModel viewModel;
+  private final ActivityResultLauncher<Intent> compareActivityLauncher =
+      registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+          return;
+        }
+        handleComparisonResult(result.getData());
+      });
+  private final ActivityResultLauncher<Intent> exportActivityLauncher =
+      registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+          return;
+        }
+        String path = result.getData().getStringExtra(Constants.PATH_KEY);
+        if (path == null || path.length() == 0) {
+          Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+          return;
+        }
+        Log.d(TAG, path);
+        exportData(path);
+      });
+  private final ActivityResultLauncher<Intent> importActivityLauncher =
+      registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+          return;
+        }
+        String path = result.getData().getStringExtra(Constants.PATH_KEY);
+        if (path == null || path.length() == 0) {
+          Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+          return;
+        }
+        Log.d(TAG, path);
+        importData(path);
+      });
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -351,14 +384,14 @@ public class MainActivity extends AppCompatActivity implements
     Intent intent = new Intent(this, FileExplorerActivity.class);
     intent.putExtra(Constants.TITLE_KEY, getString(R.string.export_title));
     intent.putExtra(Constants.SELECT_MODE_KEY, Constants.SELECT_MODE_FOLDER);
-    startActivityForResult(intent, EXPORT_REQ);
+    exportActivityLauncher.launch(intent);
   }
 
   private void importData() {
     Intent intent = new Intent(this, FileExplorerActivity.class);
     intent.putExtra(Constants.TITLE_KEY, getString(R.string.import_title));
     intent.putExtra(Constants.SELECT_MODE_KEY, Constants.SELECT_MODE_FILE);
-    startActivityForResult(intent, IMPORT_REQ);
+    importActivityLauncher.launch(intent);
   }
 
   private void takeNote() {
@@ -498,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements
     intent.putExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage());
     intent.putExtra(Constants.ITEM_KEY, item);
     intent.putExtra(Constants.SECTION_KEY, section);
-    startActivityForResult(intent, COMPARE_REQ);
+    compareActivityLauncher.launch(intent);
   }
 
   private void startComparisonActivityWithReference(int volume, int item, Language language) {
@@ -512,7 +545,7 @@ public class MainActivity extends AppCompatActivity implements
     intent.putExtra(Constants.ITEM_KEY, item);
     intent.putExtra(Constants.SECTION_KEY, 1);
     intent.putExtra(Constants.COMPARING_VOLUME_KEY, volume);
-    startActivityForResult(intent, COMPARE_REQ);
+    compareActivityLauncher.launch(intent);
   }
 
   private void compare(final ArrayList<Pair<String, Pair<Integer, Integer>>> references, final Language language) {
@@ -691,31 +724,19 @@ public class MainActivity extends AppCompatActivity implements
     }
   }
 
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (requestCode == COMPARE_REQ && resultCode == RESULT_OK) {
+  private void handleComparisonResult(Intent data) {
+    int code = data.getIntExtra(Constants.LANGUAGE_KEY, Language.THAI.getCode());
+    Language language = Language.values()[code];
+    Log.d(TAG, language.getStringCode());
 
-      int code = data.getIntExtra(Constants.LANGUAGE_KEY, Language.THAI.getCode());
-      Language language = Language.values()[code];
-      Log.d(TAG, language.getStringCode());
+    mMenuFragment.setRadioButton(language);
 
-      mMenuFragment.setRadioButton(language);
+    Log.d(TAG, language.toString() + ":" + data.getIntExtra(Constants.VOLUME_KEY, mVolume) +
+        ":" + data.getIntExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage()));
 
-      Log.d(TAG, language.toString() + ":" + data.getIntExtra(Constants.VOLUME_KEY, mVolume) +
-          ":" + data.getIntExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage()));
-
-      openBook(language, data.getIntExtra(Constants.VOLUME_KEY, mVolume),
-          data.getIntExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage()),
-          mKeywords, mIsBuddhawaj);
-
-    } else if (requestCode == EXPORT_REQ && resultCode == RESULT_OK) {
-      Log.d(TAG, data.getStringExtra(Constants.PATH_KEY));
-      exportData(data.getStringExtra(Constants.PATH_KEY));
-    } else if (requestCode == IMPORT_REQ && resultCode == RESULT_OK) {
-      Log.d(TAG, data.getStringExtra(Constants.PATH_KEY));
-      importData(data.getStringExtra(Constants.PATH_KEY));
-    }
-    super.onActivityResult(requestCode, resultCode, data);
+    openBook(language, data.getIntExtra(Constants.VOLUME_KEY, mVolume),
+        data.getIntExtra(Constants.PAGE_KEY, getReaderFragment().getCurrentPage()),
+        mKeywords, mIsBuddhawaj);
   }
 
 
@@ -880,11 +901,7 @@ public class MainActivity extends AppCompatActivity implements
   }
 
   private void importData(final String path) {
-    final ProgressDialog dialog = new ProgressDialog(this);
-    dialog.setIndeterminate(false);
-    dialog.setCancelable(false);
-    dialog.setTitle(null);
-    dialog.setMessage(getString(R.string.importing_data));
+    final AlertDialog dialog = createBlockingProgressDialog(R.string.importing_data);
     dialog.show();
     new Thread(new Runnable() {
       @Override
@@ -912,11 +929,7 @@ public class MainActivity extends AppCompatActivity implements
   }
 
   private void exportData(final String path) {
-    final ProgressDialog dialog = new ProgressDialog(this);
-    dialog.setIndeterminate(false);
-    dialog.setCancelable(false);
-    dialog.setTitle(null);
-    dialog.setMessage(getString(R.string.exporting_data));
+    final AlertDialog dialog = createBlockingProgressDialog(R.string.exporting_data);
     dialog.show();
     new Thread(new Runnable() {
       @Override
@@ -963,6 +976,26 @@ public class MainActivity extends AppCompatActivity implements
         });
       }
     }).start();
+  }
+
+  private AlertDialog createBlockingProgressDialog(int messageResId) {
+    int padding = (int) (16 * getResources().getDisplayMetrics().density);
+    LinearLayout layout = new LinearLayout(this);
+    layout.setOrientation(LinearLayout.HORIZONTAL);
+    layout.setPadding(padding, padding, padding, padding);
+
+    ProgressBar progressBar = new ProgressBar(this);
+    layout.addView(progressBar);
+
+    TextView message = new TextView(this);
+    message.setText(messageResId);
+    message.setPadding(padding, 0, 0, 0);
+    layout.addView(message);
+
+    return new AlertDialog.Builder(this)
+        .setView(layout)
+        .setCancelable(false)
+        .create();
   }
 
   @Override

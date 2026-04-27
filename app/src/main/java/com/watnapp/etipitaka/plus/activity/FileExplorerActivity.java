@@ -1,20 +1,12 @@
 package com.watnapp.etipitaka.plus.activity;
 
-import android.Manifest;
 import android.app.ListActivity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
@@ -42,7 +34,6 @@ import dart.DartModel;
 public class FileExplorerActivity extends ListActivity {
 
   private ActivityFileExplorerBinding binding;
-  private static final int REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION = 1;
 
   @DartModel
   FileExplorerActivityNavigationModel navigationModel;
@@ -95,11 +86,15 @@ public class FileExplorerActivity extends ListActivity {
 
   private void browseDir() {
     mCurrentFolder = getExternalFilesDir(null);
-    if (mCurrentFolder != null) {
-      mFiles = mCurrentFolder.listFiles(mJSFileFilter);
-      if (mFiles != null) {
-        Arrays.sort(mFiles, mFileComparator);
-      }
+    if (mCurrentFolder == null) {
+      Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+      finish();
+      return;
+    }
+
+    mFiles = mCurrentFolder.listFiles(mJSFileFilter);
+    if (mFiles != null) {
+      Arrays.sort(mFiles, mFileComparator);
     }
     binding.edtPath.setText(mCurrentFolder.getAbsolutePath());
     mAdapter = new FileExplorerAdapter(this) {
@@ -123,34 +118,7 @@ public class FileExplorerActivity extends ListActivity {
     View view = binding.getRoot();
     setContentView(view);
     binding.txtTitle.setText(navigationModel.mTitle);
-
-    int writeExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    int readExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
-    if(writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED ||
-        readExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(this,
-          new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-              Manifest.permission.READ_EXTERNAL_STORAGE},
-          REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION);
-    } else {
-      this.browseDir();
-    }
-  }
-
-  @Override
-  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    if (requestCode == REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION) {
-      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        this.browseDir();
-      } else {
-        Toast.makeText(this,
-            "The app was not allowed to write to your storage. " +
-                "Hence, it cannot function properly. Please consider granting it this permission",
-            Toast.LENGTH_LONG).show();
-      }
-    }
+    browseDir();
   }
 
   @Override

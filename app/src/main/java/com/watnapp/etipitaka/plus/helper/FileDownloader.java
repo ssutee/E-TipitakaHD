@@ -1,15 +1,23 @@
 package com.watnapp.etipitaka.plus.helper;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,8 +27,11 @@ import java.util.PriorityQueue;
   */
 public class FileDownloader {
   private final int MAX_CONCURRENCY_THREAD = 1;
-  private final PriorityQueue<DownloadFileAsyncTaskBase> mDownloadingTaskQueue;
+  private final PriorityQueue<DownloadFileTaskBase> mDownloadingTaskQueue;
   private final ArrayList<String> mDownloadingUrlList;
+  private final ExecutorService executorService;
+  private final Handler mainHandler;
+  private DownloadFileTaskBase activeTask;
 
   public interface OnFileDownloadListener {
     public void onTotalFileSizeChange(FileDownloader downloader,
@@ -46,35 +57,37 @@ public class FileDownloader {
   private void notifyTotalFileSizeChange(String url, String path, int fileId,
                                          long size) {
     if (this.onFileDownloadListener != null) {
-      this.onFileDownloadListener.onTotalFileSizeChange(this, url, path,
-          fileId, size);
+      mainHandler.post(() -> this.onFileDownloadListener.onTotalFileSizeChange(this, url, path,
+          fileId, size));
     }
   }
 
   private void notifyProgressUpdate(String url, String path, int fileId,
                                     int progress) {
     if (this.onFileDownloadListener != null) {
-      this.onFileDownloadListener.onProgressUpdate(this, url, path,
-          fileId, progress);
+      mainHandler.post(() -> this.onFileDownloadListener.onProgressUpdate(this, url, path,
+          fileId, progress));
     }
   }
 
   private void notifyDownloadingFinish(int fileId, boolean success) {
     if (this.onFileDownloadListener != null) {
-      this.onFileDownloadListener.onDownloadingFinish(this, fileId,
-          success);
+      mainHandler.post(() -> this.onFileDownloadListener.onDownloadingFinish(this, fileId,
+          success));
     }
   }
 
   public FileDownloader() {
-    mDownloadingTaskQueue = new PriorityQueue<DownloadFileAsyncTaskBase>();
+    mDownloadingTaskQueue = new PriorityQueue<DownloadFileTaskBase>();
     mDownloadingUrlList = new ArrayList<String>();
+    executorService = Executors.newSingleThreadExecutor();
+    mainHandler = new Handler(Looper.getMainLooper());
   }
 
   public void startDownload(Context context, String url, String path, int fileId) {
     Log.d("startDownload", url);
 
-    mDownloadingTaskQueue.add(new DownloadingFileAsyncTask(context,
+    mDownloadingTaskQueue.add(new DownloadingFileTask(context,
         url, path, fileId));
 
     Log.d("FileDownloader", "queue size: " + mDownloadingTaskQueue.size()
@@ -82,21 +95,29 @@ public class FileDownloader {
     mDownloadingUrlList.add(url);
     if (mDownloadingTaskQueue.size() > 0
         && mDownloadingUrlList.size() <= MAX_CONCURRENCY_THREAD) {
-      mDownloadingTaskQueue.peek().execute();
+      startNextDownload();
     }
   }
 
   public void stopDownload(int fileId) {
-    for (DownloadFileAsyncTaskBase task : mDownloadingTaskQueue) {
+    for (DownloadFileTaskBase task : mDownloadingTaskQueue) {
       if (task.getId() == fileId) {
-        task.cancel(true);
+        task.cancel();
       }
     }
   }
 
-  public abstract class DownloadFileAsyncTaskBase extends
-      AsyncTask<Void, Integer, Void> implements
-      Comparable<DownloadFileAsyncTaskBase> {
+  private synchronized void startNextDownload() {
+    if (activeTask != null || mDownloadingTaskQueue.isEmpty()) {
+      return;
+    }
+
+    activeTask = mDownloadingTaskQueue.peek();
+    activeTask.execute();
+  }
+
+  public abstract class DownloadFileTaskBase implements
+      Comparable<DownloadFileTaskBase>, Runnable {
     protected String mPath;
     protected URL mUrl;
     protected int mId;
@@ -104,9 +125,10 @@ public class FileDownloader {
     protected Context mContext;
     protected long mTotalFileSize;
     protected boolean mFileNotFound;
+    private Future<?> future;
 
-    public DownloadFileAsyncTaskBase(Context context, String url,
-                                     String path, int id) {
+    public DownloadFileTaskBase(Context context, String url,
+                                String path, int id) {
       try {
         mUrl = new URL(url);
       } catch (MalformedURLException e) {
@@ -119,8 +141,8 @@ public class FileDownloader {
       mTotalFileSize = 0;
     }
 
-    public DownloadFileAsyncTaskBase(Context context, String url,
-                                     String path) {
+    public DownloadFileTaskBase(Context context, String url,
+                                String path) {
       this(context, url, path, 0);
     }
 
@@ -137,42 +159,40 @@ public class FileDownloader {
       }
     }
 
-    @Override
-    protected void onCancelled() {
-      super.onCancelled();
-      mPleaseStop = true;
-      Log.d("FileDownloader", "before queue size: "
-          + mDownloadingTaskQueue.size() + "");
-      finishCurrentDownloading();
-      Log.d("FileDownloader", "after queue size: "
-          + mDownloadingTaskQueue.size() + "");
-    }
-
-    @Override
-    protected void onPreExecute() {
-      super.onPreExecute();
+    public void execute() {
       mPleaseStop = false;
+      future = executorService.submit(this);
+    }
+
+    public void cancel() {
+      mPleaseStop = true;
+      if (future != null) {
+        future.cancel(true);
+      }
     }
 
     @Override
-    protected void onPostExecute(Void result) {
-      super.onPostExecute(result);
-      Log.d("FileDownloader", "onPostExecute");
-      Log.d("FileDownloader", "before queue size: "
-          + mDownloadingTaskQueue.size() + "");
-      finishCurrentDownloading();
-      Log.d("FileDownloader", "after queue size: "
-          + mDownloadingTaskQueue.size() + "");
+    public void run() {
+      try {
+        download();
+      } finally {
+        Log.d("FileDownloader", "download finished");
+        Log.d("FileDownloader", "before queue size: "
+            + mDownloadingTaskQueue.size() + "");
+        finishCurrentDownloading();
+        Log.d("FileDownloader", "after queue size: "
+            + mDownloadingTaskQueue.size() + "");
+      }
     }
 
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-      super.onProgressUpdate(values);
-      notifyProgressUpdate(mUrl.toString(), mPath, mId, values[0]);
+    protected void publishProgress(Integer value) {
+      notifyProgressUpdate(mUrl.toString(), mPath, mId, value);
     }
 
+    protected abstract void download();
+
     @Override
-    public int compareTo(DownloadFileAsyncTaskBase another) {
+    public int compareTo(DownloadFileTaskBase another) {
       if (this.getId() > another.getId())
         return 1;
       if (this.getId() < another.getId())
@@ -180,37 +200,37 @@ public class FileDownloader {
       return 0;
     }
 
-    private void finishCurrentDownloading() {
-      mDownloadingTaskQueue.remove();
-      mDownloadingUrlList.remove(mUrl.toString());
-
-      if (mDownloadingTaskQueue.size() > 0
-          && mDownloadingTaskQueue.peek().getStatus() == Status.PENDING) {
-        mDownloadingTaskQueue.peek().execute();
+    private synchronized void finishCurrentDownloading() {
+      mDownloadingTaskQueue.remove(this);
+      if (mUrl != null) {
+        mDownloadingUrlList.remove(mUrl.toString());
       }
+      activeTask = null;
 
-      if (mFileNotFound || fileSize(mPath) == 0
+      if (mFileNotFound || mPleaseStop || fileSize(mPath) == 0
           || fileSize(mPath) != mTotalFileSize) {
         notifyDownloadingFinish(mId, false);
       } else {
         notifyDownloadingFinish(mId, true);
       }
+
+      startNextDownload();
     }
 
   }
 
-  public class DownloadingFileAsyncTask extends DownloadFileAsyncTaskBase {
-    public DownloadingFileAsyncTask(Context context, String url,
-                                    String path, int id) {
+  public class DownloadingFileTask extends DownloadFileTaskBase {
+    public DownloadingFileTask(Context context, String url,
+                               String path, int id) {
       super(context, url, path, id);
     }
 
-    public DownloadingFileAsyncTask(Context context, String url, String path) {
+    public DownloadingFileTask(Context context, String url, String path) {
       super(context, url, path);
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected void download() {
       BufferedOutputStream bOut = null;
       BufferedInputStream bIn = null;
       HttpURLConnection connection = null;
@@ -229,7 +249,7 @@ public class FileDownloader {
           Log.d("doInBackground",
               "file was downloaded completely or authentication failed.");
           connection.disconnect();
-          return null;
+          return;
         }
 
         mTotalFileSize = connection.getContentLength()
@@ -252,7 +272,7 @@ public class FileDownloader {
         byte[] data = new byte[1024];
         int dataSize = 0;
         long downloaded = fileSize(mPath);
-        while (!mPleaseStop && !isCancelled()
+        while (!mPleaseStop && !Thread.currentThread().isInterrupted()
             && (dataSize = bIn.read(data, 0, 1024)) >= 0) {
           bOut.write(data, 0, dataSize);
           downloaded += dataSize;
@@ -279,9 +299,7 @@ public class FileDownloader {
           e.printStackTrace();
         }
       }
-      return null;
     }
   }
 
 }
-

@@ -1,23 +1,14 @@
 package com.watnapp.etipitaka.plus.activity;
 
-import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.koushikdutta.ion.Ion;
 import com.watnapp.etipitaka.plus.Constants;
@@ -32,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -45,9 +38,9 @@ import bolts.TaskCompletionSource;
  */
 
 public class StartupActivity extends AppCompatActivity
-    implements  ActivityCompat.OnRequestPermissionsResultCallback {
+{
   private static final String TAG = "StartupActivity";
-  private Handler mHandler = new Handler();
+  private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
   private ActivityStartupBinding binding;
 
   public void onCreate(Bundle savedInstanceState) {
@@ -56,23 +49,13 @@ public class StartupActivity extends AppCompatActivity
     binding = ActivityStartupBinding.inflate(getLayoutInflater());
     View view = binding.getRoot();
     setContentView(view);
-//    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
-//      requestStorageAccessPermission();
-//    } else {
-      startApp();
-//    }
+    startApp();
   }
 
   private void startApp() {
-    final ProgressDialog unzipDialog = new ProgressDialog(this);
-    unzipDialog.setMessage(getString(R.string.uncompressing_database));
-    unzipDialog.setCancelable(false);
-
     moveOldDataFiles().continueWithTask(task -> {
-      runOnUiThread(unzipDialog::show);
       return unzipBundleDatabase();
     }).continueWithTask(task -> {
-      runOnUiThread(unzipDialog::dismiss);
       return updateDatabasesInfo();
     }).continueWithTask((Continuation<Void, Task<Boolean>>) task -> {
       startActivity(new Intent(StartupActivity.this, MainActivity.class));
@@ -95,12 +78,13 @@ public class StartupActivity extends AppCompatActivity
   @Override
   protected void onDestroy() {
     clearCache();
+    backgroundExecutor.shutdownNow();
     super.onDestroy();
   }
 
   private bolts.Task<Void> moveOldDataFiles() {
     final TaskCompletionSource<Void> source = new TaskCompletionSource<>();
-    AsyncTask.execute(() -> {
+    backgroundExecutor.execute(() -> {
       source.setResult(null);
     });
     return source.getTask();
@@ -139,8 +123,12 @@ public class StartupActivity extends AppCompatActivity
             editor.apply();
             source.setResult(null);
           } else {
-            e.printStackTrace();
-            source.setError(e);
+            if (e != null) {
+              Log.e(TAG, "Unable to update database metadata", e);
+              source.setError(e);
+            } else {
+              source.setResult(null);
+            }
           }
         });
     return source.getTask();
@@ -148,7 +136,7 @@ public class StartupActivity extends AppCompatActivity
 
   private bolts.Task<String> unzipBundleDatabase() {
     final TaskCompletionSource<String> source = new TaskCompletionSource<>();
-    AsyncTask.execute(() -> {
+    backgroundExecutor.execute(() -> {
       try {
         String outFileName = new File(Utils.getDatabaseDirectory(StartupActivity.this),
             Constants.DATABASE_ZIP_FILE).toString();
@@ -183,47 +171,5 @@ public class StartupActivity extends AppCompatActivity
     });
 
     return source.getTask();
-  }
-
-  private static final int REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION = 1;
-
-  /**
-   * Requests the {@link Manifest.permission#CAMERA} permission.
-   * If an additional rationale should be displayed, the user has to launch the request from
-   * a SnackBar that includes additional information.
-   */
-  private void requestStorageAccessPermission() {
-    // Permission has not been granted and must be requested
-    int writeExternalStoragePermission =
-            ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    int readExternalStoragePermission =
-            ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE);
-    if (writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED ||
-            readExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(StartupActivity.this,
-          new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                  Manifest.permission.READ_EXTERNAL_STORAGE},
-              REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION);
-    } else {
-      startApp();
-    }
-  }
-
-  @Override
-  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    if (requestCode == REQUEST_CODE_ACCESS_EXTERNAL_STORAGE_PERMISSION) {
-      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        startApp();
-      } else {
-        Toast.makeText(this,
-                "The app was not allowed to write to your storage. " +
-                        "Hence, it cannot function properly. Please consider granting it this permission",
-                Toast.LENGTH_LONG).show();
-        finish();
-      }
-    }
   }
 }

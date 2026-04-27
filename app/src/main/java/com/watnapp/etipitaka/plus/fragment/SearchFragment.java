@@ -2,7 +2,6 @@ package com.watnapp.etipitaka.plus.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.ContentObserver;
@@ -20,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,7 +61,8 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
   private Handler mHandler = new Handler();
 
   private ETipitakaApplication application;
-  private ProgressDialog mProgressDialog;
+  private AlertDialog mProgressDialog;
+  private ProgressBar mProgressBar;
   private Integer[] mSelectedVolumes;
   private SearchResultAdapter mAdapter;
   private int[] mResultsCount;
@@ -94,13 +96,7 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
     activity.getContentResolver()
         .registerContentObserver(DatabaseProvider.HISTORY_ITEM_CONTENT_URI, false, mContentObserver);
 
-    mProgressDialog = new ProgressDialog(activity);
-    mProgressDialog.setCancelable(false);
-    mProgressDialog.setTitle(R.string.searching);
-    mProgressDialog.setMessage(getString(R.string.please_wait));
-    mProgressDialog.setIndeterminate(false);
-    mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-
+    createProgressDialog(activity);
   }
 
   @Override
@@ -293,8 +289,8 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
       mResultsCount = new int[] {0, 0, 0};
       mIsBuddhawaj = searchType == BookDatabaseHelper.SearchType.BUDDHAWAJ;
       dataModel.search(binding.searchInput.getText().toString(), this, volumes, searchType);
-      mProgressDialog.setMax(volumes.length);
-      mProgressDialog.setProgress(0);
+      mProgressBar.setMax(volumes.length);
+      mProgressBar.setProgress(0);
       mProgressDialog.show();
       return true;
     }
@@ -307,7 +303,7 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
 
   @Override
   public void onSearchProgress(String keywords, int volume, int progress, Cursor cursor) {
-    mProgressDialog.setProgress(progress);
+    mProgressBar.setProgress(progress);
     if (volume <= dataModel.getSectionBoundary(0)) {
       mResultsCount[0] += cursor.getCount();
     } else if (volume >= dataModel.getSectionBoundary(0)+1 && volume <= dataModel.getSectionBoundary(1)) {
@@ -439,5 +435,26 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
         });
       }
     }).start();
+  }
+
+  private void createProgressDialog(Activity activity) {
+    int padding = (int) (16 * activity.getResources().getDisplayMetrics().density);
+    LinearLayout layout = new LinearLayout(activity);
+    layout.setOrientation(LinearLayout.VERTICAL);
+    layout.setPadding(padding, padding, padding, padding);
+
+    TextView message = new TextView(activity);
+    message.setText(R.string.please_wait);
+    layout.addView(message);
+
+    mProgressBar = new ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal);
+    mProgressBar.setIndeterminate(false);
+    layout.addView(mProgressBar);
+
+    mProgressDialog = new AlertDialog.Builder(activity)
+        .setTitle(R.string.searching)
+        .setView(layout)
+        .setCancelable(false)
+        .create();
   }
 }
