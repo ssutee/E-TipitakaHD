@@ -1,17 +1,13 @@
 package com.watnapp.etipitaka.plus.activity;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-
-import android.view.View;
-import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.activity.ComponentActivity;
 
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
-import com.watnapp.etipitaka.plus.adapter.FileExplorerAdapter;
-import com.watnapp.etipitaka.plus.databinding.ActivityFileExplorerBinding;
 import com.watnapp.etipitaka.plus.model.FileExplorerActivityNavigationModel;
 
 import java.io.File;
@@ -30,10 +26,7 @@ import dart.DartModel;
  * Time: 14:49
  */
 
-//@ContentView(R.layout.activity_file_explorer)
-public class FileExplorerActivity extends ListActivity {
-
-  private ActivityFileExplorerBinding binding;
+public class FileExplorerActivity extends ComponentActivity {
 
   @DartModel
   FileExplorerActivityNavigationModel navigationModel;
@@ -62,8 +55,7 @@ public class FileExplorerActivity extends ListActivity {
 
   private File mCurrentFolder;
   private File[] mFiles;
-
-  private FileExplorerAdapter mAdapter;
+  private String mSelectedPath = "";
   private int mLevel = 0;
 
   @Override
@@ -76,12 +68,12 @@ public class FileExplorerActivity extends ListActivity {
   }
 
   private void gotoParentFolder() {
+    File parentFolder = mCurrentFolder.getParentFile();
+    if (parentFolder == null) {
+      return;
+    }
     mLevel -= 1;
-    mCurrentFolder = mCurrentFolder.getParentFile();
-    mFiles = mCurrentFolder.listFiles(mJSFileFilter);
-    binding.edtPath.setText(mCurrentFolder.getAbsolutePath());
-    Arrays.sort(mFiles, mFileComparator);
-    mAdapter.notifyDataSetChanged();
+    updateFolder(parentFolder);
   }
 
   private void browseDir() {
@@ -92,54 +84,52 @@ public class FileExplorerActivity extends ListActivity {
       return;
     }
 
-    mFiles = mCurrentFolder.listFiles(mJSFileFilter);
-    if (mFiles != null) {
-      Arrays.sort(mFiles, mFileComparator);
-    }
-    binding.edtPath.setText(mCurrentFolder.getAbsolutePath());
-    mAdapter = new FileExplorerAdapter(this) {
-      @Override
-      public int getCount() {
-        return mFiles != null ? mFiles.length : 0;
-      }
-
-      @Override
-      public Object getItem(int position) {
-        return mFiles[position];
-      }
-    };
-    setListAdapter(mAdapter);
+    updateFolder(mCurrentFolder);
   }
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Dart.bind(this);
-    binding = ActivityFileExplorerBinding.inflate(getLayoutInflater());
-    View view = binding.getRoot();
-    setContentView(view);
-    binding.txtTitle.setText(navigationModel.mTitle);
     browseDir();
   }
 
-  @Override
-  protected void onListItemClick(ListView l, View v, int position, long id) {
+  private void onFileClicked(int position) {
     File file = mFiles[position];
     if (file.isDirectory() && file.canRead()) {
       mLevel += 1;
-      mCurrentFolder = file;
-      mFiles = mCurrentFolder.listFiles(mJSFileFilter);
-      binding.edtPath.setText(mCurrentFolder.getAbsolutePath());
-      Arrays.sort(mFiles, mFileComparator);
-      mAdapter.notifyDataSetChanged();
+      updateFolder(file);
     } else if (navigationModel.mSelectMode == Constants.SELECT_MODE_FILE && file.isFile() && file.canRead()) {
-      binding.edtPath.setText(file.getAbsolutePath());
-      action(null);
+      mSelectedPath = file.getAbsolutePath();
+      finishWithSelectedPath();
     }
   }
 
-  public void action(View view) {
+  private void updateFolder(File folder) {
+    mCurrentFolder = folder;
+    mFiles = mCurrentFolder.listFiles(mJSFileFilter);
+    if (mFiles == null) {
+      mFiles = new File[0];
+    } else {
+      Arrays.sort(mFiles, mFileComparator);
+    }
+    mSelectedPath = mCurrentFolder.getAbsolutePath();
+    render();
+  }
+
+  private void render() {
+    FileExplorerScreenBridge.render(
+        this,
+        navigationModel.mTitle != null ? navigationModel.mTitle : "",
+        mSelectedPath,
+        mFiles,
+        path -> mSelectedPath = path,
+        this::finishWithSelectedPath,
+        this::onFileClicked);
+  }
+
+  private void finishWithSelectedPath() {
     Intent data = new Intent();
-    data.putExtra(Constants.PATH_KEY, binding.edtPath.getText().toString());
+    data.putExtra(Constants.PATH_KEY, mSelectedPath);
     setResult(RESULT_OK, data);
     finish();
   }
