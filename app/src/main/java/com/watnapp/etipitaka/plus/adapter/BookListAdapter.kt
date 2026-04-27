@@ -3,6 +3,7 @@ package com.watnapp.etipitaka.plus.adapter
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.BaseAdapter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -67,6 +68,9 @@ class BookListAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val row = (convertView as? ComposeView) ?: createComposeView(parent)
         val title = getTitles()[position]
+        row.setOnClickListener {
+            (parent as? AdapterView<*>)?.performItemClick(row, position, getItemId(position))
+        }
         row.setContent {
             BookListRow(title = title)
         }
