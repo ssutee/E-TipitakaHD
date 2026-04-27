@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
 
 android {
@@ -28,6 +29,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 
     buildTypes {
@@ -40,6 +42,7 @@ android {
 
 dependencies {
     implementation libs.commons.lang3
+    implementation platform(libs.androidx.compose.bom)
     implementation libs.androidx.viewpager2
     implementation libs.slidingmenu
     implementation libs.stickylistheaders
@@ -62,11 +65,20 @@ dependencies {
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.appcompat
     implementation libs.androidx.recyclerview
+    implementation libs.androidx.activity.compose
+    implementation libs.androidx.compose.ui
+    implementation libs.androidx.compose.ui.tooling.preview
+    implementation libs.androidx.compose.material3
+
+    debugImplementation libs.androidx.compose.ui.tooling
+    debugImplementation libs.androidx.compose.ui.test.manifest
 
     annotationProcessor libs.dart.processor
     annotationProcessor libs.henson.processor
 
     testImplementation libs.junit
+    androidTestImplementation platform(libs.androidx.compose.bom)
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
+    androidTestImplementation libs.androidx.compose.ui.test.junit4
 }
