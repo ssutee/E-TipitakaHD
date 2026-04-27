@@ -13,7 +13,6 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,7 +28,6 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.ETipitakaApplication;
 import com.watnapp.etipitaka.plus.Utils;
-import com.watnapp.etipitaka.plus.databinding.ActivityMainBinding;
 import com.watnapp.etipitaka.plus.fragment.*;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
@@ -79,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements
   private Language mLanguage;
   private ETDataModel dataModel, previousDataModel;
   private int mItemIndexSystem = 1;
-  private ActivityMainBinding binding;
   private SharedViewModel viewModel;
   private final ActivityResultLauncher<Intent> compareActivityLauncher =
       registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -127,9 +124,7 @@ public class MainActivity extends AppCompatActivity implements
     mFavoriteDaoHelper = get(FavoriteDaoHelper.class);
     mHistoryDaoHelper = get(HistoryDaoHelper.class);
 
-    binding = ActivityMainBinding.inflate(getLayoutInflater());
-    View view = binding.getRoot();
-    setContentView(view);
+    MainActivityContentBridge.render(this);
     application = (ETipitakaApplication) getApplication();
     viewModel.getSelected().observe(this, language -> {
       previousDataModel = dataModel;
