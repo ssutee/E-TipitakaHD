@@ -1,7 +1,6 @@
 package com.watnapp.etipitaka.plus.fragment;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,12 +42,6 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
   private static final String TAG = "MenuFragment";
   private static final String STATE_SELECTED_TAB = "tab";
   private static final String[] TAB_TAGS = {"volume", "search", "history", "favorite"};
-  private static final int[] TAB_BUTTON_IDS = {
-      R.id.tab_volume,
-      R.id.tab_search,
-      R.id.tab_history,
-      R.id.tab_favorite
-  };
   private static final Class<?>[] TAB_FRAGMENT_CLASSES = {
       BookListFragment.class,
       SearchFragment.class,
@@ -63,8 +56,8 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
   private int mCurrentTabIndex = 0;
 
   public void setCurrentTab(int index) {
-    if (binding != null && index >= 0 && index < TAB_BUTTON_IDS.length) {
-      binding.tabGroup.check(TAB_BUTTON_IDS[index]);
+    if (binding != null) {
+      selectTab(index);
     }
   }
 
@@ -82,13 +75,6 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    Resources res = getResources();
-    float scale = res.getDisplayMetrics().density;
-
-    for (int tabButtonId : TAB_BUTTON_IDS) {
-      TextView tv = binding.tabGroup.findViewById(tabButtonId);
-      tv.setTextSize(getResources().getDimension(R.dimen.tabwidget_text_size) / scale);
-    }
 
     setupTabs(savedInstanceState);
 
@@ -254,8 +240,39 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
     }
     transaction.commitNow();
 
-    binding.tabGroup.setOnCheckedChangeListener((group, checkedId) -> showTab(indexForButtonId(checkedId)));
-    binding.tabGroup.check(TAB_BUTTON_IDS[selectedIndex]);
+    mCurrentTabIndex = selectedIndex;
+    renderTabs();
+  }
+
+  private void selectTab(int index) {
+    if (index < 0 || index >= TAB_TAGS.length) {
+      return;
+    }
+
+    if (index != mCurrentTabIndex) {
+      FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+      for (int i = 0; i < TAB_TAGS.length; i++) {
+        Fragment fragment = mFragments.get(TAB_TAGS[i]);
+        if (fragment == null) {
+          continue;
+        }
+        if (i == index) {
+          transaction.show(fragment);
+        } else {
+          transaction.hide(fragment);
+        }
+      }
+      transaction.commit();
+      mCurrentTabIndex = index;
+    }
+
+    renderTabs();
+  }
+
+  private void renderTabs() {
+    if (binding != null) {
+      MenuTabsBridge.render(binding.tabGroup, mCurrentTabIndex, this::selectTab);
+    }
   }
 
   private int getSavedTabIndex(Bundle savedInstanceState) {
@@ -270,35 +287,5 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
       }
     }
     return 0;
-  }
-
-  private int indexForButtonId(int checkedId) {
-    for (int i = 0; i < TAB_BUTTON_IDS.length; i++) {
-      if (TAB_BUTTON_IDS[i] == checkedId) {
-        return i;
-      }
-    }
-    return 0;
-  }
-
-  private void showTab(int index) {
-    if (index < 0 || index >= TAB_TAGS.length || index == mCurrentTabIndex) {
-      return;
-    }
-
-    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-    for (int i = 0; i < TAB_TAGS.length; i++) {
-      Fragment fragment = mFragments.get(TAB_TAGS[i]);
-      if (fragment == null) {
-        continue;
-      }
-      if (i == index) {
-        transaction.show(fragment);
-      } else {
-        transaction.hide(fragment);
-      }
-    }
-    transaction.commit();
-    mCurrentTabIndex = index;
   }
 }
