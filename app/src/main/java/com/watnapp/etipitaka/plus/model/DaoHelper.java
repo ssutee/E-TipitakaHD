@@ -7,12 +7,11 @@ import android.content.Context;
 import android.net.Uri;
 
 
-public abstract class DaoHelper {
+public abstract class DaoHelper<T extends ModelBase> {
 
   protected Context mContext;
 
-  @SuppressWarnings("rawtypes")
-  protected abstract Dao getDao();
+  protected abstract Dao<T> getDao();
 
   public DaoHelper(Context context) {
     mContext = context;
@@ -22,12 +21,11 @@ public abstract class DaoHelper {
     return getDao().size();
   }
 
-  public ModelBase get(int position) {
+  public T get(int position) {
     return getDao().get(position);
   }
 
-  @SuppressWarnings("unchecked")
-  public int insert(ModelBase object) {
+  public int insert(T object) {
     Uri uri = getDao().insert(object);
     try {
       if (uri.getLastPathSegment() != null) {
@@ -43,8 +41,7 @@ public abstract class DaoHelper {
     getDao().delete(selection, selectionArgs);
   }
 
-  @SuppressWarnings("unchecked")
-  public void delete(ModelBase object) {
+  public void delete(T object) {
     getDao().delete(object);
   }
 
@@ -52,17 +49,15 @@ public abstract class DaoHelper {
     getDao().update(values, selection, selectionArgs);
   }
 
-  @SuppressWarnings("unchecked")
-  public void update(ModelBase object) {
+  public void update(T object) {
     getDao().update(object);
   }
 
-  public ModelBase getById(int id) {
+  public T getById(int id) {
     return getDao().getById(id);
   }
 
-  @SuppressWarnings("unchecked")
-  public List<ModelBase> get(String selection, String[] selectionArgs) {
+  public List<T> get(String selection, String[] selectionArgs) {
     return getDao().get(selection, selectionArgs);
   }
 }

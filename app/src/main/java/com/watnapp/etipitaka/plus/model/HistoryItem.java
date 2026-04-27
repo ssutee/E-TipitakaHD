@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 
 public class HistoryItem extends ModelBase {
-  private Context context;
   private int id;
   private int historyId;
   private int volume;
@@ -60,12 +59,11 @@ public class HistoryItem extends ModelBase {
 
   @Override
   public void fromCursor(Cursor cursor, Context context) {
-    this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
-    this.historyId = cursor.getInt(cursor.getColumnIndex(HistoryItemTable.HistoryItemColumns.HISTORY_ID));
-    this.volume = cursor.getInt(cursor.getColumnIndex(HistoryItemTable.HistoryItemColumns.VOLUME));
-    this.page = cursor.getInt(cursor.getColumnIndex(HistoryItemTable.HistoryItemColumns.PAGE));
-    this.status = cursor.getInt(cursor.getColumnIndex(HistoryItemTable.HistoryItemColumns.STATUS));
-    this.context = context;
+    this.id = cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID));
+    this.historyId = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryItemTable.HistoryItemColumns.HISTORY_ID));
+    this.volume = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryItemTable.HistoryItemColumns.VOLUME));
+    this.page = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryItemTable.HistoryItemColumns.PAGE));
+    this.status = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryItemTable.HistoryItemColumns.STATUS));
   }
 
   @Override

@@ -17,23 +17,23 @@ import java.util.List;
  * Time: 12:58
  */
 
-public class HistoryDaoHelper extends DaoHelper {
+public class HistoryDaoHelper extends DaoHelper<History> {
 
   private Dao<History> mDao;
 
   public HistoryDaoHelper(Context context) {
     super(context);
-    mDao = new Dao<History>(History.class, context, DatabaseProvider.HISTORY_CONTENT_URI);
+    mDao = new Dao<>(History.class, context, DatabaseProvider.HISTORY_CONTENT_URI);
   }
 
   @Override
-  protected Dao getDao() {
+  protected Dao<History> getDao() {
     return mDao;
   }
 
   public History get(String keywords, BookDatabaseHelper.Language language,
                      SparseBooleanArray selectedSections, boolean isBuddhawaj) {
-    List<ModelBase> result = get(HistoryColumns.KEYWORDS + " LIKE ? AND "
+    List<History> result = get(HistoryColumns.KEYWORDS + " LIKE ? AND "
         + HistoryColumns.LANGUAGE + " = ? AND "
         + HistoryColumns.SECTION1 + " = ? AND "
         + HistoryColumns.SECTION2 + " = ? AND "
@@ -46,7 +46,7 @@ public class HistoryDaoHelper extends DaoHelper {
             isBuddhawaj ? "1" : "0"
         });
 
-    return result != null && result.size() > 0 ? (History) result.get(0) : null;
+    return result != null && result.size() > 0 ? result.get(0) : null;
   }
 
   public boolean contains(String keywords, BookDatabaseHelper.Language language,

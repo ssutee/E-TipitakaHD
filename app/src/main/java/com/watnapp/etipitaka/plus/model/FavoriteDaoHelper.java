@@ -16,16 +16,16 @@ import java.util.List;
  * Time: 15:23
  */
 
-public class FavoriteDaoHelper extends DaoHelper {
+public class FavoriteDaoHelper extends DaoHelper<Favorite> {
   private Dao<Favorite> mDao;
 
   public FavoriteDaoHelper(Context context) {
     super(context);
-    mDao = new Dao<Favorite>(Favorite.class, context, DatabaseProvider.FAVORITE_CONTENT_URI);
+    mDao = new Dao<>(Favorite.class, context, DatabaseProvider.FAVORITE_CONTENT_URI);
   }
 
   @Override
-  protected Dao getDao() {
+  protected Dao<Favorite> getDao() {
     return mDao;
   }
 

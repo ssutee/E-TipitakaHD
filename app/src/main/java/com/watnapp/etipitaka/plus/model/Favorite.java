@@ -6,7 +6,6 @@ import android.database.Cursor;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 public class Favorite extends ModelBase {
-  private Context context;
   private int id;
   private String note;
   private int language;
@@ -80,14 +79,13 @@ public class Favorite extends ModelBase {
 
   @Override
   public void fromCursor(Cursor cursor, Context context) {
-    this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
-    this.note = cursor.getString(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.NOTE));
-    this.language = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.LANGUAGE));
-    this.volume = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.VOLUME));
-    this.page = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.PAGE));
-    this.item = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.ITEM));
-    this.score = cursor.getInt(cursor.getColumnIndex(FavoriteTable.FavoriteColumns.SCORE));
-    this.context = context;
+    this.id = cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID));
+    this.note = cursor.getString(cursor.getColumnIndexOrThrow(FavoriteTable.FavoriteColumns.NOTE));
+    this.language = cursor.getInt(cursor.getColumnIndexOrThrow(FavoriteTable.FavoriteColumns.LANGUAGE));
+    this.volume = cursor.getInt(cursor.getColumnIndexOrThrow(FavoriteTable.FavoriteColumns.VOLUME));
+    this.page = cursor.getInt(cursor.getColumnIndexOrThrow(FavoriteTable.FavoriteColumns.PAGE));
+    this.item = cursor.getInt(cursor.getColumnIndexOrThrow(FavoriteTable.FavoriteColumns.ITEM));
+    this.score = cursor.getInt(cursor.getColumnIndexOrThrow(FavoriteTable.FavoriteColumns.SCORE));
   }
 
   @Override

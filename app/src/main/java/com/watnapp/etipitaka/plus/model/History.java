@@ -7,7 +7,6 @@ import android.util.SparseBooleanArray;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 public class History extends ModelBase {
-  private Context context;
   private int id;
   private String keywords;
   private int language;
@@ -137,19 +136,18 @@ public class History extends ModelBase {
 
   @Override
   public void fromCursor(Cursor cursor, Context context) {
-    this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
-    this.keywords = cursor.getString(cursor.getColumnIndex(HistoryTable.HistoryColumns.KEYWORDS));
-    this.language = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.LANGUAGE));
-    this.section1 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.SECTION1)) == 1;
-    this.section2 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.SECTION2)) == 1;
-    this.section3 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.SECTION3)) == 1;
-    this.result1 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.RESULT1));
-    this.result2 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.RESULT2));
-    this.result3 = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.RESULT3));
-    this.score = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.SCORE));
-    this.content = cursor.getString(cursor.getColumnIndex(HistoryTable.HistoryColumns.CONTENT));
-    this.buddhawaj = cursor.getInt(cursor.getColumnIndex(HistoryTable.HistoryColumns.BUDDHAWAJ)) == 1;
-    this.context = context;
+    this.id = cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID));
+    this.keywords = cursor.getString(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.KEYWORDS));
+    this.language = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.LANGUAGE));
+    this.section1 = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.SECTION1)) == 1;
+    this.section2 = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.SECTION2)) == 1;
+    this.section3 = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.SECTION3)) == 1;
+    this.result1 = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.RESULT1));
+    this.result2 = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.RESULT2));
+    this.result3 = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.RESULT3));
+    this.score = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.SCORE));
+    this.content = cursor.getString(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.CONTENT));
+    this.buddhawaj = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryTable.HistoryColumns.BUDDHAWAJ)) == 1;
   }
 
   @Override
@@ -174,6 +172,5 @@ public class History extends ModelBase {
     history.fromCursor(cursor, context);
     return history;
   }
-
 
 }

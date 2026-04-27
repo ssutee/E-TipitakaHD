@@ -15,16 +15,16 @@ import java.util.List;
  * Time: 19:51
  */
 
-public class HistoryItemDaoHelper extends DaoHelper {
+public class HistoryItemDaoHelper extends DaoHelper<HistoryItem> {
   private Dao<HistoryItem> mDao;
 
   public HistoryItemDaoHelper(Context context) {
     super(context);
-    mDao = new Dao<HistoryItem>(HistoryItem.class, context, DatabaseProvider.HISTORY_ITEM_CONTENT_URI);
+    mDao = new Dao<>(HistoryItem.class, context, DatabaseProvider.HISTORY_ITEM_CONTENT_URI);
   }
 
   @Override
-  protected Dao getDao() {
+  protected Dao<HistoryItem> getDao() {
     return mDao;
   }
 
