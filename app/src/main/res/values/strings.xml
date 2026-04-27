@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">E-Tipitaka+</string>
+    <string name="title_template">%1$s v%2$s</string>
+    <string name="volume">เล่ม</string>
+    <string name="search">ค้นหา</string>
+    <string name="history">ประวัติ</string>
+    <string name="bookmark">จดจำ</string>
+    <string name="thai">ไทย</string>
+    <string name="pali">บาลี</string>
+    <string name="thai_full_name"> พระไตรปิฎกไทย (ฉบับหลวง) </string>
+    <string name="thaimm_full_name"> พระไตรปิฎกไทย (ฉบับมหามกุฏฯ) </string>
+    <string name="thaimc_full_name"> พระไตรปิฎกไทย (ฉบับมหาจุฬาฯ ๑) </string>
+    <string name="thaimc2_full_name"> พระไตรปิฎกไทย (ฉบับมหาจุฬาฯ ๒) </string>
+    <string name="pali_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ พ.ศ.๒๕๓๘) </string>
+    <string name="palinew_full_name"> พระไตรปิฎกบาลี (ฉบับสยามรัฐ พ.ศ. ๒๔๗๐) </string>
+    <string name="subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s ข้อที่ %4$s</string>
+    <string name="subtitle_noitem_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s</string>
+    <string name="favorite_template">เล่มที่ %1$s หน้าที่ %2$s ข้อที่ %3$s</string>
+    <string name="favorite_no_item_template">เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="non_item_subtitle_template">%1$s\nเล่มที่ %2$s หน้าที่ %3$s</string>
+    <string name="go_to">ข้ามไปที่</string>
+    <string name="go_to_page">หน้าที่</string>
+    <string name="go_to_item">ข้อที่</string>
+    <string name="save">บันทึก</string>
+    <string name="compare">เทียบเคียง</string>
+    <string name="goto_page_title">ข้ามไปที่หน้า</string>
+    <string name="goto_page_message">ป้อนเลขหน้าที่ต้องการ (%1$d ถึง %2$d)</string>
+    <string name="goto_item_title">ข้ามไปที่ข้อ</string>
+    <string name="goto_item_message">ป้อนเลขข้อที่ต้องการ (%1$d ถึง %2$d)</string>
+    <string name="query_hint">ป้อนคำค้นหาที่ต้องการ</string>
+    <string name="searching">กำลังค้นหาข้อมูล</string>
+    <string name="please_wait">กรุณารอซักครู่</string>
+    <string name="please_select_category">เลือกหมวดหมู่ที่ต้องการค้นหา</string>
+    <string name="please_enter_keywords">กรุณาป้อนคำค้นหา</string>
+    <string name="search_result_summary">พบคำว่า \"%1$s\" ทั้งหมด %2$s หน้า</string>
+    <string name="found_n_pages">พบ %1$s หน้า</string>
+    <string name="n_volume_n_page">พระไตรปิฎก เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="buddhawaj_n_volume_n_page">พุทธวจนปิฎก เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="thaipb_n_volume_n_page">พุทธวจนหมวดธรรม เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="n_volume_n_page_minimal">เล่มที่ %1$s หน้าที่ %2$s</string>
+    <string name="search_result_not_found">ไม่พบคำว่า \"%1$s\"\nใน%2$s</string>
+    <string name="abbr_section1">วิ.(%1$s)</string>
+    <string name="abbr_section2">สุตต.(%1$s)</string>
+    <string name="abbr_section3">อภิ.(%1$s)</string>
+    <string name="not_found">ไม่พบข้อมูล</string>
+    <string name="seq_thai_numbers">๐๑๒๓๔๕๖๗๘๙</string>
+    <string name="regex_item_number_1">^(\\s*)(\\{[๐๑๒๓๔๕๖๗๘๙]+\\})*(\\s*)\\[([๐๑๒๓๔๕๖๗๘๙-]+)\\]</string>
+    <string name="regex_item_number_2">^(\\s*)\\{([๐๑๒๓๔๕๖๗๘๙]+)\\}</string>
+    <string name="regex_item_number_3">\\{([0-9:\\.]+)\\}</string>
+    <string name="select_item">เลือกข้อที่ต้องการ</string>
+    <string name="select_page">เลือกหน้าที่ต้องการ</string>
+    <string name="font_family_new">
+    <![CDATA[
+        <style type=\"text/css\">
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK\') format(\'svg\');
+            font-weight: normal; font-style: normal;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-Bold\') format(\'svg\');
+            font-weight: bold;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-Italic\') format(\'svg\');
+            font-style: italic, oblique;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.svg#THSarabunPSK-BoldItalic\') format(\'svg\');
+            font-weight: bold; font-style: italic, oblique;
+        }
+        </style>
+    ]]>
+    </string>
+    <string name="font_family_old">
+    <![CDATA[
+        <style type=\"text/css\">
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabun.ttf\') format(\'truetype\');
+            font-weight: normal; font-style: normal;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabunBold.ttf\') format(\'truetype\');
+            font-weight: bold;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabunItalic.ttf\') format(\'truetype\');
+            font-style: italic, oblique;
+        }
+        @font-face {
+            font-family: \'TH SarabunPSK\';
+            src: url(\'file:///android_asset/fonts/THSarabunBoldItalic.ttf\') format(\'truetype\');
+            font-weight: bold; font-style: italic, oblique;
+        }
+        </style>
+    ]]>
+    </string>
+    <string name="html_text_template">
+    <![CDATA[
+        <html>
+            <head>
+                %3$s
+                <style type=\"text/css\">
+                    body { color:%4$s; background-color:%5$s; }
+                    p { margin-bottom:0px; padding-bottom:0px; }
+                    span.level-1 { font-size: 110%%; }
+                    span.level-2 { color: #555555; font-size: 85%%; }
+                    span.level-3 { color: #888888; font-size: 75%%; }
+                    span.footnote { color: green; font-weight: normal; font-size: 75%%; }
+                    span.reference { color: grey; font-weight: normal; font-size: 75%%; }
+                    div.center { text-align: center; margin: 0; padding: 0; }
+                    .keywords { color: #0000FF; background: yellow; }
+                </style>
+                <script type=\"text/javascript\" src=\"jquery-2.1.1.min.js\"></script>
+                <script type=\"text/javascript\" src=\"rangy-core.js\"></script>
+                <script type=\"text/javascript\" src=\"rangy-cssclassapplier.js\"></script>
+                <script type=\"text/javascript\" src=\"rangy-serializer.js\"></script>
+                <script type=\"text/javascript\" src=\"rangy-textrange.js\"></script>
+                <script>
+                    function scrollToElement(theElement) {
+                        var selectedPosX = 0;
+                        var selectedPosY = 0;
+                        while(theElement != null) {
+                            selectedPosX += theElement.offsetLeft;
+                            selectedPosY += theElement.offsetTop;
+                            theElement = theElement.offsetParent;
+                        }
+                        window.scrollTo(selectedPosX,selectedPosY);
+                    }
+
+                    function scrollToKeywords() {
+                        var keywords = document.getElementById(\"keywords\");
+                        if (keywords) {
+                            scrollToElement(keywords);
+                        }
+                    }
+
+                    function scrollToItem(number) {
+                        var item = document.getElementById(\"i_\" + number);
+                        if (item) {
+                            scrollToElement(item);
+                        }
+                    }
+
+                    function search(term, searchType) {
+                        var searchResultApplier = rangy.createClassApplier(\"keywords\",
+                            { elementProperties: { id: \"keywords\" } });
+                        var range = rangy.createRange();
+                        var searchScopeRange = rangy.createRange();
+                        searchScopeRange.selectNodeContents(document.body);
+
+                        var options = {
+                            caseSensitive: true,
+                            wholeWordsOnly: false,
+                            withinRange: searchScopeRange,
+                            direction: \"forward\"
+                        };
+
+                        range.selectNodeContents(document.body);
+                        searchResultApplier.undoToRange(range);
+
+                        term = new RegExp(term, \"g\");
+
+                        while (range.findText(term, options)) {
+                            var parentNode = range.startContainer.parentNode;
+                            if (searchType == 1 || (searchType == 2 && parentNode.hasAttributes() && parentNode.attributes[\"class\"] !== undefined && (parentNode.attributes[\"class\"].value == \"level-1\" || parentNode.attributes[\"class\"].value == \"level-2\"))) {
+                                searchResultApplier.applyToRange(range);
+                            }
+                            range.collapse(false);
+                        }
+                    }
+                </script>
+            </head>
+            <body style=\"font-size:%2$s; %7$s\">
+                <p style=\"white-space: pre-wrap;\">%1$s</p>
+                <div style=\"white-space: pre-wrap; font-size:80%%; color:green;\">%6$s</div>
+            </body>
+        </html>
+    ]]>
+    </string>
+    <string name="html_dict_template">
+    <![CDATA[
+        <html>
+            <head>
+                %4$s
+                <style type=\"text/css\">
+                    p { margin: 0px; padding: 0px; }
+                    hr { margin: 5px 0px 5px 0px; padding: 0px; }
+                </style>
+            </head>
+            <body style=\"font-size:%3$s; %5$s\">
+                <p style=\"white-space: pre-wrap;\"><span style=\"color:blue;\">%1$s</span><hr/>%2$s</p>
+            </body>
+        </html>
+    ]]>
+    </string>
+    <string name="space_error">โปรแกรมต้องการเนื้อที่อย่างน้อย %1$s แต่คุณมีเพียง %2$s</string>
+    <string name="font_size">ขนาดอักษร</string>
+    <string name="increase_font_size">เพิ่มขนาดอักษร</string>
+    <string name="decrease_font_size">ลดขนาดอักษร</string>
+    <string name="preferences">ตั้งค่า</string>
+    <string name="enter_note">ป้อนข้อความที่ต้องการบันทึก</string>
+    <string name="save_complete">บันทึกเสร็จ</string>
+    <string name="favorite">บันทึก</string>
+    <string name="view_note">อ่านบันทึก</string>
+    <string name="edit">แก้ไข</string>
+    <string name="delete">ลบ</string>
+    <string name="edit_note">แก้ไขบันทึก</string>
+    <string name="open_note">เปิดบันทึก</string>
+    <string name="confirm_delete_favorite">คุณต้องการลบการจดจำนี้หรือไม่?</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="go_to_parent_folder">ไปยังโฟร์เดอร์ชั้นบน</string>
+    <string name="import_data">นำข้อมูลเข้า</string>
+    <string name="export_data">นำข้อมูลออก</string>
+    <string name="select">เลือก</string>
+    <string name="export_title">เลือกโฟล์เดอร์ที่ต้องการนำข้อมูลออก</string>
+    <string name="import_title">เลือกไฟล์ข้อมูลที่ต้องการนำเข้า</string>
+    <string name="exporting_data">กำลังนำข้อมูลออก</string>
+    <string name="export_complete">นำข้อมูลออกสำเร็จ</string>
+    <string name="file_not_found">ไม่พบไฟล์ข้อมูล</string>
+    <string name="importing_data">กำลังนำข้อมูลเข้า</string>
+    <string name="import_complete">นำข้อมูลเข้าสำเร็จ</string>
+    <string name="confirm_delete_history">คุณต้องการลบประวัติการค้นหานี้หรือไม่?</string>
+    <string name="database_error">ฐานข้อมูลผิดพลาด</string>
+    <string name="downloading_database">กำลังดาวน์โหลดฐานข้อมูล</string>
+    <string name="no_internet_connection">ไม่สามารถเชื่อมต่ออินเทอร์เน็ต</string>
+    <string name="uncompressing_database">กำลังขยายฐานข้อมูล</string>
+    <string name="pali_dict">พจนานุกรม บาลี-ไทย</string>
+    <string name="thai_dict">พจนานุกรม ไทย-ไทย</string>
+    <string name="english_dict">พจนานุกรม บาลี-อังกฤษ</string>
+    <string name="adjust_font_size">เปลี่ยนขนาดอักษร</string>
+    <string name="manage_data">จัดการข้อมูล</string>
+    <string name="adjust_font_color">เปลี่ยนสีอักษร</string>
+    <string name="black_color">สีดำ</string>
+    <string name="white_color">สีขาว</string>
+    <string name="sepia_color">สีน้ำตาลอ่อน</string>
+    <string name="select_langauge">เลือกภาษาที่ต้องการ</string>
+    <string name="siamrat">สยามรัฐ</string>
+    <string name="mahachula">มหาจุฬาฯ</string>
+    <string name="choose_items_index_system">เลือกระบบเลขข้อที่ต้องการ</string>
+    <string name="unsupported_old_version_file">ไม่สามารถนำเข้าไฟล์รุ่นเก่า</string>
+    <string name="thaibt_full_name">ชุดห้าเล่มจากพระโอษฐ์</string>
+    <string name="exit_program">ออกจากโปรแกรม</string>
+    <string name="are_you_sure">คุณแน่ใจหรือไม่?</string>
+    <string name="sorting">เรียงลำดับ</string>
+    <string name="select_sorting_type">เลือกรูปแบบการเรียงลำดับ</string>
+    <string name="select_ordering">เรียงลำดับจาก..</string>
+    <string name="mark">สำคัญ</string>
+    <string name="thaiwn_full_name">พุทธวจนปิฎก ๓๓ เล่ม</string>
+    <string name="choose_search_type">เลือกรูปแบบการค้นหา</string>
+    <string name="buddhawaj">พุทธวจน</string>
+    <string name="thaipb_full_name">พุทธวจนหมวดธรรม</string>
+    <string name="romanct_full_name">Tipitaka Roman Script</string>
+    <string name="thai_short_name">ฉบับหลวง</string>
+    <string name="pali_short_name">บาลีสยามรัฐ ๒๕๓๘</string>
+    <string name="palinew_short_name">บาลีสยามรัฐ ๒๔๗๐</string>
+    <string name="thaimm_short_name">มหามกุฏฯ</string>
+    <string name="thaimc_short_name">มหาจุฬาฯ (๑)</string>
+    <string name="thaimc2_short_name">มหาจุฬาฯ (๒)</string>
+    <string name="thaiwn_short_name">พุทธวจนปิฎก</string>
+    <string name="thaipb_short_name">หมวดธรรม</string>
+    <string name="thaibt_short_name">ชุดห้าเล่ม</string>
+    <string name="romanct_short_name">Roman Script</string>
+    <string name="close">ปิด</string>
+    <string name="no_space_left">เนื้อที่ไม่เพียงพอ</string>
+    <string name="move_old_files">กำลังย้ายไฟล์</string>
+    <string name="thaivn_full_name">อริยวินัย</string>
+    <string name="thaims_full_name">พระไตรปิฎกไทย (ฉบับเฉลิมพระเกียรติ)</string>
+    <string name="thaivn_short_name">อริยวินัย</string>
+    <string name="no_data">ฐานข้อมูลยังเตรียมไม่เสร็จ</string>
+    <string name="database_version_mismatched">โปรแกรมไม่สามารถอัพเดตฐานข้อมูลเป็นรุ่นล่าสุดได้ซึ่งอาจทำให้โปรแกรมทำงานผิดพลาดได้</string>
+
+    <string name="text_paused_cellular">Would you like to enable downloading over cellular connections? Depending on your data plan, this may cost you money.</string>
+    <string name="text_paused_cellular_2">If you choose not to enable downloading over cellular connections, the download will automatically resume when wi-fi is available.</string>
+    <string name="text_button_resume_cellular">Resume download</string>
+    <string name="text_button_wifi_settings">Wi-Fi settings</string>
+    <string name="text_verifying_download">Verifying Download</string>
+    <string name="text_validation_complete">XAPK File Validation Complete.  Select OK to start the movie.</string>
+    <string name="text_validation_failed">XAPK File Validation Failed.</string>
+    <string name="text_button_pause">Pause Download</string>
+    <string name="text_button_resume">Resume Download</string>
+    <string name="text_button_cancel">Cancel</string>
+    <string name="text_button_cancel_verify">Cancel Verification</string>
+
+    <string name="read_permission_denied">READ_EXTERNAL_STORAGE permission request was denied.</string>
+    <string name="read_permission_justification">READ_EXTERNAL_STORAGE permission is required to read expansion files.</string>
+    <string name="read_permission_requesting">"Permission is not available. Requesting READ_EXTERNAL_STORAGE permission."</string>
+
+    <string name="write_permission_denied">WRITE_EXTERNAL_STORAGE permission request was denied.</string>
+    <string name="write_permission_justification">WRITE_EXTERNAL_STORAGE permission is required to download expansion files.</string>
+    <string name="write_permission_requesting">"Permission is not available. Requesting WRITE_EXTERNAL_STORAGE permission."</string>
+    <string name="dictionary">พจนานุกรม</string>
+    <string name="database_not_found">ไม่พบฐานข้อมูล</string>
+    <string name="confirm_download_database">คุณต้องการดาวน์โหลดฐานข้อมูลเพิ่มหรือไม่?</string>
+    <string name="download">ดาวน์โหลด</string>
+    <string name="download_complete">ดาวน์โหลดเสร็จแล้ว</string>
+    <string name="downloading">กำลังดาวน์โหลด</string>
+    <string name="database_needs_update">ฐานข้อมูลมีการเปลี่ยนแปลง</string>
+    <string name="confirm_update_database">คุณต้องการปรับปรุงฐานข้อมูลหรือไม่?</string>
+    <string name="update">ปรับปรุง</string>
+    <string name="thaims_short_name">เฉลิมพระเกียรติ</string>
+    <string name="download_error">เกิดข้อผิดพลาดในการดาวน์โหลด</string>
+</resources>

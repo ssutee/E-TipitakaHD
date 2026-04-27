@@ -1,0 +1,50 @@
+[versions]
+androidx-appcompat = "1.7.1"
+androidx-constraintlayout = "2.2.1"
+androidx-core = "1.16.0"
+androidx-espresso = "3.6.1"
+androidx-junit = "1.2.1"
+androidx-lifecycle = "2.8.7"
+androidx-recyclerview = "1.4.0"
+androidx-viewpager2 = "1.1.0"
+bolts = "1.4.0"
+commons-io = "2.13.0"
+commons-lang3 = "3.6"
+dart = "3.0.1"
+guava = "32.0.1-jre"
+ion = "3.1.0"
+junit = "4.13.2"
+koin = "3.3.3"
+kotlinx-coroutines = "1.7.3"
+slidingmenu = "1.3"
+sqliteassethelper = "2.0.1"
+stickylistheaders = "2.7.1"
+
+[libraries]
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
+androidx-lifecycle-livedata-core-ktx = { module = "androidx.lifecycle:lifecycle-livedata-core-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidx-recyclerview" }
+androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "androidx-viewpager2" }
+bolts-applinks = { module = "com.parse.bolts:bolts-applinks", version.ref = "bolts" }
+bolts-tasks = { module = "com.parse.bolts:bolts-tasks", version.ref = "bolts" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+dart = { module = "com.f2prateek.dart:dart", version.ref = "dart" }
+dart-annotations = { module = "com.f2prateek.dart:dart-annotations", version.ref = "dart" }
+dart-processor = { module = "com.f2prateek.dart:dart-processor", version.ref = "dart" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+henson = { module = "com.f2prateek.dart:henson", version.ref = "dart" }
+henson-processor = { module = "com.f2prateek.dart:henson-processor", version.ref = "dart" }
+ion = { module = "com.koushikdutta.ion:ion", version.ref = "ion" }
+junit = { module = "junit:junit", version.ref = "junit" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+slidingmenu = { module = "com.jeremyfeinstein.slidingmenu:library", version.ref = "slidingmenu" }
+sqliteassethelper = { module = "com.readystatesoftware.sqliteasset:sqliteassethelper", version.ref = "sqliteassethelper" }
+stickylistheaders = { module = "com.github.mtotschnig:StickyListHeaders", version.ref = "stickylistheaders" }

@@ -1,0 +1,42 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext.kotlin_version = '2.0.21'
+
+    
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.8.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://jzaccone.github.io/SlidingMenu-aar"
+        }
+        maven { url "https://jitpack.io" }
+    }
+}
+
+tasks.register('clean', Delete) {
+    delete rootProject.layout.buildDirectory
+}
+
+tasks.register('verifyDebug') {
+    group = 'verification'
+    description = 'Builds the debug APK and runs local debug unit tests.'
+    dependsOn ':app:assembleDebug', ':app:testDebugUnitTest'
+}
+
+tasks.register('verifyDebugOnDevice') {
+    group = 'verification'
+    description = 'Runs debug instrumentation tests on a connected device or emulator.'
+    dependsOn ':app:connectedDebugAndroidTest'
+}
