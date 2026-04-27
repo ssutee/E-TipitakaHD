@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -68,6 +67,8 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
   private boolean mShowingButtons = false;
   private boolean mHidingButtons = false;
+  private int mSeekBarProgress = 0;
+  private int mSeekBarMax = 0;
   private ETDataModel dataModel;
 
   private FragmentReaderBinding binding;
@@ -159,6 +160,13 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
+    ReaderChromeBridge.renderSubtitle(binding.txtSubtitle, "");
+    renderSeekBar();
+    ReaderChromeBridge.renderBottomControls(
+            binding.layoutButtons,
+            () -> doCompare(binding.layoutButtons),
+            () -> doReturn(binding.layoutButtons));
+
     if (!mShowButtons) {
       binding.layoutButtons.setVisibility(View.GONE);
     }
@@ -187,7 +195,7 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
       @Override
       public void onPageSelected(int position) {
-        binding.seekbar.setProgress(position);
+        setSeekBarProgress(position);
         updateSubtitle(mVolume, position + 1);
         mHidingSeekBar = mShowingSeekBar = false;
         mHidingButtons = mShowingButtons = false;
@@ -218,45 +226,6 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
       @Override
       public void onPageScrollStateChanged(int state) {
         super.onPageScrollStateChanged(state);
-      }
-    });
-
-    binding.seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (fromUser) {
-          updateNonItemSubtitle(mVolume, seekBar.getProgress() + 1);
-        }
-      }
-
-      @Override
-      public void onStartTrackingTouch(SeekBar seekBar) {
-
-      }
-
-      @Override
-      public void onStopTrackingTouch(SeekBar seekBar) {
-        binding.viewpager.setCurrentItem(seekBar.getProgress(), false);
-        updateSubtitle(mVolume, seekBar.getProgress()+1);
-        History history = application.getHistory();
-        if (history != null) {
-          mHistoryItemDaoHelper.insertOrUpdate(history.getId(), mVolume,
-              seekBar.getProgress()+1, HistoryItem.Status.SKIMMED);
-        }
-      }
-    });
-
-    binding.btnCompare.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        doCompare(v);
-      }
-    });
-
-    binding.btnReturn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        doReturn(v);
       }
     });
 
@@ -348,11 +317,11 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
     mPagerAdapter = createPagerAdapter(cursor);
     binding.viewpager.setAdapter(mPagerAdapter);
 
-    binding.seekbar.setProgress(0);
+    setSeekBarProgress(0);
     if (page <= cursor.getCount()) {
       binding.viewpager.setCurrentItem(page-1, false);
-      binding.seekbar.setMax(cursor.getCount() - 1);
-      binding.seekbar.setProgress(page - 1);
+      setSeekBarMax(cursor.getCount() - 1);
+      setSeekBarProgress(page - 1);
       binding.seekbar.setVisibility(View.VISIBLE);
     } else {
       binding.seekbar.setVisibility(View.GONE);
@@ -378,9 +347,9 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
   private void updateNonItemSubtitle(int volume, int page) {
     String fullName = dataModel.getLanguage().getFullName(getActivity());
-    binding.txtSubtitle.setText(getString(R.string.non_item_subtitle_template,
-        fullName, Utils.convertToThaiNumber(getActivity(), volume),
-        Utils.convertToThaiNumber(getActivity(), page)));
+    ReaderChromeBridge.renderSubtitle(binding.txtSubtitle, getString(R.string.non_item_subtitle_template,
+            fullName, Utils.convertToThaiNumber(getActivity(), volume),
+            Utils.convertToThaiNumber(getActivity(), page)));
   }
 
   private void updateSubtitle(final int volume, final int page) {
@@ -404,8 +373,8 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
         mHandler.post(new Runnable() {
           @Override
           public void run() {
-            binding.txtSubtitle.setText(Utils.getSubtitle(getActivity(), mLanguage, volume,
-                page + dataModel.getMinimumPageNumber(volume) - 1, thaiItem));
+            ReaderChromeBridge.renderSubtitle(binding.txtSubtitle, Utils.getSubtitle(getActivity(), mLanguage, volume,
+                    page + dataModel.getMinimumPageNumber(volume) - 1, thaiItem));
           }
         });
       }
@@ -532,6 +501,37 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
       }
     });
     binding.seekbar.startAnimation(animation);
+  }
+
+  private void setSeekBarProgress(int progress) {
+    mSeekBarProgress = progress;
+    renderSeekBar();
+  }
+
+  private void setSeekBarMax(int max) {
+    mSeekBarMax = max;
+    if (mSeekBarProgress > max) {
+      mSeekBarProgress = max;
+    }
+    renderSeekBar();
+  }
+
+  private void renderSeekBar() {
+    ReaderChromeBridge.renderSeekBar(binding.seekbar, mSeekBarProgress, mSeekBarMax,
+            (progress, fromUser) -> {
+              mSeekBarProgress = progress;
+              if (fromUser) {
+                updateNonItemSubtitle(mVolume, progress + 1);
+              } else {
+                binding.viewpager.setCurrentItem(progress, false);
+                updateSubtitle(mVolume, progress + 1);
+                History history = application.getHistory();
+                if (history != null) {
+                  mHistoryItemDaoHelper.insertOrUpdate(history.getId(), mVolume,
+                          progress + 1, HistoryItem.Status.SKIMMED);
+                }
+              }
+            });
   }
 
   public void doCompare(View view) {
