@@ -19,14 +19,12 @@ allprojects {
         google()
         mavenCentral()
         maven {
-            url "http://jzaccone.github.io/SlidingMenu-aar"
-            allowInsecureProtocol = true
+            url "https://jzaccone.github.io/SlidingMenu-aar"
         }
-        mavenCentral()
         maven { url "https://jitpack.io" }
     }
 }
 
 tasks.register('clean', Delete) {
-    ddelete rootProject.layout.buildDirectory
+    delete rootProject.layout.buildDirectory
 }
