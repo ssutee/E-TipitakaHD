@@ -28,3 +28,15 @@ allprojects {
 tasks.register('clean', Delete) {
     delete rootProject.layout.buildDirectory
 }
+
+tasks.register('verifyDebug') {
+    group = 'verification'
+    description = 'Builds the debug APK and runs local debug unit tests.'
+    dependsOn ':app:assembleDebug', ':app:testDebugUnitTest'
+}
+
+tasks.register('verifyDebugOnDevice') {
+    group = 'verification'
+    description = 'Runs debug instrumentation tests on a connected device or emulator.'
+    dependsOn ':app:connectedDebugAndroidTest'
+}
