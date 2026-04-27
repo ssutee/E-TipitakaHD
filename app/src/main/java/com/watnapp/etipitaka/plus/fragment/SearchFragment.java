@@ -20,11 +20,13 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.compose.ui.platform.ComposeView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -34,13 +36,15 @@ import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.activity.MainActivity;
 import com.watnapp.etipitaka.plus.adapter.SearchResultAdapter;
-import com.watnapp.etipitaka.plus.databinding.FragmentSearchBinding;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.model.*;
 import com.watnapp.etipitaka.plus.vm.SharedViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
 import static org.koin.java.KoinJavaComponent.*;
 
 /**
@@ -74,7 +78,9 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
 
   private ContentObserver mContentObserver;
   private boolean mIsBuddhawaj;
-  private FragmentSearchBinding binding;
+  private ComposeView composeView;
+  private StickyListHeadersListView listView;
+  private String mSearchInputText = "";
   private SharedViewModel viewModel;
 
   @Override
@@ -88,7 +94,9 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
       @Override
       public void onChange(boolean selfChange, Uri uri) {
         if (uri.compareTo(DatabaseProvider.HISTORY_ITEM_CONTENT_URI) == 0) {
-          binding.list.post(() -> mAdapter.notifyDataSetChanged());
+          if (listView != null && mAdapter != null) {
+            listView.post(() -> mAdapter.notifyDataSetChanged());
+          }
         }
       }
     };
@@ -122,34 +130,17 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    binding = FragmentSearchBinding.inflate(inflater, container, false);
-    View view = binding.getRoot();
-    return view;
+    composeView = new ComposeView(requireContext());
+    listView = new StickyListHeadersListView(requireContext());
+    listView.setFastScrollEnabled(true);
+    listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    renderSearchScreen();
+    return composeView;
   }
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    binding.searchInput.setClearDrawable(R.drawable.ic_clear_holo_light);
-    binding.searchInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-      @Override
-      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        startSearch();
-        return true;
-      }
-    });
-
-    binding.btnSearch.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (binding.searchInput.getText().length() > 0) {
-          startSearch();
-        } else {
-          mInputMethodManager.showSoftInput(binding.searchInput, InputMethodManager.SHOW_FORCED);
-          Toast.makeText(getActivity(), R.string.please_enter_keywords, Toast.LENGTH_SHORT).show();
-        }
-      }
-    });
     mAdapter = new SearchResultAdapter(getActivity(), null) {
       @Override
       public String getKeywords() {
@@ -178,17 +169,36 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
       }
 
     };
-    binding.list.setAdapter(mAdapter);
-    binding.list.setOnItemClickListener(this);
+    listView.setAdapter(mAdapter);
+    listView.setOnItemClickListener(this);
     viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
     viewModel.getSelected().observe(getViewLifecycleOwner(), language -> {
       dataModel = ETDataModelCreator.create(language, getActivity());
-      binding.list.post(() -> {
+      listView.post(() -> {
         mAdapter.swapCursor(null);
         mAdapter.notifyDataSetChanged();
       });
     });
 
+  }
+
+  private void onSearchButtonClick() {
+    if (mSearchInputText.trim().length() > 0) {
+      startSearch();
+    } else {
+      Toast.makeText(getActivity(), R.string.please_enter_keywords, Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  private void renderSearchScreen() {
+    if (composeView != null && listView != null) {
+      SearchScreenBridge.render(
+          composeView,
+          mSearchInputText,
+          listView,
+          query -> mSearchInputText = query,
+          this::onSearchButtonClick);
+    }
   }
 
   private void startSearch() {
@@ -285,10 +295,10 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
   }
 
   private boolean search(Integer[] volumes, BookDatabaseHelper.SearchType searchType) {
-    if (binding.searchInput.getText().length() > 0) {
+    if (mSearchInputText.trim().length() > 0) {
       mResultsCount = new int[] {0, 0, 0};
       mIsBuddhawaj = searchType == BookDatabaseHelper.SearchType.BUDDHAWAJ;
-      dataModel.search(binding.searchInput.getText().toString(), this, volumes, searchType);
+      dataModel.search(mSearchInputText, this, volumes, searchType);
       mProgressBar.setMax(volumes.length);
       mProgressBar.setProgress(0);
       mProgressDialog.show();
@@ -315,7 +325,7 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
 
   @Override
   public void onSearchFinish(String keywords, final Cursor cursor, int[] totalPages) {
-    mKeywords = binding.searchInput.getText().toString();
+    mKeywords = mSearchInputText;
 
     if (!mHistoryDaoHelper.contains(keywords, application.getLanguage(), mCheckedCategories, mIsBuddhawaj)) {
       History history = new History();
@@ -347,8 +357,8 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
     mCurrentHistoryItems = mHistoryItemDaoHelper.getByHistoryId(mCurrentHistory.getId());
 
     mProgressDialog.dismiss();
-    mInputMethodManager.hideSoftInputFromWindow(binding.searchInput.getWindowToken(), 0);
-    binding.list.post(new Runnable() {
+    mInputMethodManager.hideSoftInputFromWindow(composeView.getWindowToken(), 0);
+    listView.post(new Runnable() {
       @Override
       public void run() {
         cursor.moveToFirst();
@@ -379,11 +389,11 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
 
   private void scrollToSection(int section) {
     if (section == 1 && mResultsCount[0] > 0) {
-      binding.list.setSelectionFromTop(3, 0);
+      listView.setSelectionFromTop(3, 0);
     } else if (section == 2 && mResultsCount[1] > 0) {
-      binding.list.setSelectionFromTop(mResultsCount[0]+3, 0);
+      listView.setSelectionFromTop(mResultsCount[0]+3, 0);
     } else if (section == 3 && mResultsCount[2] > 0) {
-      binding.list.setSelectionFromTop(mResultsCount[0]+mResultsCount[1]+3, 0);
+      listView.setSelectionFromTop(mResultsCount[0]+mResultsCount[1]+3, 0);
     }
   }
 
@@ -419,7 +429,8 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
 
   public void loadHistory(final History history) {
     mCurrentHistory = history;
-    binding.searchInput.setText(history.getKeywords());
+    mSearchInputText = history.getKeywords();
+    renderSearchScreen();
     mKeywords = history.getKeywords();
     mIsBuddhawaj = history.isBuddhawaj();
     Log.d(TAG, "load history = " + mIsBuddhawaj);
