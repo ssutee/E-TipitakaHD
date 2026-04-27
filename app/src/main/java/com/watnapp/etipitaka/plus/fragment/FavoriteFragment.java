@@ -9,12 +9,13 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.util.Log;
-import android.view.*;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.ListFragment;
+import androidx.compose.ui.platform.ComposeView;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -25,12 +26,14 @@ import com.watnapp.etipitaka.plus.ETipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.activity.MainActivity;
-import com.watnapp.etipitaka.plus.adapter.FavoriteAdapter;
 import com.watnapp.etipitaka.plus.model.DatabaseProvider;
 import com.watnapp.etipitaka.plus.model.Favorite;
 import com.watnapp.etipitaka.plus.model.FavoriteDaoHelper;
 import com.watnapp.etipitaka.plus.model.FavoriteTable;
 import com.watnapp.etipitaka.plus.vm.SharedViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -39,17 +42,17 @@ import com.watnapp.etipitaka.plus.vm.SharedViewModel;
  * Date: 9/7/2013
  * Time: 16:48
  */
-public class FavoriteFragment extends ListFragment
+public class FavoriteFragment extends Fragment
     implements LoaderManager.LoaderCallbacks<Cursor>, TextEntryDialogFragment.TextEntryDialogButtonClickListener {
 
   private static final String TAG = "FavoriteFragment";
-  private static final int FRAGMENT_GROUPID = 1;
 
-  private FavoriteAdapter mAdapter;
   private FavoriteDaoHelper mDaoHelper;
   private ETipitakaApplication application;
   private Favorite selectedFavorite;
   private SharedViewModel viewModel;
+  private ComposeView composeView;
+  private List<Favorite> favorites = new ArrayList<>();
 
   @Override
   public void onAttach(@NonNull Context context) {
@@ -66,7 +69,6 @@ public class FavoriteFragment extends ListFragment
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    mAdapter = new FavoriteAdapter(getContext());
     mDaoHelper = new FavoriteDaoHelper(getContext());
 
     LoaderManager.getInstance(FavoriteFragment.this)
@@ -79,59 +81,26 @@ public class FavoriteFragment extends ListFragment
   }
 
   @Override
+  public void onDestroyView() {
+    super.onDestroyView();
+    composeView = null;
+  }
+
+  @Override
   public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    setListAdapter(mAdapter);
-    registerForContextMenu(getListView());
     viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
     viewModel.getSelected().observe(getViewLifecycleOwner(), language ->  {
-      getListView().post(() -> LoaderManager.getInstance(FavoriteFragment.this)
-              .restartLoader(Constants.FAVORITE_LOADER, null, FavoriteFragment.this));
+      composeView.post(() -> LoaderManager.getInstance(FavoriteFragment.this)
+          .restartLoader(Constants.FAVORITE_LOADER, null, FavoriteFragment.this));
     });
   }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.fragment_favorite, container, false);
-  }
-
-  @Override
-  public void onCreateContextMenu(@NonNull ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-    if (v.getId() == android.R.id.list) {
-      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_OPEN, Menu.NONE, R.string.open_note);
-      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_EDIT, Menu.NONE, R.string.edit_note);
-      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
-      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_MARK, Menu.NONE, R.string.mark);
-      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_SORT, Menu.NONE, R.string.sorting);
-    }
-  }
-
-  @Override
-  public boolean onContextItemSelected(MenuItem item) {
-    if (item.getGroupId() == FRAGMENT_GROUPID) {
-      AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-      Cursor cursor = mAdapter.getCursor();
-      cursor.moveToPosition(info.position);
-      selectedFavorite = Favorite.newInstance(cursor, getActivity());
-      switch (item.getItemId()) {
-        case Constants.MENU_ITEM_OPEN:
-          openNote(selectedFavorite);
-          return true;
-        case Constants.MENU_ITEM_EDIT:
-          editNote(selectedFavorite);
-          return true;
-        case Constants.MENU_ITEM_DELETE:
-          delete(selectedFavorite);
-          return true;
-        case Constants.MENU_ITEM_MARK:
-          mark(selectedFavorite);
-          return true;
-        case Constants.MENU_ITEM_SORT:
-          sort();
-          return true;
-      }
-    }
-    return super.onContextItemSelected(item);
+    composeView = new ComposeView(requireContext());
+    renderFavoriteScreen();
+    return composeView;
   }
 
   private void mark(Favorite favorite) {
@@ -245,20 +214,14 @@ public class FavoriteFragment extends ListFragment
 
   @Override
   public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-    mAdapter.swapCursor(data);
+    favorites = createFavorites(data);
+    renderFavoriteScreen();
   }
 
   @Override
   public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-    mAdapter.swapCursor(null);
-  }
-
-  @Override
-  public void onListItemClick(ListView l, @NonNull View v, int position, long id) {
-    Cursor cursor = mAdapter.getCursor();
-    cursor.moveToPosition(position);
-    Favorite favorite = Favorite.newInstance(cursor, getActivity());
-    openNote(favorite);
+    favorites = new ArrayList<>();
+    renderFavoriteScreen();
   }
 
   @Override
@@ -273,5 +236,30 @@ public class FavoriteFragment extends ListFragment
 
   @Override
   public void onTextEntryDialogNegativeButtonClick() {
+  }
+
+  private List<Favorite> createFavorites(Cursor cursor) {
+    List<Favorite> result = new ArrayList<>();
+    if (cursor == null || !cursor.moveToFirst()) {
+      return result;
+    }
+    do {
+      result.add(Favorite.newInstance(cursor, requireContext()));
+    } while (cursor.moveToNext());
+    return result;
+  }
+
+  private void renderFavoriteScreen() {
+    if (composeView == null) {
+      return;
+    }
+    FavoriteHistoryScreenBridge.renderFavorites(
+        composeView,
+        favorites,
+        this::openNote,
+        this::editNote,
+        this::delete,
+        this::mark,
+        this::sort);
   }
 }

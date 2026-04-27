@@ -7,12 +7,13 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.view.*;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.ListFragment;
+import androidx.compose.ui.platform.ComposeView;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -21,10 +22,12 @@ import androidx.loader.content.Loader;
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.ETipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
-import com.watnapp.etipitaka.plus.adapter.HistoryAdapter;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.model.*;
 import com.watnapp.etipitaka.plus.vm.SharedViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,15 +36,15 @@ import com.watnapp.etipitaka.plus.vm.SharedViewModel;
  * Time: 19:52
  */
 
-public class HistoryFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class HistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
   public static final String TAG = "HistoryFragment";
-  private static final int FRAGMENT_GROUPID = 2;
 
   private ETipitakaApplication application;
-  private HistoryAdapter mAdapter;
   private HistoryDaoHelper mDaoHelper;
   private SharedViewModel viewModel;
+  private ComposeView composeView;
+  private List<History> histories = new ArrayList<>();
 
   @Override
   public void onAttach(Context context) {
@@ -61,12 +64,6 @@ public class HistoryFragment extends ListFragment implements LoaderManager.Loade
     LoaderManager.getInstance(this)
             .initLoader(Constants.HISTORY_LOADER, null, this);
     mDaoHelper = new HistoryDaoHelper(getContext());
-    mAdapter = new HistoryAdapter(getActivity()) {
-      @Override
-      public BookDatabaseHelper.Language getLanguage() {
-        return application.getLanguage();
-      }
-    };
   }
 
   @Override
@@ -75,51 +72,26 @@ public class HistoryFragment extends ListFragment implements LoaderManager.Loade
   }
 
   @Override
+  public void onDestroyView() {
+    super.onDestroyView();
+    composeView = null;
+  }
+
+  @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.fragment_history, container, false);
+    composeView = new ComposeView(requireContext());
+    renderHistoryScreen();
+    return composeView;
   }
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    setListAdapter(mAdapter);
-    registerForContextMenu(getListView());
     viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
     viewModel.getSelected().observe(getViewLifecycleOwner(), language -> {
-      getListView().post(() ->
-              LoaderManager.getInstance(HistoryFragment.this)
-                      .restartLoader(Constants.HISTORY_LOADER, null, HistoryFragment.this));
+      composeView.post(() -> LoaderManager.getInstance(HistoryFragment.this)
+          .restartLoader(Constants.HISTORY_LOADER, null, HistoryFragment.this));
     });
-  }
-
-  @Override
-  public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-    if (v.getId() == android.R.id.list) {
-      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_DELETE, Menu.NONE, R.string.delete);
-      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_MARK, Menu.NONE, R.string.mark);
-      menu.add(FRAGMENT_GROUPID, Constants.MENU_ITEM_SORT, Menu.NONE, R.string.sorting);
-    }
-  }
-
-  @Override
-  public boolean onContextItemSelected(MenuItem item) {
-    if (item.getGroupId() == FRAGMENT_GROUPID) {
-      AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-      Cursor cursor = mAdapter.getCursor();
-      History history = History.newInstance(cursor, getActivity());
-      switch (item.getItemId()) {
-        case Constants.MENU_ITEM_DELETE:
-          delete(history);
-          return true;
-        case Constants.MENU_ITEM_SORT:
-          sort();
-          return true;
-        case Constants.MENU_ITEM_MARK:
-          mark(history);
-          return true;
-      }
-    }
-    return super.onContextItemSelected(item);
   }
 
   private void mark(History history) {
@@ -160,23 +132,22 @@ public class HistoryFragment extends ListFragment implements LoaderManager.Loade
 
   @Override
   public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-    mAdapter.swapCursor(data);
+    histories = createHistories(data);
+    renderHistoryScreen();
   }
 
   @Override
   public void onLoaderReset(Loader<Cursor> cursorLoader) {
-    mAdapter.swapCursor(null);
+    histories = new ArrayList<>();
+    renderHistoryScreen();
   }
 
-  @Override
-  public void onListItemClick(ListView l, View v, int position, long id) {
+  private void openHistory(History history) {
     MenuFragment parentFragment = (MenuFragment) getParentFragment();
     try {
       OnHistorySelectedListener listener = parentFragment;
       parentFragment.setCurrentTab(1);
-      Cursor cursor = mAdapter.getCursor();
-      cursor.moveToPosition(position);
-      listener.onHistorySelected(History.newInstance(cursor, getActivity()));
+      listener.onHistorySelected(history);
     } catch (ClassCastException ignored) {
     }
   }
@@ -222,5 +193,30 @@ public class HistoryFragment extends ListFragment implements LoaderManager.Loade
 
   public interface OnHistorySelectedListener {
     public void onHistorySelected(History history);
+  }
+
+  private List<History> createHistories(Cursor cursor) {
+    List<History> result = new ArrayList<>();
+    if (cursor == null || !cursor.moveToFirst()) {
+      return result;
+    }
+    do {
+      result.add(History.newInstance(cursor, requireContext()));
+    } while (cursor.moveToNext());
+    return result;
+  }
+
+  private void renderHistoryScreen() {
+    if (composeView == null) {
+      return;
+    }
+    FavoriteHistoryScreenBridge.renderHistory(
+        composeView,
+        histories,
+        application.getLanguage(),
+        this::openHistory,
+        this::delete,
+        this::mark,
+        this::sort);
   }
 }
