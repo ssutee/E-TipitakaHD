@@ -162,6 +162,7 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
     if (!mShowButtons) {
       binding.layoutButtons.setVisibility(View.GONE);
     }
+    updatePagerBottomMargin();
 
     try {
       final Field recyclerViewField = ViewPager2.class.getDeclaredField("mRecyclerView");
@@ -291,6 +292,14 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
         return args;
       }
     };
+  }
+
+  private void updatePagerBottomMargin() {
+    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewpager.getLayoutParams();
+    params.bottomMargin = mShowButtons
+            ? getResources().getDimensionPixelSize(R.dimen.reader_bottom_controls_space)
+            : 0;
+    binding.viewpager.setLayoutParams(params);
   }
 
   public PageFragment getCurrentPageFragment() {
