@@ -11,9 +11,9 @@ import android.widget.*;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
 
 import com.watnapp.etipitaka.plus.ETipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
@@ -24,7 +24,6 @@ import com.watnapp.etipitaka.plus.model.History;
 import com.watnapp.etipitaka.plus.vm.SharedViewModel;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -42,15 +41,31 @@ import static com.watnapp.etipitaka.plus.helper.DownloadDatabaseKt.update;
 
 public class MenuFragment extends Fragment implements HistoryFragment.OnHistorySelectedListener {
   private static final String TAG = "MenuFragment";
-  private TabHost mTabHost;
-  private ViewPager mViewPager;
-  private TabsAdapter mTabsAdapter;
+  private static final String STATE_SELECTED_TAB = "tab";
+  private static final String[] TAB_TAGS = {"volume", "search", "history", "favorite"};
+  private static final int[] TAB_BUTTON_IDS = {
+      R.id.tab_volume,
+      R.id.tab_search,
+      R.id.tab_history,
+      R.id.tab_favorite
+  };
+  private static final Class<?>[] TAB_FRAGMENT_CLASSES = {
+      BookListFragment.class,
+      SearchFragment.class,
+      HistoryFragment.class,
+      FavoriteFragment.class
+  };
+
+  private final HashMap<String, Fragment> mFragments = new HashMap<String, Fragment>();
   private ETipitakaApplication application;
   private FragmentMenuBinding binding;
   private SharedViewModel viewModel;
+  private int mCurrentTabIndex = 0;
 
   public void setCurrentTab(int index) {
-    mTabHost.setCurrentTab(index);
+    if (binding != null && index >= 0 && index < TAB_BUTTON_IDS.length) {
+      binding.tabGroup.check(TAB_BUTTON_IDS[index]);
+    }
   }
 
   @Override
@@ -70,10 +85,12 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
     Resources res = getResources();
     float scale = res.getDisplayMetrics().density;
 
-    for (int i = 0; i < mTabHost.getTabWidget().getChildCount(); i++) {
-      TextView tv = (TextView) mTabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
-      tv.setTextSize(getResources().getDimension(R.dimen.tabwidget_text_size)/scale);
+    for (int tabButtonId : TAB_BUTTON_IDS) {
+      TextView tv = binding.tabGroup.findViewById(tabButtonId);
+      tv.setTextSize(getResources().getDimension(R.dimen.tabwidget_text_size) / scale);
     }
+
+    setupTabs(savedInstanceState);
 
     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
         R.array.full_languages, android.R.layout.simple_spinner_item);
@@ -190,164 +207,98 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     binding = FragmentMenuBinding.inflate(inflater, container, false);
-    mTabHost = (TabHost)binding.getRoot();
-    mTabHost.setup();
-
-    mViewPager = mTabHost.findViewById(R.id.pager);
-    mViewPager.setOffscreenPageLimit(4);
-
-    mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
-
-    mTabsAdapter.addTab(mTabHost.newTabSpec("volume").setIndicator(getString(R.string.volume)),
-        BookListFragment.class, null);
-    mTabsAdapter.addTab(mTabHost.newTabSpec("search").setIndicator(getString(R.string.search)),
-        SearchFragment.class, null);
-    mTabsAdapter.addTab(mTabHost.newTabSpec("history").setIndicator(getString(R.string.history)),
-        HistoryFragment.class, null);
-    mTabsAdapter.addTab(mTabHost.newTabSpec("favorite").setIndicator(getString(R.string.favorite)),
-        FavoriteFragment.class, null);
-
-    if (savedInstanceState != null) {
-      mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
-    }
-
-    return mTabHost;
+    return binding.getRoot();
   }
 
   @Override
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    outState.putString("tab", mTabHost.getCurrentTabTag());
+    outState.putString(STATE_SELECTED_TAB, TAB_TAGS[mCurrentTabIndex]);
   }
 
   @Override
   public void onDestroyView() {
     super.onDestroyView();
-    mTabHost = null;
+    binding = null;
   }
 
   @Override
   public void onHistorySelected(History history) {
     Log.d(TAG, history.getKeywords());
-    SearchFragment fragment = (SearchFragment) mTabsAdapter.getFragmentByTag("search");
-    fragment.loadHistory(history);
+    SearchFragment fragment = (SearchFragment) mFragments.get("search");
+    if (fragment != null) {
+      fragment.loadHistory(history);
+      setCurrentTab(1);
+    }
   }
 
-  /**
-   * This is a helper class that implements the management of tabs and all
-   * details of connecting a ViewPager with associated TabHost.  It relies on a
-   * trick.  Normally a tab host has a simple API for supplying a View or
-   * Intent that each tab will show.  This is not sufficient for switching
-   * between pages.  So instead we make the content part of the tab host
-   * 0dp high (it is not shown) and the TabsAdapter supplies its own dummy
-   * view to show as the tab content.  It listens to changes in tabs, and takes
-   * care of switch to the correct paged in the ViewPager whenever the selected
-   * tab changes.
-   */
-  public static class TabsAdapter extends FragmentStatePagerAdapter
-      implements TabHost.OnTabChangeListener, ViewPager.OnPageChangeListener {
-    private final Context mContext;
-    private final TabHost mTabHost;
-    private final ViewPager mViewPager;
-    private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
-    private final HashMap<String, Fragment> mHash = new HashMap<String, Fragment>();
+  private void setupTabs(Bundle savedInstanceState) {
+    FragmentManager fragmentManager = getChildFragmentManager();
+    FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-    static final class TabInfo {
-      private final String tag;
-      private final Class<?> clss;
-      private final Bundle args;
+    int selectedIndex = getSavedTabIndex(savedInstanceState);
+    for (int i = 0; i < TAB_TAGS.length; i++) {
+      String tag = TAB_TAGS[i];
+      Fragment fragment = fragmentManager.findFragmentByTag(tag);
+      if (fragment == null) {
+        fragment = Fragment.instantiate(requireContext(), TAB_FRAGMENT_CLASSES[i].getName(), null);
+        transaction.add(R.id.menu_content, fragment, tag);
+      }
+      mFragments.put(tag, fragment);
 
-      TabInfo(String _tag, Class<?> _class, Bundle _args) {
-        tag = _tag;
-        clss = _class;
-        args = _args;
+      if (i == selectedIndex) {
+        transaction.show(fragment);
+      } else {
+        transaction.hide(fragment);
       }
     }
+    transaction.commitNow();
 
-    static class DummyTabFactory implements TabHost.TabContentFactory {
-      private final Context mContext;
+    binding.tabGroup.setOnCheckedChangeListener((group, checkedId) -> showTab(indexForButtonId(checkedId)));
+    binding.tabGroup.check(TAB_BUTTON_IDS[selectedIndex]);
+  }
 
-      public DummyTabFactory(Context context) {
-        mContext = context;
+  private int getSavedTabIndex(Bundle savedInstanceState) {
+    if (savedInstanceState == null) {
+      return 0;
+    }
+
+    String selectedTag = savedInstanceState.getString(STATE_SELECTED_TAB, TAB_TAGS[0]);
+    for (int i = 0; i < TAB_TAGS.length; i++) {
+      if (TAB_TAGS[i].equals(selectedTag)) {
+        return i;
       }
+    }
+    return 0;
+  }
 
-      @Override
-      public View createTabContent(String tag) {
-        View v = new View(mContext);
-        v.setMinimumWidth(0);
-        v.setMinimumHeight(0);
-        return v;
+  private int indexForButtonId(int checkedId) {
+    for (int i = 0; i < TAB_BUTTON_IDS.length; i++) {
+      if (TAB_BUTTON_IDS[i] == checkedId) {
+        return i;
       }
     }
+    return 0;
+  }
 
-    public TabsAdapter(Fragment fragment, TabHost tabHost, ViewPager pager) {
-      super(fragment.getChildFragmentManager());
-      mContext = fragment.getActivity();
-      mTabHost = tabHost;
-      mViewPager = pager;
-      mTabHost.setOnTabChangedListener(this);
-      mViewPager.setAdapter(this);
-      mViewPager.setOnPageChangeListener(this);
+  private void showTab(int index) {
+    if (index < 0 || index >= TAB_TAGS.length || index == mCurrentTabIndex) {
+      return;
     }
 
-    public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args) {
-      tabSpec.setContent(new DummyTabFactory(mContext));
-      String tag = tabSpec.getTag();
-
-      TabInfo info = new TabInfo(tag, clss, args);
-      mTabs.add(info);
-      mTabHost.addTab(tabSpec);
-      notifyDataSetChanged();
+    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+    for (int i = 0; i < TAB_TAGS.length; i++) {
+      Fragment fragment = mFragments.get(TAB_TAGS[i]);
+      if (fragment == null) {
+        continue;
+      }
+      if (i == index) {
+        transaction.show(fragment);
+      } else {
+        transaction.hide(fragment);
+      }
     }
-
-    @Override
-    public int getCount() {
-      return mTabs.size();
-    }
-
-    @Override
-    public Fragment getItem(int position) {
-      TabInfo info = mTabs.get(position);
-      Fragment fragment = Fragment.instantiate(mContext, info.clss.getName(), info.args);
-      mHash.put(info.tag, fragment);
-      return fragment;
-    }
-
-    @Override
-    public void onTabChanged(String tabId) {
-      int position = mTabHost.getCurrentTab();
-      mViewPager.setCurrentItem(position);
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-      // Unfortunately when TabHost changes the current tab, it kindly
-      // also takes care of putting focus on it when not in touch mode.
-      // The jerk.
-      // This hack tries to prevent this from pulling focus out of our
-      // ViewPager.
-      TabWidget widget = mTabHost.getTabWidget();
-      int oldFocusability = widget.getDescendantFocusability();
-      widget.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
-      mTabHost.setCurrentTab(position);
-      widget.setDescendantFocusability(oldFocusability);
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-    }
-
-    @Override
-    public int getItemPosition(Object object) {
-      return POSITION_NONE;
-    }
-
-    public Fragment getFragmentByTag(String tab) {
-      return mHash.get(tab);
-    }
+    transaction.commit();
+    mCurrentTabIndex = index;
   }
 }
