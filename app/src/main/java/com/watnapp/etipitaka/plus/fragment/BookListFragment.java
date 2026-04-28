@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.compose.ui.platform.ComposeView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -14,8 +15,6 @@ import com.watnapp.etipitaka.plus.ETipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.activity.MainActivity;
-import com.watnapp.etipitaka.plus.adapter.BookListAdapter;
-import com.watnapp.etipitaka.plus.databinding.FragmentBookListBinding;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.model.ETDataModel;
 import com.watnapp.etipitaka.plus.model.ETDataModelCreator;
@@ -28,12 +27,11 @@ import com.watnapp.etipitaka.plus.vm.SharedViewModel;
  * Time: 22:57
 
  */
-public class BookListFragment extends Fragment implements BookListAdapter.BookListAdapterDataSource {
+public class BookListFragment extends Fragment {
 
   private ETipitakaApplication application;
-  private BookListAdapter mAdapter;
   private ETDataModel dataModel;
-  private FragmentBookListBinding binding;
+  private ComposeView composeView;
   private SharedViewModel viewModel;
 
   @Override
@@ -57,30 +55,27 @@ public class BookListFragment extends Fragment implements BookListAdapter.BookLi
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    mAdapter = new BookListAdapter(getActivity(), application.getLanguage(), this);
-    binding.list.setAdapter(mAdapter);
-    binding.list.setOnItemClickListener((parent, view1, position, id) -> {
-      MainActivity activity = (MainActivity) getActivity();
-      activity.openBook(application.getLanguage(), position+1);
-      application.setHistory(null);
-    });
+    renderBookList();
     viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
     viewModel.getSelected().observe(getActivity(), language -> {
       dataModel = ETDataModelCreator.create(language, getActivity());
-      mAdapter.setLanguage(language);
-      mAdapter.notifyDataSetChanged();
+      renderBookList();
     });
   }
 
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    binding = FragmentBookListBinding.inflate(inflater, container, false);
-    View view = binding.getRoot();
-    return view;
+    composeView = new ComposeView(requireContext());
+    return composeView;
   }
 
   @Override
-  public int getTitlesArrayId(BookDatabaseHelper.Language language) {
+  public void onDestroyView() {
+    super.onDestroyView();
+    composeView = null;
+  }
+
+  private int getTitlesArrayId(BookDatabaseHelper.Language language) {
     if (language == BookDatabaseHelper.Language.PALI
             || language == BookDatabaseHelper.Language.PALINEW) {
       return R.array.pali_book_titles_with_numbers;
@@ -100,8 +95,7 @@ public class BookListFragment extends Fragment implements BookListAdapter.BookLi
     return R.array.book_titles_with_number;
   }
 
-  @Override
-  public int getSectionsArrayId(BookDatabaseHelper.Language language) {
+  private int getSectionsArrayId(BookDatabaseHelper.Language language) {
     if (language == BookDatabaseHelper.Language.PALI) {
       return R.array.pali_sections;
     } else if (!Utils.isTipitaka(language)) {
@@ -110,8 +104,23 @@ public class BookListFragment extends Fragment implements BookListAdapter.BookLi
     return R.array.sections;
   }
 
-  @Override
-  public int getSectionBoundary(int index) {
-    return dataModel.getSectionBoundary(index);
+  private void renderBookList() {
+    if (composeView == null) {
+      return;
+    }
+
+    BookDatabaseHelper.Language language = application.getLanguage();
+    int sectionsArrayId = getSectionsArrayId(language);
+    String[] sections = sectionsArrayId > 0 ? getResources().getStringArray(sectionsArrayId) : null;
+    BookListScreenBridge.render(
+        composeView,
+        getResources().getStringArray(getTitlesArrayId(language)),
+        sections,
+        new int[] {dataModel.getSectionBoundary(0), dataModel.getSectionBoundary(1)},
+        position -> {
+          MainActivity activity = (MainActivity) getActivity();
+          activity.openBook(application.getLanguage(), position + 1);
+          application.setHistory(null);
+        });
   }
 }
