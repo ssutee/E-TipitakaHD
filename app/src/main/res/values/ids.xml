@@ -3,4 +3,8 @@
     <item name="reader_fragment" type="id" />
     <item name="left_reader_fragment" type="id" />
     <item name="right_reader_fragment" type="id" />
+    <item name="txt_subtitle" type="id" />
+    <item name="viewpager" type="id" />
+    <item name="seekbar" type="id" />
+    <item name="layout_buttons" type="id" />
 </resources>
