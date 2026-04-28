@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements
 //    }
 
     setupSlidingMenu();
+    setupBackPressedCallback();
     initReader();
   }
 
@@ -594,22 +596,39 @@ public class MainActivity extends AppCompatActivity implements
 
   @Override
   public void onBackPressed() {
+    handleBackPressed();
+  }
+
+  private void setupBackPressedCallback() {
+    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+      @Override
+      public void handleOnBackPressed() {
+        handleBackPressed();
+      }
+    });
+  }
+
+  private void handleBackPressed() {
     if (mSlidingMenu.isMenuShowing()) {
       mSlidingMenu.showContent();
     } else {
-      new AlertDialog.Builder(this)
-          .setTitle(R.string.exit_program)
-          .setMessage(R.string.are_you_sure)
-          .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              MainActivity.super.onBackPressed();
-            }
-          })
-          .setNegativeButton(android.R.string.no, null)
-          .create()
-          .show();
+      showExitConfirmationDialog();
     }
+  }
+
+  private void showExitConfirmationDialog() {
+    new AlertDialog.Builder(this)
+        .setTitle(R.string.exit_program)
+        .setMessage(R.string.are_you_sure)
+        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            finish();
+          }
+        })
+        .setNegativeButton(android.R.string.no, null)
+        .create()
+        .show();
   }
 
   private void setupSlidingMenu() {
