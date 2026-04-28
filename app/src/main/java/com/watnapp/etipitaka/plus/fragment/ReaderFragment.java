@@ -23,7 +23,6 @@ import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.ETipitakaApplication;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
-import com.watnapp.etipitaka.plus.databinding.FragmentReaderBinding;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.plus.model.ETDataModel;
@@ -71,7 +70,7 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
   private int mSeekBarMax = 0;
   private ETDataModel dataModel;
 
-  private FragmentReaderBinding binding;
+  private ReaderFragmentViews binding;
 
   public interface OnMenuButtonClickListener {
     public void onCompareButtonClick(Language language, int volume, int page);
@@ -145,9 +144,8 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    binding = FragmentReaderBinding.inflate(inflater, container, false);
-    View view = binding.getRoot();
-    return view;
+    binding = ReaderFragmentContentBridge.create(requireContext());
+    return binding.root;
   }
 
   @Override
