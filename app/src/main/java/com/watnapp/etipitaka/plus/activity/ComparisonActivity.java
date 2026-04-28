@@ -6,14 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
-import com.watnapp.etipitaka.plus.databinding.ActivityComparisonBinding;
 import com.watnapp.etipitaka.plus.fragment.ReaderFragment;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
@@ -43,16 +41,13 @@ public class ComparisonActivity extends AppCompatActivity
   private ReaderFragment mRightFragment;
   private ETDataModel mDataModel1;
   private ETDataModel mDataModel2;
-  private ActivityComparisonBinding binding;
   @DartModel ComparisonActivityNavigationModel navigationModel;
 
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Dart.bind(this);
-    binding = ActivityComparisonBinding.inflate(getLayoutInflater());
-    View view = binding.getRoot();
-    setContentView(view);
+    ComparisonActivityContentBridge.render(this);
 
     mLanguage1 = Language.values()[navigationModel.mLanguageCode];
     mLanguage2 = Language.values()[navigationModel.mComparingLanguageCode];
