@@ -4,6 +4,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.ComponentActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +39,12 @@ object ComparisonActivityContentBridge {
             id = R.id.right_reader_fragment
         }
 
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+            val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+
         root.addView(
             leftHost,
             LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f),
@@ -51,6 +59,7 @@ object ComparisonActivityContentBridge {
         )
 
         activity.setContentView(root)
+        ViewCompat.requestApplyInsets(root)
     }
 }
 
