@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.activity
 
+import android.util.TypedValue
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -35,9 +36,20 @@ object MainActivityContentBridge {
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT,
-            ),
+            ).apply {
+                topMargin = activity.resolveActionBarHeight()
+            },
         )
         activity.setContentView(root)
+    }
+}
+
+private fun ComponentActivity.resolveActionBarHeight(): Int {
+    val typedValue = TypedValue()
+    return if (theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, typedValue, true)) {
+        TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)
+    } else {
+        0
     }
 }
 
