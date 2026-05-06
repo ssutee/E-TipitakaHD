@@ -2,23 +2,15 @@ package com.watnapp.etipitaka.plus.fragment
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
+import android.text.InputFilter
+import android.text.InputType
+import android.view.Gravity
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.fragment.app.DialogFragment
-import com.watnapp.etipitaka.plus.ui.compose.ETipitakaTheme
 
 class TextEntryDialogFragment : DialogFragment() {
 
@@ -32,7 +24,7 @@ class TextEntryDialogFragment : DialogFragment() {
         fun onTextEntryDialogNegativeButtonClick()
     }
 
-    private var inputText = ""
+    private var inputEditText: EditText? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val args = requireArguments()
@@ -42,49 +34,58 @@ class TextEntryDialogFragment : DialogFragment() {
         val lines = args.getInt(ARG_LINES)
         val mode = InputMode.entries[args.getInt(ARG_MODE)]
         val note = args.getString(ARG_NOTE).orEmpty()
-        inputText = note
 
-        val inputView = ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                ETipitakaTheme {
-                    var text by remember { mutableStateOf(note) }
-                    inputText = text
-                    OutlinedTextField(
-                        value = text,
-                        onValueChange = {
-                            text = if (mode == InputMode.DIGIT) it.filter(Char::isDigit) else it
-                            inputText = text
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(if (lines > 1) 160.dp else 64.dp)
-                            .padding(top = 8.dp),
-                        minLines = if (lines > 1) lines else 1,
-                        maxLines = if (lines > 1) lines else 1,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = if (mode == InputMode.DIGIT) {
-                                KeyboardType.Number
-                            } else {
-                                KeyboardType.Text
-                            },
-                        ),
-                    )
+        val inputView = EditText(requireContext()).apply {
+            setText(note)
+            setSelectAllOnFocus(false)
+            setSelection(text.length)
+            minLines = if (lines > 1) lines else 1
+            maxLines = if (lines > 1) lines else 1
+            gravity = if (lines > 1) Gravity.TOP or Gravity.START else Gravity.CENTER_VERTICAL
+            isSingleLine = lines <= 1
+            inputType = if (mode == InputMode.DIGIT) {
+                filters = arrayOf(InputFilter { source, _, _, _, _, _ ->
+                    source.filter(Char::isDigit)
+                })
+                InputType.TYPE_CLASS_NUMBER
+            } else {
+                InputType.TYPE_CLASS_TEXT or if (lines > 1) {
+                    InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                } else {
+                    0
                 }
             }
         }
+        inputEditText = inputView
 
         return AlertDialog.Builder(requireActivity())
             .setView(inputView)
             .setTitle(if (title == 0) null else getString(title))
             .setMessage(message)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                notifyPositiveButtonClick(inputText, id)
+                notifyPositiveButtonClick(inputView.text.toString(), id)
             }
             .setNegativeButton(android.R.string.cancel) { _, _ ->
                 notifyNegativeButtonClick()
             }
             .create()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        inputEditText?.post {
+            val editText = inputEditText ?: return@post
+            editText.requestFocus()
+            val inputMethodManager =
+                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }
+
+    override fun onDestroyView() {
+        inputEditText = null
+        super.onDestroyView()
     }
 
     private fun notifyPositiveButtonClick(text: String, id: Int) {
