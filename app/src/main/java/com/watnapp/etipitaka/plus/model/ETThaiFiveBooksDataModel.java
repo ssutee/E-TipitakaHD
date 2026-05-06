@@ -15,6 +15,14 @@ import java.util.ArrayList;
  * Created by sutee on 16/6/14.
  */
 public class ETThaiFiveBooksDataModel extends ETDataModel {
+  private static final String TABLE_SPEECH = "speech";
+  private static final String[] SEARCH_PROJECTION = {
+      "rowid AS _id",
+      "book",
+      "page",
+      "title",
+      "content",
+  };
 
   public ETThaiFiveBooksDataModel(Context context) {
     super(context);
@@ -68,7 +76,7 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
-    Cursor cursor = db.query("speech", null, "book=?",
+    Cursor cursor = db.query(TABLE_SPEECH, null, "book=?",
         new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
     if (page > 0 && page <= cursor.getCount()) {
@@ -118,7 +126,8 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   @Override
   public int getPageById(int pageId) {
     openDatabase();
-    Cursor cursor = db.query("main", null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
+    Cursor cursor = db.query(TABLE_SPEECH, SEARCH_PROJECTION, "rowid = ?",
+        new String[] {String.valueOf(pageId)}, null, null, null);
     cursor.moveToFirst();
     int page = cursor.getInt(cursor.getColumnIndex("page"));
     cursor.close();
@@ -151,8 +160,8 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
             selectionArgs.add("%" + keyword.replace('+', ' ') + "%");
           }
 
-          Cursor cursor = db.query("main", null, selection, selectionArgs.toArray(new String[selectionArgs.size()]),
-              null, null, null);
+          Cursor cursor = db.query(TABLE_SPEECH, SEARCH_PROJECTION, selection,
+              selectionArgs.toArray(new String[selectionArgs.size()]), null, null, null);
 
           if (listener != null) {
             listener.onSearchProgress(keywords, volume, i+1, cursor);
