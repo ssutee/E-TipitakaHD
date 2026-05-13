@@ -383,7 +383,10 @@ public class MainActivity extends AppCompatActivity implements
 
   private void exportData() {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    String filename = String.format("edata-%s.js", dateFormat.format(new Date()));
+    // No extension here: the system "Save as" UI appends ".json" to match the
+    // application/json MIME type, giving "edata-YYYY-MM-DD.json". (Naming it
+    // ".js" would yield "edata-...js.json", which the importer wouldn't accept.)
+    String filename = String.format("edata-%s", dateFormat.format(new Date()));
     Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
         .addCategory(Intent.CATEGORY_OPENABLE)
         .setType("application/json")
@@ -812,12 +815,14 @@ public class MainActivity extends AppCompatActivity implements
         }
       });
 
-    } catch (FileNotFoundException e) {
+    } catch (IOException | JSONException e) {
       e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (JSONException e) {
-      e.printStackTrace();
+      mHandler.post(new Runnable() {
+        @Override
+        public void run() {
+          Toast.makeText(MainActivity.this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+        }
+      });
     }
   }
 
@@ -939,17 +944,14 @@ public class MainActivity extends AppCompatActivity implements
         try {
           temp = copyUriToCacheFile(uri, queryDisplayName(uri));
           final String path = temp.getAbsolutePath();
-          if (path.endsWith(".json.etz")) {
+          if (path.endsWith(".etz")) {
+            // Apple backup: "*.json.etz"
             importAppleData(path);
-          } else if (path.endsWith(".js")) {
-            importAndroidData(path);
           } else {
-            mHandler.post(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
-              }
-            });
+            // App's own JSON backup: "*.js" (legacy) or "*.json" (current export).
+            // Unknown extensions fall through here too; importAndroidData
+            // surfaces a parse failure rather than crashing.
+            importAndroidData(path);
           }
         } catch (IOException e) {
           e.printStackTrace();
