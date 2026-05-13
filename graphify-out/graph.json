@@ -2475,7 +2475,7 @@
       "label": "DictActivity",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L27",
+      "source_location": "L33",
       "id": "activity_dictactivity_dictactivity",
       "community": 22,
       "norm_label": "dictactivity"
@@ -2484,7 +2484,7 @@
       "label": ".getDictDatabaseHelper()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L31",
+      "source_location": "L37",
       "id": "activity_dictactivity_dictactivity_getdictdatabasehelper",
       "community": 22,
       "norm_label": ".getdictdatabasehelper()"
@@ -2493,7 +2493,7 @@
       "label": ".getDictAdapter()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L32",
+      "source_location": "L38",
       "id": "activity_dictactivity_dictactivity_getdictadapter",
       "community": 22,
       "norm_label": ".getdictadapter()"
@@ -2502,7 +2502,7 @@
       "label": ".getFontFamily()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L33",
+      "source_location": "L39",
       "id": "activity_dictactivity_dictactivity_getfontfamily",
       "community": 22,
       "norm_label": ".getfontfamily()"
@@ -2511,7 +2511,7 @@
       "label": ".getFontFaces()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L34",
+      "source_location": "L40",
       "id": "activity_dictactivity_dictactivity_getfontfaces",
       "community": 22,
       "norm_label": ".getfontfaces()"
@@ -2520,7 +2520,7 @@
       "label": ".getFontSize()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L35",
+      "source_location": "L41",
       "id": "activity_dictactivity_dictactivity_getfontsize",
       "community": 22,
       "norm_label": ".getfontsize()"
@@ -2529,7 +2529,7 @@
       "label": ".getTypeface()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L36",
+      "source_location": "L42",
       "id": "activity_dictactivity_dictactivity_gettypeface",
       "community": 22,
       "norm_label": ".gettypeface()"
@@ -2538,7 +2538,7 @@
       "label": ".onDestroy()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L40",
+      "source_location": "L46",
       "id": "activity_dictactivity_dictactivity_ondestroy",
       "community": 22,
       "norm_label": ".ondestroy()"
@@ -2547,7 +2547,7 @@
       "label": ".onCreate()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L46",
+      "source_location": "L52",
       "id": "activity_dictactivity_dictactivity_oncreate",
       "community": 22,
       "norm_label": ".oncreate()"
@@ -2556,7 +2556,7 @@
       "label": ".search()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L54",
+      "source_location": "L74",
       "id": "activity_dictactivity_dictactivity_search",
       "community": 22,
       "norm_label": ".search()"
@@ -2565,7 +2565,7 @@
       "label": ".renderEntries()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L86",
+      "source_location": "L106",
       "id": "activity_dictactivity_dictactivity_renderentries",
       "community": 22,
       "norm_label": ".renderentries()"
@@ -2574,7 +2574,7 @@
       "label": ".showEntry()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L90",
+      "source_location": "L110",
       "id": "activity_dictactivity_dictactivity_showentry",
       "community": 22,
       "norm_label": ".showentry()"
@@ -2583,7 +2583,7 @@
       "label": ".onCreateOptionsMenu()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java",
-      "source_location": "L116",
+      "source_location": "L136",
       "id": "activity_dictactivity_dictactivity_oncreateoptionsmenu",
       "community": 22,
       "norm_label": ".oncreateoptionsmenu()"
@@ -3393,7 +3393,7 @@
       "label": "MainActivityContentBridge",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/MainActivityHost.kt",
-      "source_location": "L16",
+      "source_location": "L17",
       "id": "activity_mainactivityhost_mainactivitycontentbridge",
       "community": 5,
       "norm_label": "mainactivitycontentbridge"
@@ -3402,7 +3402,7 @@
       "label": ".render()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/MainActivityHost.kt",
-      "source_location": "L17",
+      "source_location": "L18",
       "id": "activity_mainactivityhost_mainactivitycontentbridge_render",
       "community": 5,
       "norm_label": ".render()"
@@ -3411,7 +3411,7 @@
       "label": "resolveActionBarHeight()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/MainActivityHost.kt",
-      "source_location": "L47",
+      "source_location": "L48",
       "id": "activity_mainactivityhost_resolveactionbarheight",
       "community": 5,
       "norm_label": "resolveactionbarheight()"
@@ -3420,7 +3420,7 @@
       "label": "MainActivityHost()",
       "file_type": "code",
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/MainActivityHost.kt",
-      "source_location": "L56",
+      "source_location": "L57",
       "id": "activity_mainactivityhost_mainactivityhost",
       "community": 5,
       "norm_label": "mainactivityhost()"
@@ -20257,9 +20257,9 @@
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/MainActivity.java",
       "source_location": "L980",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "activity_mainactivity_mainactivity",
-      "target": "activity_mainactivity_mainactivity_querydisplayname",
-      "confidence_score": 1.0
+      "target": "activity_mainactivity_mainactivity_querydisplayname"
     },
     {
       "relation": "method",
@@ -20267,9 +20267,9 @@
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/activity/MainActivity.java",
       "source_location": "L995",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "activity_mainactivity_mainactivity",
-      "target": "activity_mainactivity_mainactivity_copyuritocachefile",
-      "confidence_score": 1.0
+      "target": "activity_mainactivity_mainactivity_copyuritocachefile"
     },
     {
       "relation": "method",
@@ -25949,9 +25949,9 @@
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/fragment/TextEntryDialogFragment.kt",
       "source_location": "L180",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "app_src_main_java_com_watnapp_etipitaka_plus_fragment_textentrydialogfragment_kt",
-      "target": "fragment_textentrydialogfragment_textentrydialogcontent",
-      "confidence_score": 1.0
+      "target": "fragment_textentrydialogfragment_textentrydialogcontent"
     },
     {
       "relation": "method",
@@ -25969,9 +25969,9 @@
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/fragment/TextEntryDialogFragment.kt",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "fragment_textentrydialogfragment_textentrydialogfragment",
-      "target": "fragment_textentrydialogfragment_textentrydialogfragment_oncreateview",
-      "confidence_score": 1.0
+      "target": "fragment_textentrydialogfragment_textentrydialogfragment_oncreateview"
     },
     {
       "relation": "method",
@@ -25979,9 +25979,9 @@
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/fragment/TextEntryDialogFragment.kt",
       "source_location": "L104",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "fragment_textentrydialogfragment_textentrydialogfragment",
-      "target": "fragment_textentrydialogfragment_textentrydialogfragment_onstart",
-      "confidence_score": 1.0
+      "target": "fragment_textentrydialogfragment_textentrydialogfragment_onstart"
     },
     {
       "relation": "method",
@@ -26107,9 +26107,9 @@
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/fragment/TextEntryDialogFragment.kt",
       "source_location": "L84",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "fragment_textentrydialogfragment_textentrydialogfragment_oncreateview",
-      "target": "fragment_textentrydialogfragment_textentrydialogcontent",
-      "confidence_score": 1.0
+      "target": "fragment_textentrydialogfragment_textentrydialogcontent"
     },
     {
       "relation": "calls",
@@ -26118,9 +26118,9 @@
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/fragment/TextEntryDialogFragment.kt",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "fragment_textentrydialogfragment_textentrydialogfragment_oncreateview",
-      "target": "fragment_textentrydialogfragment_textentrydialogfragment_notifypositivebuttonclick",
-      "confidence_score": 1.0
+      "target": "fragment_textentrydialogfragment_textentrydialogfragment_notifypositivebuttonclick"
     },
     {
       "relation": "calls",
@@ -26129,9 +26129,9 @@
       "source_file": "app/src/main/java/com/watnapp/etipitaka/plus/fragment/TextEntryDialogFragment.kt",
       "source_location": "L95",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "fragment_textentrydialogfragment_textentrydialogfragment_oncreateview",
-      "target": "fragment_textentrydialogfragment_textentrydialogfragment_notifynegativebuttonclick",
-      "confidence_score": 1.0
+      "target": "fragment_textentrydialogfragment_textentrydialogfragment_notifynegativebuttonclick"
     },
     {
       "relation": "calls",

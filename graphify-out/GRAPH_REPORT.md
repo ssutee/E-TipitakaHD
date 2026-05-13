@@ -1,7 +1,7 @@
 # Graph Report - E-TipitakaHD  (2026-05-13)
 
 ## Corpus Check
-- 97 files · ~243,799 words
+- 97 files · ~243,857 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
