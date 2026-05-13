@@ -4,11 +4,11 @@ import android.app.AlertDialog;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
+import android.view.View;
 
 import android.widget.TextView;
 
@@ -16,6 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.compose.ui.platform.ComposeView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.adapter.DictAdapter;
@@ -48,37 +51,24 @@ abstract public class DictActivity extends AppCompatActivity {
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_dict);
 
-    LinearLayout root = new LinearLayout(this);
-    root.setOrientation(LinearLayout.VERTICAL);
-    root.setFitsSystemWindows(true);
-
-    Toolbar toolbar = new Toolbar(this);
-    TypedValue primary = new TypedValue();
-    if (getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, primary, true)) {
-      toolbar.setBackgroundColor(primary.data);
-    }
-    toolbar.setPopupTheme(androidx.appcompat.R.style.ThemeOverlay_AppCompat_Light);
-    root.addView(toolbar, new LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT, resolveActionBarHeight()));
-
-    composeView = new ComposeView(this);
-    root.addView(composeView, new LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
-
-    setContentView(root);
+    Toolbar toolbar = findViewById(R.id.dict_toolbar);
     setSupportActionBar(toolbar);
+    composeView = findViewById(R.id.dict_compose);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+      final View root = findViewById(android.R.id.content);
+      ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+        Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+        return insets;
+      });
+      ViewCompat.requestApplyInsets(root);
+    }
 
     renderEntries();
     search(null);
-  }
-
-  private int resolveActionBarHeight() {
-    TypedValue typedValue = new TypedValue();
-    if (getTheme().resolveAttribute(androidx.appcompat.R.attr.actionBarSize, typedValue, true)) {
-      return TypedValue.complexToDimensionPixelSize(typedValue.data, getResources().getDisplayMetrics());
-    }
-    return 0;
   }
 
   private void search(final String headword) {

@@ -1,5 +1,6 @@
 package com.watnapp.etipitaka.plus.activity
 
+import android.os.Build
 import android.util.TypedValue
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
@@ -31,15 +32,15 @@ object MainActivityContentBridge {
             FrameLayout.LayoutParams.MATCH_PARENT,
         )
         root.addView(composeShell, layoutParams)
-        root.addView(
-            fragmentHost,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT,
-            ).apply {
-                topMargin = activity.resolveActionBarHeight()
-            },
-        )
+
+        val edgeToEdge = Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM
+        val fragmentParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT,
+        ).apply {
+            topMargin = if (edgeToEdge) activity.resolveActionBarHeight() else 0
+        }
+        root.addView(fragmentHost, fragmentParams)
         activity.setContentView(root)
     }
 }
