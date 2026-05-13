@@ -1,13 +1,17 @@
 package com.watnapp.etipitaka.plus.activity;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -86,31 +90,31 @@ public class MainActivity extends AppCompatActivity implements
         }
         handleComparisonResult(result.getData());
       });
-  private final ActivityResultLauncher<Intent> exportActivityLauncher =
+  private final ActivityResultLauncher<Intent> exportDocumentLauncher =
       registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() != RESULT_OK || result.getData() == null) {
           return;
         }
-        String path = result.getData().getStringExtra(Constants.PATH_KEY);
-        if (path == null || path.length() == 0) {
+        Uri uri = result.getData().getData();
+        if (uri == null) {
           Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
           return;
         }
-        Log.d(TAG, path);
-        exportData(path);
+        Log.d(TAG, uri.toString());
+        exportData(uri);
       });
-  private final ActivityResultLauncher<Intent> importActivityLauncher =
+  private final ActivityResultLauncher<Intent> importDocumentLauncher =
       registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() != RESULT_OK || result.getData() == null) {
           return;
         }
-        String path = result.getData().getStringExtra(Constants.PATH_KEY);
-        if (path == null || path.length() == 0) {
+        Uri uri = result.getData().getData();
+        if (uri == null) {
           Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
           return;
         }
-        Log.d(TAG, path);
-        importData(path);
+        Log.d(TAG, uri.toString());
+        importData(uri);
       });
 
   public void onCreate(Bundle savedInstanceState) {
@@ -378,17 +382,28 @@ public class MainActivity extends AppCompatActivity implements
   }
 
   private void exportData() {
-    Intent intent = new Intent(this, FileExplorerActivity.class);
-    intent.putExtra(Constants.TITLE_KEY, getString(R.string.export_title));
-    intent.putExtra(Constants.SELECT_MODE_KEY, Constants.SELECT_MODE_FOLDER);
-    exportActivityLauncher.launch(intent);
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    String filename = String.format("edata-%s.js", dateFormat.format(new Date()));
+    Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
+        .addCategory(Intent.CATEGORY_OPENABLE)
+        .setType("application/json")
+        .putExtra(Intent.EXTRA_TITLE, filename);
+    try {
+      exportDocumentLauncher.launch(intent);
+    } catch (ActivityNotFoundException e) {
+      Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+    }
   }
 
   private void importData() {
-    Intent intent = new Intent(this, FileExplorerActivity.class);
-    intent.putExtra(Constants.TITLE_KEY, getString(R.string.import_title));
-    intent.putExtra(Constants.SELECT_MODE_KEY, Constants.SELECT_MODE_FILE);
-    importActivityLauncher.launch(intent);
+    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
+        .addCategory(Intent.CATEGORY_OPENABLE)
+        .setType("*/*");
+    try {
+      importDocumentLauncher.launch(intent);
+    } catch (ActivityNotFoundException e) {
+      Toast.makeText(this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+    }
   }
 
   private void takeNote() {
@@ -914,78 +929,132 @@ public class MainActivity extends AppCompatActivity implements
     }
   }
 
-  private void importData(final String path) {
+  private void importData(final Uri uri) {
     final AlertDialog dialog = createBlockingProgressDialog(R.string.importing_data);
     dialog.show();
     new Thread(new Runnable() {
       @Override
       public void run() {
-        if (!(new File(path).exists())) {
+        File temp = null;
+        try {
+          temp = copyUriToCacheFile(uri, queryDisplayName(uri));
+          final String path = temp.getAbsolutePath();
+          if (path.endsWith(".json.etz")) {
+            importAppleData(path);
+          } else if (path.endsWith(".js")) {
+            importAndroidData(path);
+          } else {
+            mHandler.post(new Runnable() {
+              @Override
+              public void run() {
+                Toast.makeText(MainActivity.this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
+              }
+            });
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
           mHandler.post(new Runnable() {
             @Override
             public void run() {
               Toast.makeText(MainActivity.this, R.string.file_not_found, Toast.LENGTH_SHORT).show();
             }
           });
-        } else if (path.endsWith(".js")) {
-          importAndroidData(path);
-        } else if (path.endsWith(".json.etz")) {
-          importAppleData(path);
-        }
-        mHandler.post(new Runnable() {
-          @Override
-          public void run() {
-            dialog.dismiss();
+        } finally {
+          if (temp != null) {
+            //noinspection ResultOfMethodCallIgnored
+            temp.delete();
           }
-        });
+          mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+              dialog.dismiss();
+            }
+          });
+        }
       }
     }).start();
   }
 
-  private void exportData(final String path) {
+  private String queryDisplayName(Uri uri) {
+    try (Cursor cursor = getContentResolver().query(
+        uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+      if (cursor != null && cursor.moveToFirst()) {
+        int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        if (index >= 0) {
+          return cursor.getString(index);
+        }
+      }
+    } catch (Exception e) {
+      Log.w(TAG, "Unable to query display name for " + uri, e);
+    }
+    return null;
+  }
+
+  private File copyUriToCacheFile(Uri uri, String displayName) throws IOException {
+    String suffix = ".js";
+    if (displayName != null) {
+      if (displayName.endsWith(".json.etz")) {
+        suffix = ".json.etz";
+      } else {
+        int dot = displayName.lastIndexOf('.');
+        if (dot >= 0) {
+          suffix = displayName.substring(dot);
+        }
+      }
+    }
+    File out = File.createTempFile("etipitaka_import_", suffix, getCacheDir());
+    try (InputStream in = getContentResolver().openInputStream(uri);
+         OutputStream os = new FileOutputStream(out)) {
+      if (in == null) {
+        throw new IOException("Unable to open input stream for " + uri);
+      }
+      byte[] buffer = new byte[8192];
+      int read;
+      while ((read = in.read(buffer)) > 0) {
+        os.write(buffer, 0, read);
+      }
+    } catch (IOException e) {
+      //noinspection ResultOfMethodCallIgnored
+      out.delete();
+      throw e;
+    }
+    return out;
+  }
+
+  private void exportData(final Uri uri) {
     final AlertDialog dialog = createBlockingProgressDialog(R.string.exporting_data);
     dialog.show();
     new Thread(new Runnable() {
       @Override
       public void run() {
-        JSONObject jsonObject = new JSONObject();
-        Date now = new Date();
+        boolean success = false;
         try {
+          JSONObject jsonObject = new JSONObject();
           jsonObject.put(FavoriteTable.TABLE_NAME, mFavoriteDaoHelper.dumpJSONArray());
           jsonObject.put(HistoryTable.TABLE_NAME, mHistoryDaoHelper.dumpJSONArray());
-          (new File(path)).mkdirs();
-          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-          String filename = String.format("edata-%s", dateFormat.format(now));
-          String expectedFilename = filename;
-          int count = 0;
-          while ((new File(path, expectedFilename+".js")).exists()) {
-            count += 1;
-            expectedFilename = filename + "_" + count;
+          OutputStream os = getContentResolver().openOutputStream(uri);
+          if (os == null) {
+            throw new IOException("Unable to open output stream for " + uri);
           }
+          BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
           try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(new File(path, expectedFilename+".js"))));
             bw.write(jsonObject.toString());
             bw.flush();
+          } finally {
             bw.close();
-            mHandler.post(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, R.string.export_complete, Toast.LENGTH_SHORT).show();
-              }
-            });
-          } catch (FileNotFoundException e) {
-            e.printStackTrace();
-          } catch (IOException e) {
-            e.printStackTrace();
           }
-        } catch (JSONException e) {
+          success = true;
+        } catch (JSONException | IOException e) {
           e.printStackTrace();
         }
+        final boolean exported = success;
         mHandler.post(new Runnable() {
           @Override
           public void run() {
             dialog.dismiss();
+            Toast.makeText(MainActivity.this,
+                exported ? R.string.export_complete : R.string.export_failed,
+                Toast.LENGTH_SHORT).show();
           }
         });
       }
