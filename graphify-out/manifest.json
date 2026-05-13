@@ -1,0 +1,886 @@
+{
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/gradlew": {
+    "mtime": 1777268678.0,
+    "hash": "f092910dfa8e47c5a37a452c3f6baf8a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/androidTest/java/com/watnapp/etipitaka/DaoInstrumentedTest.java": {
+    "mtime": 1777268678.0,
+    "hash": "8e6d8fc9aa4a02d28dc68ac1df6f4c9a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/androidTest/java/com/watnapp/etipitaka/ExampleInstrumentedTest.java": {
+    "mtime": 1777268678.0,
+    "hash": "09558bc81973d0af3f44961cc032cc07"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/jquery-2.1.1.min.js": {
+    "mtime": 1777268678.0,
+    "hash": "e40ec2161fe7993196f23c8a07346306"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/rangy-core.js": {
+    "mtime": 1777268678.0,
+    "hash": "b458aa9acef2e6b26eac2263225c7e19"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/rangy-cssclassapplier.js": {
+    "mtime": 1777268678.0,
+    "hash": "2be4548d58c0fdff08805f3d97bbc39a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/rangy-serializer.js": {
+    "mtime": 1777268678.0,
+    "hash": "480111368bf6723b815dd08ba9b42f30"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/rangy-textrange.js": {
+    "mtime": 1777268678.0,
+    "hash": "4ba5022a34148d27c0b62bafd489a977"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/meetup/adapter/CursorPagerAdapter.java": {
+    "mtime": 1777268678.0,
+    "hash": "5c789ea3b1e5adf5015d8482941b7421"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/touchsi/widget/ClearableAutoCompleteTextView.java": {
+    "mtime": 1777268678.0,
+    "hash": "31fad37626ecaac2963f6509c54711f0"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/AppModule.kt": {
+    "mtime": 1777268678.0,
+    "hash": "4fee07ff636953e61b3f7efdde2aa92c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/Constants.java": {
+    "mtime": 1777268678.0,
+    "hash": "0f6142c46ee4fc3504b337ebddaea24e"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/ETipitakaApplication.kt": {
+    "mtime": 1777268678.0,
+    "hash": "b87b2e1af555ee4fe69bf24267ffed90"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/UnzipUtility.java": {
+    "mtime": 1777268678.0,
+    "hash": "526597000a31bdb51c91cc350c197fd5"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/Utils.java": {
+    "mtime": 1777268678.0,
+    "hash": "c6749e51c80cf737c8abb2b6058cd244"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/ComparisonActivity.java": {
+    "mtime": 1777388018.0,
+    "hash": "b97988e65bdde7854167be965c2ae6ea"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/ComparisonActivityHost.kt": {
+    "mtime": 1777420395.0,
+    "hash": "ec96cb762296963f905ccc4a4f4c3e5f"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/DictActivity.java": {
+    "mtime": 1777325065.0,
+    "hash": "48c561f9fee8bfdb7c24432405ce0e9d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/DictScreen.kt": {
+    "mtime": 1777325065.0,
+    "hash": "662e9d3cad3a4788c6846aaaf72dc463"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/EnglishDictActivity.java": {
+    "mtime": 1777268678.0,
+    "hash": "86670c2746e983436c84e540b3a66e04"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/FileExplorerActivity.java": {
+    "mtime": 1777324639.0,
+    "hash": "df3a28b16ee348c4e8d325845bd06f6b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/FileExplorerScreen.kt": {
+    "mtime": 1777324639.0,
+    "hash": "cefd82ae5888e5097b0e87c2df5d16b1"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/MainActivity.java": {
+    "mtime": 1777384630.0,
+    "hash": "dbd26b76551f3218fb932c332793308d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/MainActivityHost.kt": {
+    "mtime": 1777386037.0,
+    "hash": "b74b761c1a22dabaeeffc7b1291d601a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/PaliDictActivity.java": {
+    "mtime": 1777268678.0,
+    "hash": "ab5887ea67262b46794b7579e86a1bee"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/StartupActivity.java": {
+    "mtime": 1777268678.0,
+    "hash": "f69a9c8022148f80a66be65f38d4cef3"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/activity/ThaiDictActivity.java": {
+    "mtime": 1777268678.0,
+    "hash": "3778e920abdc152500dc558e15ecd700"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/adapter/DictAdapter.java": {
+    "mtime": 1777268678.0,
+    "hash": "7859cae073a47162a15ea2cd9d8a6d56"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/adapter/EnglishDictAdapter.java": {
+    "mtime": 1777268678.0,
+    "hash": "a824b3deac12ce3f20bf62b32a3faccd"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/adapter/PaliDictAdapter.java": {
+    "mtime": 1777268678.0,
+    "hash": "f86ac5c0f106b41148b53af6193240df"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/adapter/SearchResultAdapter.java": {
+    "mtime": 1777268678.0,
+    "hash": "a9a00d5905669b140a451a4c9873c93d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/adapter/ThaiDictAdapter.java": {
+    "mtime": 1777268678.0,
+    "hash": "52153bfeb96ca40ba024940f33ce1e84"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/BlankFragment.java": {
+    "mtime": 1777268678.0,
+    "hash": "0b10314db8150acc45e2a7cfaf1178a9"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/BookListFragment.java": {
+    "mtime": 1777387513.0,
+    "hash": "ffa2f02fed9d9b02760d0aef68d5b715"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/BookListScreen.kt": {
+    "mtime": 1777387513.0,
+    "hash": "3455a0d11e740ea428579c0bb46d8177"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/FavoriteFragment.java": {
+    "mtime": 1777384630.0,
+    "hash": "552a75dcd6e3a791df94e6c87b71f126"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/FavoriteHistoryScreen.kt": {
+    "mtime": 1777384630.0,
+    "hash": "6178d6934135c33158b180f618c0ad87"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/FontDialogFragment.java": {
+    "mtime": 1777268678.0,
+    "hash": "ca5620e986516437c3166f2ca8c23f9a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/HistoryFragment.java": {
+    "mtime": 1777384630.0,
+    "hash": "5b393cd9e665177eb0f986f51e6e3efe"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/MenuFragment.java": {
+    "mtime": 1777302117.0,
+    "hash": "eea8a912229b0ae178dbb281d66abedf"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/MenuTabs.kt": {
+    "mtime": 1777302117.0,
+    "hash": "4603de7561937ef940e773f23ba572bc"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/PageFragment.java": {
+    "mtime": 1777268678.0,
+    "hash": "5dc8a4ec1b0e27aff9d356ba5051835d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/ReaderChrome.kt": {
+    "mtime": 1777302529.0,
+    "hash": "b7b660568516ad72501d34d24eed128a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/ReaderFragment.java": {
+    "mtime": 1777420579.0,
+    "hash": "14ecd64642fbedbf819819dfb2e5f544"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/ReaderFragmentHost.kt": {
+    "mtime": 1777420579.0,
+    "hash": "a36779cd4adebffb512815d715c5bb9b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/SearchFragment.java": {
+    "mtime": 1777325753.0,
+    "hash": "652ea61db01461503b6c8c437c3c98b0"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/SearchScreen.kt": {
+    "mtime": 1777325753.0,
+    "hash": "19a62aa757f4d4bcafbe960242ef5e2c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/fragment/TextEntryDialogFragment.kt": {
+    "mtime": 1778078734.0,
+    "hash": "3ccaccdb91563c9bc1ba492bd542876c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/BookDatabaseHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "925341aad4f1f82e8244ba7b8bca1ead"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/DictDatabaseHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "1aefa8765b9bb3c1a9d07227d0e47156"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/DownloadDatabase.kt": {
+    "mtime": 1777268678.0,
+    "hash": "54bbda8ac5fe7a422a4d3376b66bfc9b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/DummyContentProvider.java": {
+    "mtime": 1777268678.0,
+    "hash": "380f4efbbddc4e216fead1e3d41bb0e6"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/EnglishDictDatabaseHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "82dee38e98fb4e2e528961be81fe434d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/ExternalStorage.java": {
+    "mtime": 1777268678.0,
+    "hash": "714810b66404a6a0c8bca1069ce6d43d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/FileDownloader.java": {
+    "mtime": 1777268678.0,
+    "hash": "28626900a8725d909bca6b7c2c127d57"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/PaliDictDatabaseHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "1232c102a0f5edb65c2223c6e8370e1a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/StorageUtils.java": {
+    "mtime": 1777268678.0,
+    "hash": "0745bf97b8dfd06a03c40f024846bc76"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/helper/ThaiDictDatabaseHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "191ff4ffeba84131a5628de284c944ad"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ComparisonActivityNavigationModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "35db762112209fa030986f942385fc48"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/Dao.java": {
+    "mtime": 1777268678.0,
+    "hash": "94296c780eb6d03a53c5cb9e74ff4009"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/DaoHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "b7ad4bbe328bae461a6c11700d79ca2a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/DatabaseOpenHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "a99c725beb0f0542bb143c4cb4757c86"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/DatabaseProvider.java": {
+    "mtime": 1777268678.0,
+    "hash": "5f1b9e6a131e4cc91b563a7b3e01d1b5"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETBasicDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "86042c27fa3c123afd04d5e6eb9203e5"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "254315c3647da884a7d90ac25d66b721"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETDataModelCreator.java": {
+    "mtime": 1777268678.0,
+    "hash": "477502189175a43da472fcd6c5be10fa"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETHandbookDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "e3f41147060b03fbec12e73d7168565d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETPaliSiamratDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "dc42a206db90aaf03b1f3a2b9aa83e2a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETPaliSiamratNewDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "16bf582afb7bb15c3cd0fb59ac40ff8c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETRomanScriptDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "7a6200c515ee48ae2e6f25661489aea0"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETSiamratDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "39c91a391fd037a45c72bdc5c409565b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiFiveBooksDataModel.java": {
+    "mtime": 1778079295.0,
+    "hash": "e65f8e4a1f1b390afe5766e841284cd0"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiMahaChula2DataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "f21ea984b1a4fd6384158c2fdddcd992"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiMahaChulaDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "546b596c8390213d6a3f494be60b9912"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiMahaMakutDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "bd3b7e6035750819bde988c40fe80377"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiPocketBookDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "8f1f4ba58f83ce8585532a03eae53737"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiSiamratDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "f515a70939f8fa3685f87078f757ea94"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiSupremeDataModel.kt": {
+    "mtime": 1777268678.0,
+    "hash": "09b7faf5c022cb4f3a5dcf5bedcc38ff"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiVinayaDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "2ba147e85fb6d266f60c3598395cab00"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ETThaiWatnaDataModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "0436155fddc60fc96382795b697fad33"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/Favorite.kt": {
+    "mtime": 1777270178.0,
+    "hash": "f858fc73f9a24b6c0e4ef2b5d5c8ad18"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/FavoriteDaoHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "706d7bbe001932a4e81c51a6d9779b50"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/FavoriteTable.kt": {
+    "mtime": 1777270178.0,
+    "hash": "b07fd4fdceca96927e91f08064850168"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/FileExplorerActivityNavigationModel.java": {
+    "mtime": 1777268678.0,
+    "hash": "dbde1e18d99d5d9d282274c9f921d937"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/History.kt": {
+    "mtime": 1777270178.0,
+    "hash": "7a489be0e860d9980820f8c3f4ddaeb9"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/HistoryDaoHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "6bd6ce18f602b898c7e51905a7d765aa"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/HistoryItem.kt": {
+    "mtime": 1777270178.0,
+    "hash": "a64517d02cd05197959e3d5bb2cc6220"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/HistoryItemDaoHelper.java": {
+    "mtime": 1777268678.0,
+    "hash": "f8d95df7c33097d59bb9dc654e4d1b4b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/HistoryItemTable.kt": {
+    "mtime": 1777270178.0,
+    "hash": "b111d86ebf217d104d534466e116086d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/HistoryTable.kt": {
+    "mtime": 1777270178.0,
+    "hash": "c48212ae107dff3146b6f6f136237b3c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/model/ModelBase.kt": {
+    "mtime": 1777270178.0,
+    "hash": "9f96de1bb705aae6466702d0b3b2ff9d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/ui/compose/ETipitakaCompose.kt": {
+    "mtime": 1777297033.0,
+    "hash": "1739be88418b84744527c454decf15ee"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/vm/SharedViewModel.kt": {
+    "mtime": 1777268678.0,
+    "hash": "8beaf7cfa4cc7a6d3eb84e5603539547"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/widget/ClearableAutoCompleteTextView.java": {
+    "mtime": 1777268678.0,
+    "hash": "a4f235cf4a4949d026185de74d74739f"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/java/com/watnapp/etipitaka/plus/widget/MyWebView.java": {
+    "mtime": 1777268678.0,
+    "hash": "f25d02e6dfd90dc7a2105749098696a8"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/schema.js": {
+    "mtime": 1777268678.0,
+    "hash": "00bfaa2c9ec841e85af21942ed04e2a3"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/test/java/com/watnapp/etipitaka/ExampleUnitTest.java": {
+    "mtime": 1777268678.0,
+    "hash": "b045621a05df5f547185444461abd3d9"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/CLAUDE.md": {
+    "mtime": 1778638271.0,
+    "hash": "5d319b7dcfdee958a41edb1c11e89c9b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/README.md": {
+    "mtime": 1777423588.0,
+    "hash": "2d7bbd99252966562d0b8c90677c558d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/docs/COMPOSE_MIGRATION_PLAN.md": {
+    "mtime": 1777297033.0,
+    "hash": "d2e22cac181b8db4255034f7ff9b9c44"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/fonts/THSarabun.svg": {
+    "mtime": 1777268678.0,
+    "hash": "edbbc56e0277f7aa1801d86b66131fc6"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/fonts/THSarabunBold.svg": {
+    "mtime": 1777268678.0,
+    "hash": "fe657ac8763b383137a9740a403b38eb"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/fonts/THSarabunBoldItalic.svg": {
+    "mtime": 1777268678.0,
+    "hash": "383af49a7607b96af1aac35156981fef"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/assets/fonts/THSarabunItalic.svg": {
+    "mtime": 1777268678.0,
+    "hash": "301b97f494ae31ccc4d76de3ae1f78e4"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable/icon.png": {
+    "mtime": 1777268678.0,
+    "hash": "81b57bc077c1ba9c81ee0b7c9eecbf84"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/baseline_menu_book_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "e61a936ea4f79100d09a3e9955f89254"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/baseline_menu_book_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "211b794e12550223bfc401b9bffe0c6a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/baseline_menu_book_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "8cdfe7ec13f90f95185f1fdaee5c413c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/baseline_menu_book_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "7251836b2672b105bc8be12cd9424eb7"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/baseline_menu_open_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "fd71a16d5bed3dbe5401287de9da1604"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/baseline_menu_open_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "b21991bfe6a486812c0bcbc10c7fdfb5"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/baseline_menu_open_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "efdfbca393135b0e0bbb3eef96e11384"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/baseline_menu_open_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "31e2f4bb3ae6dae6deafee0aa756923c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_off_disable_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "22b17d3ce6ac6a9171fa7085f4782eb8"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_off_disable_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "22b17d3ce6ac6a9171fa7085f4782eb8"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_off_disabled_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "545c95860ec54c99864f11d0d5bf0303"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_off_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "489cba00d73d553a78a29af942647726"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_off_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "bc11a7c96160e16d8bd273decc9049de"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_off_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "c27e6db28bd8e6c827dd5e856c44ed77"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_off_normal_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "59d9990aefbd3aedefdbf1ca5f864631"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_off_pressed_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "08a1a63d17de346d44979a8e0fd4a9a5"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_on_disable_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "4df999e1e198269915300ebf14c42a33"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_on_disable_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "4df999e1e198269915300ebf14c42a33"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_on_disabled_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "43a78d0c9a22cc267cfa215a3747669f"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_on_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "08db8a0d6457dbcbde9766905ee3a0dc"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_on_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "c89a6e423c51c955acaeb5ffa2bbea51"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_on_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "fbb63fdc178741a4b3538e7924c3855c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_check_on_pressed_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "63346c8c46a129b849463e886d2ae8a8"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/btn_rating_star_on_normal.png": {
+    "mtime": 1777268678.0,
+    "hash": "72484660d47dcf7d063a68f3626ed788"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/ic_clear_search_api_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "a3aee52339651eaf81bb15e8633afa0f"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/ic_clear_search_api_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "653c5679e1c94e2e59d9cfa0005d3668"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/ic_menu_font.png": {
+    "mtime": 1777268678.0,
+    "hash": "42db90502a40b5192d093f333d7a75cf"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/ic_menu_goto.png": {
+    "mtime": 1777268678.0,
+    "hash": "de086209b19485b9d95f8b6e46e575e0"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-hdpi/ic_menu_refresh.png": {
+    "mtime": 1777268678.0,
+    "hash": "0876d6757135e15ccc7671f973a0a771"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-ldpi/btn_rating_star_on_normal.png": {
+    "mtime": 1777268678.0,
+    "hash": "a788988e54d1d6e6e7a70ed3c6179473"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-ldpi/ic_menu_font.png": {
+    "mtime": 1777268678.0,
+    "hash": "35e0a2dee9f3b4bc1893d0935592e9fd"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-ldpi/ic_menu_goto.png": {
+    "mtime": 1777268678.0,
+    "hash": "d05888a295738cb3da7293cd03f598b4"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-ldpi/ic_menu_refresh.png": {
+    "mtime": 1777268678.0,
+    "hash": "ebea52232254d0fa8bdcc8f21f4dc195"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/baseline_menu_book_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "15258a7643c1fb663d3298d14c4f0166"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/baseline_menu_book_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "c2d41e2574a99b78ef6a3c63156d2988"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/baseline_menu_book_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "211b794e12550223bfc401b9bffe0c6a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/baseline_menu_book_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "607e511c401f992ae5235fbac41baf46"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/baseline_menu_open_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "82f1e0f5938dc6cf4088f55d0fe8b4fd"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/baseline_menu_open_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "e5e7576e6e99e04520a2349155ca0108"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/baseline_menu_open_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "b21991bfe6a486812c0bcbc10c7fdfb5"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/baseline_menu_open_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "8e569934302e150b0180a12fdf91538a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_off_disable_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "7f0a7b7055f63e9fdeefa8d1fd85fff9"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_off_disabled_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "ce21cb193b663e2e3750d4a92594be9f"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_off_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "8263b83b5189690dff82baa1955a0447"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_off_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "6146acb802cd8b325e7c5083913425a0"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_off_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "6c2cfb0ac7c781a0d712166dcf8a0031"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_off_normal_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "3306d164ff2d13400856c5f6ceaf2c62"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_off_pressed_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "b2449bc82fe21658a8fbeead232f05fd"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_on_disable_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "84be5435d213b9e7331c81e9d91a8b38"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_on_disabled_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "1038656a62ec5208dc1a24922a86b372"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_on_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "f72899bebe251b4ffb8a4d1cd1a113d7"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_on_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "8607ff8f46b2db1c28d7ec36fe4cdd4e"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_on_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "1869903eb3c3984cb1e14aa4bd8d5fcb"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_check_on_pressed_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "ab4db42098d0c05f3e7c4fd05cb683d2"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/btn_rating_star_on_normal.png": {
+    "mtime": 1777268678.0,
+    "hash": "5b6f1f8d0441a9150e03b4f78602d58d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/ic_clear_search_api_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "41741050ab9dcffe515aa8d6b4c8963d"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/ic_clear_search_api_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "bca3da1a07dd7270d24944c51b786db1"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/ic_menu_font.png": {
+    "mtime": 1777268678.0,
+    "hash": "e579769f5213a8c2c3736e2ae8763bc1"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/ic_menu_goto.png": {
+    "mtime": 1777268678.0,
+    "hash": "b46a4f09c3e3b6c1024f9d19d5734730"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-mdpi/ic_menu_refresh.png": {
+    "mtime": 1777268678.0,
+    "hash": "7c848846df23659b070f0b03d95fdb9e"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/baseline_menu_book_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "211b794e12550223bfc401b9bffe0c6a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/baseline_menu_book_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "607e511c401f992ae5235fbac41baf46"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/baseline_menu_book_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "7251836b2672b105bc8be12cd9424eb7"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/baseline_menu_book_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "c7630d8f4e771dd69474af3078eb4031"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/baseline_menu_open_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "b21991bfe6a486812c0bcbc10c7fdfb5"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/baseline_menu_open_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "8e569934302e150b0180a12fdf91538a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/baseline_menu_open_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "31e2f4bb3ae6dae6deafee0aa756923c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/baseline_menu_open_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "04c4da573d014a0a1d5775db685bdd98"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_off_disable_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "beee5e533a14f2a78fa7c92128f4b065"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_off_disabled_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "87c23ea3c518803766cf6d4c258e2e23"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_off_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "146ef308fdc84fe93f5b68efc6439635"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_off_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "7326ee8b01aeb6005e66a9dd114e4d1b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_off_holo.png": {
+    "mtime": 1777268678.0,
+    "hash": "b3537574090222a19cd2639357d876df"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_off_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "5823d5890f577996ca3503f9b6157881"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_off_normal_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "b8d16204b693e1f8a229f3e29df5fe1e"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_off_pressed_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "f5f4a02a1118de2a211bd7ebeaab889b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_on_disabled_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "3c502dc4d9bce7671eef8aa578ff496b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_on_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "46d50acd31269ae94d5c19a25e3180ce"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_on_focused_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "b35a30d5f218f3258b8b1540ec2d8489"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_on_holo.png": {
+    "mtime": 1777268678.0,
+    "hash": "a02bb574d7ec88882be01ade7ec53169"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_on_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "75dce480dbfab5292b1ec0c859540a10"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_check_on_pressed_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "c62ffc1820c5a55fd111f8b75c105be4"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/btn_rating_star_on_normal.png": {
+    "mtime": 1777268678.0,
+    "hash": "bd4e54988324c11f8ff2eb78eed2c2c0"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/file.png": {
+    "mtime": 1777268678.0,
+    "hash": "8f6623c182191c69771922320efd8232"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/folder.png": {
+    "mtime": 1777268678.0,
+    "hash": "6bc7d3db67077dc334dbcfe44ec77108"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/ic_clear_search_api_disabled_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "c6a3d6498eb4640ac914e9503118679b"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/ic_clear_search_api_holo_light.png": {
+    "mtime": 1777268678.0,
+    "hash": "edf047e7ad9803be7d57231d052831f9"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/ic_menu_font.png": {
+    "mtime": 1777268678.0,
+    "hash": "8f5ed4b54970f0e696828e13598aa184"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/ic_menu_goto.png": {
+    "mtime": 1777268678.0,
+    "hash": "86b1fdaa618fc14c1e70fd77d8264f4f"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xhdpi/ic_menu_refresh.png": {
+    "mtime": 1777268678.0,
+    "hash": "ce0bb65c390385155828aa401d9ddbdb"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxhdpi/baseline_menu_book_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "8cdfe7ec13f90f95185f1fdaee5c413c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxhdpi/baseline_menu_book_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "7251836b2672b105bc8be12cd9424eb7"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxhdpi/baseline_menu_book_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "9ad99d425d3e12df050ffc87e5c612a4"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxhdpi/baseline_menu_book_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "bb290f989c23a86822022ed509e31fed"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxhdpi/baseline_menu_open_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "efdfbca393135b0e0bbb3eef96e11384"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxhdpi/baseline_menu_open_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "31e2f4bb3ae6dae6deafee0aa756923c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxhdpi/baseline_menu_open_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "3dd70c0f85acf1a1dd96757b3dfe9254"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxhdpi/baseline_menu_open_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "154c9b2df116e31dee1fa28ee21abfc9"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxxhdpi/baseline_menu_book_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "7251836b2672b105bc8be12cd9424eb7"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxxhdpi/baseline_menu_book_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "c7630d8f4e771dd69474af3078eb4031"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxxhdpi/baseline_menu_book_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "bb290f989c23a86822022ed509e31fed"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxxhdpi/baseline_menu_book_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "5639fafa414ede8e6aa6f893ed14eb48"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxxhdpi/baseline_menu_open_black_18.png": {
+    "mtime": 1777268678.0,
+    "hash": "31e2f4bb3ae6dae6deafee0aa756923c"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxxhdpi/baseline_menu_open_black_24.png": {
+    "mtime": 1777268678.0,
+    "hash": "04c4da573d014a0a1d5775db685bdd98"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxxhdpi/baseline_menu_open_black_36.png": {
+    "mtime": 1777268678.0,
+    "hash": "154c9b2df116e31dee1fa28ee21abfc9"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/drawable-xxxhdpi/baseline_menu_open_black_48.png": {
+    "mtime": 1777268678.0,
+    "hash": "435671a49b9a9b6fc7f5ed686b711f55"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1777268678.0,
+    "hash": "a299535b64b6ff5d5c4e556e27b73b03"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png": {
+    "mtime": 1777421841.0,
+    "hash": "3435c98df0b9cc0ba30e6dd058b59a4a"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1777268678.0,
+    "hash": "dc4de906d2590a9628a24faa57ac4959"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png": {
+    "mtime": 1777421841.0,
+    "hash": "41d6eb1c4f6d5277c78871c1d0f582a8"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1777268678.0,
+    "hash": "0ec79d84021fa61674b647026c0764b2"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png": {
+    "mtime": 1777421841.0,
+    "hash": "602e3326d9f057198313fa4b77c90e80"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1777268678.0,
+    "hash": "26d2fd89bdc59656d0fe15a971788af7"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png": {
+    "mtime": 1777421841.0,
+    "hash": "45362caf0281b5a986b4a2ca92dcc13e"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1777268678.0,
+    "hash": "934cda7ca5867d0b6a980ba495859fd7"
+  },
+  "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png": {
+    "mtime": 1777421841.0,
+    "hash": "3b81a1b4b8deec1639f621636dcd231f"
+  }
+}
