@@ -5,13 +5,16 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.compose.ui.platform.ComposeView;
 
 import com.watnapp.etipitaka.plus.R;
@@ -45,10 +48,37 @@ abstract public class DictActivity extends AppCompatActivity {
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    LinearLayout root = new LinearLayout(this);
+    root.setOrientation(LinearLayout.VERTICAL);
+    root.setFitsSystemWindows(true);
+
+    Toolbar toolbar = new Toolbar(this);
+    TypedValue primary = new TypedValue();
+    if (getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, primary, true)) {
+      toolbar.setBackgroundColor(primary.data);
+    }
+    toolbar.setPopupTheme(androidx.appcompat.R.style.ThemeOverlay_AppCompat_Light);
+    root.addView(toolbar, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, resolveActionBarHeight()));
+
     composeView = new ComposeView(this);
-    setContentView(composeView);
+    root.addView(composeView, new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+
+    setContentView(root);
+    setSupportActionBar(toolbar);
+
     renderEntries();
     search(null);
+  }
+
+  private int resolveActionBarHeight() {
+    TypedValue typedValue = new TypedValue();
+    if (getTheme().resolveAttribute(androidx.appcompat.R.attr.actionBarSize, typedValue, true)) {
+      return TypedValue.complexToDimensionPixelSize(typedValue.data, getResources().getDisplayMetrics());
+    }
+    return 0;
   }
 
   private void search(final String headword) {
