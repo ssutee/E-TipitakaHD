@@ -1,78 +1,81 @@
-# Graph Report - E-TipitakaHD (Android Tipitaka reader)  (2026-05-13)
+# Graph Report - E-TipitakaHD  (2026-05-13)
 
 ## Corpus Check
-- Large corpus: 221 files · ~243,317 words. Semantic extraction will be expensive (many Claude tokens). Consider running on a subfolder, or use --no-semantic to run AST-only.
+- 97 files · ~243,799 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1405 nodes · 2268 edges · 61 communities detected
-- Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 310 edges (avg confidence: 0.8)
-- Token cost: 327,882 input · 81,978 output
+- 1410 nodes · 2278 edges · 63 communities detected
+- Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 312 edges (avg confidence: 0.8)
+- Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Book Database & Data Access|Book Database & Data Access]]
-- [[_COMMUNITY_Comparison & Dictionary Core|Comparison & Dictionary Core]]
-- [[_COMMUNITY_Activity Lifecycle & Pali Editions|Activity Lifecycle & Pali Editions]]
-- [[_COMMUNITY_Compose UI Bridges & Renderers|Compose UI Bridges & Renderers]]
-- [[_COMMUNITY_Thai Data Models & Pivot Conversion|Thai Data Models & Pivot Conversion]]
-- [[_COMMUNITY_Search & History Paging|Search & History Paging]]
-- [[_COMMUNITY_Dictionary Activities & Fonts|Dictionary Activities & Fonts]]
-- [[_COMMUNITY_App Startup & Data Import|App Startup & Data Import]]
-- [[_COMMUNITY_Siamrat & MahaChula Editions|Siamrat & MahaChula Editions]]
-- [[_COMMUNITY_Main Activity Orchestration|Main Activity Orchestration]]
-- [[_COMMUNITY_Favorites|Favorites]]
-- [[_COMMUNITY_File Explorer & Downloads|File Explorer & Downloads]]
-- [[_COMMUNITY_History Fragment & Shared State|History Fragment & Shared State]]
-- [[_COMMUNITY_Rangy Core (vendored)|Rangy Core (vendored)]]
-- [[_COMMUNITY_Reader UI & Chrome|Reader UI & Chrome]]
-- [[_COMMUNITY_Rangy TextRange (vendored)|Rangy TextRange (vendored)]]
-- [[_COMMUNITY_jQuery (vendored)|jQuery (vendored)]]
-- [[_COMMUNITY_ETDataModel Base Class|ETDataModel Base Class]]
-- [[_COMMUNITY_Dependency Injection & App Wiring|Dependency Injection & App Wiring]]
-- [[_COMMUNITY_HistoryItem Persistence|HistoryItem Persistence]]
-- [[_COMMUNITY_Compose Migration Plan (docs)|Compose Migration Plan (docs)]]
-- [[_COMMUNITY_Rangy CSS Class Applier (vendored)|Rangy CSS Class Applier (vendored)]]
-- [[_COMMUNITY_Generic Dictionary Screen|Generic Dictionary Screen]]
-- [[_COMMUNITY_Content Providers|Content Providers]]
-- [[_COMMUNITY_Rangy Serializer (vendored)|Rangy Serializer (vendored)]]
-- [[_COMMUNITY_ETBasicDataModel|ETBasicDataModel]]
-- [[_COMMUNITY_Clearable AutoComplete Widget|Clearable AutoComplete Widget]]
-- [[_COMMUNITY_Thai Supreme Edition Model|Thai Supreme Edition Model]]
-- [[_COMMUNITY_Generic DAO|Generic DAO]]
-- [[_COMMUNITY_Database Download|Database Download]]
-- [[_COMMUNITY_Storage Utilities|Storage Utilities]]
-- [[_COMMUNITY_SQLite Open Helper|SQLite Open Helper]]
-- [[_COMMUNITY_Model Base (Kotlin)|Model Base (Kotlin)]]
-- [[_COMMUNITY_Favorite Table Schema|Favorite Table Schema]]
-- [[_COMMUNITY_HistoryItem Table Schema|HistoryItem Table Schema]]
-- [[_COMMUNITY_History Table Schema|History Table Schema]]
-- [[_COMMUNITY_Reader Fragment Host|Reader Fragment Host]]
-- [[_COMMUNITY_Rangy Library Modules|Rangy Library Modules]]
-- [[_COMMUNITY_Toolbar Menu Icons|Toolbar Menu Icons]]
-- [[_COMMUNITY_Instrumented Test Sample|Instrumented Test Sample]]
-- [[_COMMUNITY_Application Class|Application Class]]
-- [[_COMMUNITY_Data Model Factory|Data Model Factory]]
-- [[_COMMUNITY_Unit Test Sample|Unit Test Sample]]
-- [[_COMMUNITY_Custom View Widgets|Custom View Widgets]]
-- [[_COMMUNITY_App Brand Assets|App Brand Assets]]
-- [[_COMMUNITY_Constants|Constants]]
-- [[_COMMUNITY_Comparison Navigation Model|Comparison Navigation Model]]
-- [[_COMMUNITY_File Explorer Navigation Model|File Explorer Navigation Model]]
-- [[_COMMUNITY_BookMenu Drawer Icons|Book/Menu Drawer Icons]]
-- [[_COMMUNITY_Holo Checkbox Drawables|Holo Checkbox Drawables]]
-- [[_COMMUNITY_Checkbox State Drawables|Checkbox State Drawables]]
-- [[_COMMUNITY_Checkbox & Star Icons|Checkbox & Star Icons]]
-- [[_COMMUNITY_Checkbox OnOff Icons|Checkbox On/Off Icons]]
-- [[_COMMUNITY_File & Folder Icons|File & Folder Icons]]
-- [[_COMMUNITY_Instrumented Test (dup)|Instrumented Test (dup)]]
-- [[_COMMUNITY_Unit Test (dup)|Unit Test (dup)]]
-- [[_COMMUNITY_jQuery File Node|jQuery File Node]]
-- [[_COMMUNITY_Blank Fragment|Blank Fragment]]
-- [[_COMMUNITY_File Explorer Nav Model (dup)|File Explorer Nav Model (dup)]]
-- [[_COMMUNITY_Rating Star Drawable|Rating Star Drawable]]
-- [[_COMMUNITY_Rating Star Icon (dup)|Rating Star Icon (dup)]]
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
+- [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 40|Community 40]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
+- [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 63|Community 63]]
+- [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 65|Community 65]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `MainActivity` - 47 edges
+1. `MainActivity` - 49 edges
 2. `BookDatabaseHelper` - 36 edges
 3. `ETDataModel` - 33 edges
 4. `ReaderFragment` - 30 edges
@@ -129,143 +132,143 @@
 - **app launcher icon set** — app_launcher_icon, app_launcher_foreground [INFERRED 0.95]
 - **toolbar menu icons** — icon_menu_book, icon_menu_open [INFERRED 0.85]
 
-## Communities (64 total, 32 thin omitted)
+## Communities (66 total, 34 thin omitted)
 
-### Community 0 - "Book Database & Data Access"
+### Community 0 - "Community 0"
 Cohesion: 0.03
-Nodes (10): BookDatabaseHelper, getCode(), OnGetItemsListener, OnSearchListener, ExternalStorage, DaoHelper, ETHandbookDataModel, ETRomanScriptDataModel (+2 more)
+Nodes (11): BookDatabaseHelper, getCode(), getFullName(), OnGetItemsListener, OnSearchListener, ExternalStorage, DaoHelper, ETHandbookDataModel (+3 more)
 
-### Community 1 - "Comparison & Dictionary Core"
+### Community 1 - "Community 1"
 Cohesion: 0.04
 Nodes (92): BookDatabaseHelper, BookListFragment, BookListScreen / BookListScreenBridge, ComparisonActivity, ComparisonActivityContentBridge, ComparisonActivityNavigationModel, ComparisonDivider, Dao (+84 more)
 
-### Community 2 - "Activity Lifecycle & Pali Editions"
+### Community 2 - "Community 2"
 Cohesion: 0.03
 Nodes (19): ComparisonActivity, AppCompatActivity, DialogFragment, ETDataModel, ETPaliSiamratDataModel, ETThaiMahaChulaDataModel, Fragment, BlankFragment (+11 more)
 
-### Community 3 - "Compose UI Bridges & Renderers"
-Cohesion: 0.04
-Nodes (48): ComparisonActivityContentBridge, ComparisonDivider(), DictEntryClickListener, DictHeadword, DictScreen(), DictScreenBridge, FileExplorerItemClickListener, FileExplorerPathChangedListener (+40 more)
-
-### Community 4 - "Thai Data Models & Pivot Conversion"
+### Community 3 - "Community 3"
 Cohesion: 0.03
 Nodes (6): ETHandbookDataModel, OnConvertFromPivotListener, OnConvertToPivotListener, ETThaiFiveBooksDataModel, ETThaiPocketBookDataModel, ETThaiVinayaDataModel
 
-### Community 5 - "Search & History Paging"
+### Community 4 - "Community 4"
 Cohesion: 0.05
 Nodes (6): CursorPagerAdapter, SearchFragment, FragmentStateAdapter, History, newInstance(), HistoryDaoHelper
 
-### Community 6 - "Dictionary Activities & Fonts"
+### Community 5 - "Community 5"
+Cohesion: 0.04
+Nodes (37): ComparisonActivityContentBridge, ComparisonDivider(), DictEntryClickListener, DictHeadword, DictScreen(), DictScreenBridge, FileExplorerItemClickListener, FileExplorerPathChangedListener (+29 more)
+
+### Community 6 - "Community 6"
 Cohesion: 0.03
 Nodes (12): EnglishDictActivity, PaliDictActivity, ThaiDictActivity, EnglishDictAdapter, PaliDictAdapter, ThaiDictAdapter, DictActivity, DictAdapter (+4 more)
 
-### Community 7 - "App Startup & Data Import"
-Cohesion: 0.06
-Nodes (12): StartupActivity, DictAdapter, ViewHolder, HeaderViewHolder, SearchResultAdapter, ViewHolder, CursorAdapter, getFullName() (+4 more)
+### Community 7 - "Community 7"
+Cohesion: 0.04
+Nodes (6): DaoInstrumentedTest, FavoriteFragment, Favorite, newInstance(), FavoriteDaoHelper, Utils
 
-### Community 8 - "Siamrat & MahaChula Editions"
+### Community 9 - "Community 9"
 Cohesion: 0.04
 Nodes (5): ETBasicDataModel, ETPaliSiamratDataModel, ETThaiMahaChulaDataModel, ETThaiMahaMakutDataModel, ETThaiSiamratDataModel
 
-### Community 10 - "Favorites"
-Cohesion: 0.06
-Nodes (4): FavoriteFragment, Favorite, newInstance(), FavoriteDaoHelper
-
-### Community 11 - "File Explorer & Downloads"
-Cohesion: 0.08
-Nodes (8): compare(), FileExplorerActivity, ComponentActivity, DownloadFileTaskBase, DownloadingFileTask, FileDownloader, OnFileDownloadListener, Runnable
-
-### Community 12 - "History Fragment & Shared State"
+### Community 10 - "Community 10"
 Cohesion: 0.07
-Nodes (4): HistoryFragment, OnHistorySelectedListener, MenuFragment, SharedViewModel
+Nodes (9): compare(), StartupActivity, getStringCode(), DownloadFileTaskBase, DownloadingFileTask, FileDownloader, OnFileDownloadListener, UnzipUtility (+1 more)
 
-### Community 13 - "Rangy Core (vendored)"
+### Community 11 - "Community 11"
+Cohesion: 0.08
+Nodes (7): ReaderBottomControls(), ReaderChromeBridge, ReaderSeekBar(), ReaderSeekBarListener, ReaderSubtitle(), OnMenuButtonClickListener, ReaderFragment
+
+### Community 12 - "Community 12"
 Cohesion: 0.18
 Nodes (37): A(), ab(), B(), bb(), C(), D(), E(), F() (+29 more)
 
-### Community 14 - "Reader UI & Chrome"
-Cohesion: 0.09
-Nodes (7): ReaderBottomControls(), ReaderChromeBridge, ReaderSeekBar(), ReaderSeekBarListener, ReaderSubtitle(), OnMenuButtonClickListener, ReaderFragment
-
-### Community 15 - "Rangy TextRange (vendored)"
+### Community 13 - "Community 13"
 Cohesion: 0.1
 Nodes (29): A(), ab(), B(), Bb(), Cb(), Db(), Eb(), J() (+21 more)
 
-### Community 16 - "jQuery (vendored)"
+### Community 14 - "Community 14"
+Cohesion: 0.08
+Nodes (14): DialogAction(), FavoriteActionDialog(), FavoriteActionListener, FavoriteHistoryScreenBridge, FavoriteRow(), FavoriteScreen(), HistoryActionDialog(), HistoryActionListener (+6 more)
+
+### Community 15 - "Community 15"
 Cohesion: 0.1
 Nodes (24): Bc(), D(), fb(), G(), hb(), I(), ib(), jb() (+16 more)
 
-### Community 18 - "Dependency Injection & App Wiring"
+### Community 17 - "Community 17"
 Cohesion: 0.1
 Nodes (32): appModule (Koin DI module), BookDatabaseHelper, BookDatabaseHelper.Language, Constants, DaoHelper, DaoInstrumentedTest, DummyContentProvider, ETBasicDataModel (+24 more)
 
-### Community 19 - "HistoryItem Persistence"
-Cohesion: 0.09
-Nodes (5): DaoInstrumentedTest, HistoryItem, newInstance(), Status, HistoryItemDaoHelper
-
-### Community 20 - "Compose Migration Plan (docs)"
+### Community 18 - "Community 18"
 Cohesion: 0.1
 Nodes (28): activity_main.xml (main activity host layout), Build / IDE Setup (Gradle, JDK 17, API 36), E-TipitakaHD Project (CLAUDE.md), Jetpack Compose Migration Plan (doc), Jetpack Compose Migration Effort, ETipitakaTheme (Compose theme), Compose Migration Ground Rules, Long-Term Cleanup After Compose Adoption (+20 more)
 
-### Community 21 - "Rangy CSS Class Applier (vendored)"
+### Community 19 - "Community 19"
+Cohesion: 0.14
+Nodes (7): DictAdapter, ViewHolder, HeaderViewHolder, SearchResultAdapter, ViewHolder, CursorAdapter, StickyListHeadersAdapter
+
+### Community 20 - "Community 20"
+Cohesion: 0.1
+Nodes (4): HistoryItem, newInstance(), Status, HistoryItemDaoHelper
+
+### Community 21 - "Community 21"
 Cohesion: 0.16
 Nodes (23): a(), B(), C(), E(), g(), h(), i(), j() (+15 more)
 
-### Community 22 - "Generic Dictionary Screen"
+### Community 22 - "Community 22"
 Cohesion: 0.13
 Nodes (3): DictActivity, DictDatabaseHelper, SQLiteAssetHelper
 
-### Community 23 - "Content Providers"
+### Community 24 - "Community 24"
 Cohesion: 0.12
 Nodes (3): ContentProvider, DummyContentProvider, DatabaseProvider
 
-### Community 24 - "Rangy Serializer (vendored)"
+### Community 25 - "Community 25"
 Cohesion: 0.21
 Nodes (16): c(), d(), f(), g(), h(), i(), j(), k() (+8 more)
 
-### Community 26 - "Clearable AutoComplete Widget"
+### Community 27 - "Community 27"
 Cohesion: 0.21
 Nodes (3): AutoCompleteTextView, ClearableAutoCompleteTextView, Listener
 
-### Community 29 - "Database Download"
+### Community 31 - "Community 31"
 Cohesion: 0.43
 Nodes (7): download(), downloadDatabaseZipFile(), getCurrentDatabase(), getLocalDatabaseVersion(), isThaiClient(), unzipDatabase(), update()
 
-### Community 37 - "Rangy Library Modules"
+### Community 39 - "Community 39"
 Cohesion: 0.5
 Nodes (4): rangy-core.js (vendored Rangy selection/range library core), rangy-cssclassapplier.js (vendored Rangy CSS class applier module), rangy-serializer.js (vendored Rangy selection serializer module), rangy-textrange.js (vendored Rangy text range module)
 
-### Community 38 - "Toolbar Menu Icons"
+### Community 40 - "Community 40"
 Cohesion: 0.67
 Nodes (4): Clear search (X), Menu: font size, Menu: go to (jump arrow), Menu: refresh
 
-### Community 43 - "Custom View Widgets"
+### Community 45 - "Community 45"
 Cohesion: 0.67
 Nodes (3): ClearableAutoCompleteTextView, CursorPagerAdapter, MyWebView
 
-### Community 44 - "App Brand Assets"
+### Community 46 - "Community 46"
 Cohesion: 0.67
 Nodes (3): app launcher foreground, App launcher icon - blue letter 'E' fused with a Dharma wheel; E-Tipitaka brand mark, THSarabun (SarabunPSK) Thai font family - SVG glyph sheets: Regular, Bold, Italic, BoldItalic; bundled app font for Thai Tipitaka text
 
 ## Knowledge Gaps
 - **71 isolated node(s):** `Constants`, `DictHeadword`, `ViewHolder`, `ViewHolder`, `HeaderViewHolder` (+66 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **32 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Utils` connect `Activity Lifecycle & Pali Editions` to `Book Database & Data Access`, `Comparison & Dictionary Core`, `Thai Data Models & Pivot Conversion`, `App Startup & Data Import`, `Siamrat & MahaChula Editions`, `Reader UI & Chrome`?**
-  _High betweenness centrality (0.166) - this node is a cross-community bridge._
-- **Why does `FavoriteFragment` connect `Favorites` to `Main Activity Orchestration`, `Activity Lifecycle & Pali Editions`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
-- **Why does `ReaderFragment` connect `Reader UI & Chrome` to `Book Database & Data Access`, `Main Activity Orchestration`, `Activity Lifecycle & Pali Editions`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+- **Why does `Utils` connect `Community 2` to `Community 0`, `Community 1`, `Community 3`, `Community 9`, `Community 11`, `Community 19`?**
+  _High betweenness centrality (0.169) - this node is a cross-community bridge._
+- **Why does `FavoriteFragment` connect `Community 7` to `Community 8`, `Community 2`?**
+  _High betweenness centrality (0.060) - this node is a cross-community bridge._
+- **Why does `SearchFragment` connect `Community 4` to `Community 2`?**
+  _High betweenness centrality (0.050) - this node is a cross-community bridge._
 - **What connects `Constants`, `DictHeadword`, `ViewHolder` to the rest of the system?**
   _71 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Book Database & Data Access` be split into smaller, more focused modules?**
+- **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.03 - nodes in this community are weakly interconnected._
-- **Should `Comparison & Dictionary Core` be split into smaller, more focused modules?**
+- **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.04 - nodes in this community are weakly interconnected._
-- **Should `Activity Lifecycle & Pali Editions` be split into smaller, more focused modules?**
+- **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.03 - nodes in this community are weakly interconnected._
