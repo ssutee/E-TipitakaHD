@@ -94,10 +94,26 @@ public class ETRomanScriptDataModel extends ETDataModel {
     openDatabase();
     Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { String.valueOf(volume) }, null, null, "page");
-    cursor.moveToFirst();
-    String[] items = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
-    cursor.close();
-    return Integer.parseInt(items[0]);
+    try {
+      int itemsCol = cursor.getColumnIndex("items");
+      if (itemsCol < 0) {
+        return 1;
+      }
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        String raw = cursor.getString(itemsCol);
+        if (raw == null) continue;
+        for (String token : raw.trim().split("\\s+")) {
+          if (token.isEmpty()) continue;
+          try {
+            return Integer.parseInt(token);
+          } catch (NumberFormatException ignore) {
+          }
+        }
+      }
+      return 1;
+    } finally {
+      cursor.close();
+    }
   }
 
   @Override
@@ -105,19 +121,27 @@ public class ETRomanScriptDataModel extends ETDataModel {
     openDatabase();
     Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { String.valueOf(volume) }, null, null, "page");
-    cursor.moveToFirst();
-    int maxItem = 0;
-    while (!cursor.isAfterLast()) {
-      String[] items = cursor.getString(cursor.getColumnIndex("items")).split("\\s+");
-      for (int i=0; i<items.length; ++i) {
-        if (items[i].length() > 0) {
-          maxItem = Math.max(maxItem, Integer.parseInt(items[i]));
+    try {
+      int itemsCol = cursor.getColumnIndex("items");
+      if (itemsCol < 0) {
+        return 1;
+      }
+      int maxItem = 0;
+      for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+        String raw = cursor.getString(itemsCol);
+        if (raw == null) continue;
+        for (String token : raw.trim().split("\\s+")) {
+          if (token.isEmpty()) continue;
+          try {
+            maxItem = Math.max(maxItem, Integer.parseInt(token));
+          } catch (NumberFormatException ignore) {
+          }
         }
       }
-      cursor.moveToNext();
+      return maxItem > 0 ? maxItem : 1;
+    } finally {
+      cursor.close();
     }
-    cursor.close();
-    return maxItem;
   }
 
   @Override
