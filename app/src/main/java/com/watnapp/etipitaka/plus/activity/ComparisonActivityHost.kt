@@ -41,8 +41,8 @@ object ComparisonActivityContentBridge {
 
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
             val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            WindowInsetsCompat.CONSUMED
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            windowInsets
         }
 
         root.addView(

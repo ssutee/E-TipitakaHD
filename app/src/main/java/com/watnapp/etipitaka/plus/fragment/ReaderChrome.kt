@@ -3,9 +3,12 @@ package com.watnapp.etipitaka.plus.fragment
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -136,8 +139,9 @@ private fun ReaderBottomControls(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(45.dp)
-            .background(ETipitakaThemeTokens.colors.translucentControl),
+            .background(ETipitakaThemeTokens.colors.translucentControl)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .height(45.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {

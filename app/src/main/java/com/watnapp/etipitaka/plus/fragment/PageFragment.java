@@ -85,6 +85,7 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
 
       @Override
       public void onPageFinished(WebView view, String url) {
+        applyBodyBottomPadding(view);
         if(mKeywords != null && mKeywords.trim().length() > 0) {
           ArrayList<String> terms = new ArrayList<String>();
           for (String term : mKeywords.split("\\s+")) {
@@ -104,6 +105,9 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
     int fontSize = prefs.getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     String fontColor = prefs.getString(Constants.FONT_COLOR_KEY, Constants.DEFAULT_FONT_COLOR);
     String backgroundColor = prefs.getString(Constants.BACKGROUND_COLOR_KEY, Constants.DEFAULT_BACKGROUND_COLOR);
+    try {
+      binding.webview.setBackgroundColor(android.graphics.Color.parseColor(backgroundColor));
+    } catch (IllegalArgumentException ignore) {}
     String fontFamily = getString(Build.VERSION.SDK_INT >= 15 ? R.string.font_family_new : R.string.font_family_old);
     mHtml = getString(R.string.html_text_template,
         highlightItemNumbers(mText),
@@ -114,6 +118,25 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
     mHtml = mHtml.replace("\t", "&#9;");
     binding.webview.loadDataWithBaseURL("file:///android_asset/", mHtml, "text/html", "UTF-8", null);
     binding.webview.setOnScrollChangedListener((MyWebView.OnScrollChangedListener) getParentFragment());
+  }
+
+  private void applyBodyBottomPadding(WebView view) {
+    androidx.fragment.app.Fragment parent = getParentFragment();
+    if (!(parent instanceof ReaderFragment) || !((ReaderFragment) parent).hasBottomBar()) {
+      return;
+    }
+    int barPx = getResources().getDimensionPixelSize(R.dimen.reader_bottom_controls_space);
+    int navPx = 0;
+    androidx.core.view.WindowInsetsCompat insets =
+            androidx.core.view.ViewCompat.getRootWindowInsets(view);
+    if (insets != null) {
+      navPx = insets.getInsets(
+              androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom;
+    }
+    float density = view.getResources().getDisplayMetrics().density;
+    int totalCssPx = Math.round((barPx + navPx) / density);
+    view.evaluateJavascript(String.format(Locale.ENGLISH,
+            "document.body.style.paddingBottom='%dpx';", totalCssPx), null);
   }
 
   public void setFontSize(int size) {
@@ -154,6 +177,9 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
     editor.apply();
     binding.webview.loadUrl(String.format("javascript:$('body').css('background-color','%s'); $('body').css('color','%s'); ",
         background, font));
+    try {
+      binding.webview.setBackgroundColor(android.graphics.Color.parseColor(background));
+    } catch (IllegalArgumentException ignore) {}
   }
 
   public String getFontColor() {

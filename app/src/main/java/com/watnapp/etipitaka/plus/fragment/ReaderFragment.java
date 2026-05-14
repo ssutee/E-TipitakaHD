@@ -61,6 +61,10 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
   private int mPage;
   private boolean mShowButtons = false;
 
+  public boolean hasBottomBar() {
+    return mShowButtons;
+  }
+
   private boolean mShowingSeekBar = false;
   private boolean mHidingSeekBar = false;
 
@@ -263,9 +267,7 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
   private void updatePagerBottomMargin() {
     ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewpager.getLayoutParams();
-    params.bottomMargin = mShowButtons
-            ? getResources().getDimensionPixelSize(R.dimen.reader_bottom_controls_space)
-            : 0;
+    params.bottomMargin = 0;
     binding.viewpager.setLayoutParams(params);
   }
 
