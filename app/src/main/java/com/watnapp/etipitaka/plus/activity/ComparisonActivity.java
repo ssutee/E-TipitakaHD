@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,6 +19,8 @@ import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.plus.model.ComparisonActivityNavigationModel;
 import com.watnapp.etipitaka.plus.model.ETDataModel;
 import com.watnapp.etipitaka.plus.model.ETDataModelCreator;
+
+import java.io.File;
 
 import dart.Dart;
 import dart.DartModel;
@@ -112,56 +115,64 @@ public class ComparisonActivity extends AppCompatActivity
   @Override
   public void onCompareButtonClick(final Language language, final int volume, final int page) {
     final ETDataModel sourceModel = language == mDataModel1.getLanguage() ? mDataModel1 : mDataModel2;
-    final ETDataModel targetModel = language == mDataModel1.getLanguage() ? mDataModel2 : mDataModel1;
 
-    if (sourceModel.getLanguage() == Language.THAIBT || targetModel.getLanguage() == Language.THAIBT ||
-        sourceModel.getLanguage() == Language.THAIPB || targetModel.getLanguage() == Language.THAIPB) {
+    if (sourceModel.getLanguage() == Language.THAIBT || sourceModel.getLanguage() == Language.THAIPB) {
       return;
     }
 
-    sourceModel.getComparingItemsAtPage(volume, page, new BookDatabaseHelper.OnGetItemsListener() {
-      @Override
-      public void onGetItemsFinish(final Integer[] items, final Integer[] sections) {
-        mHandler.post(new Runnable() {
-          @Override
-          public void run() {
-            String[] choices = new String[items.length];
-            for (int i=0; i<items.length; ++i) {
-              choices[i] = getString(R.string.go_to_item) + " " +
-                  Utils.convertToThaiNumber(ComparisonActivity.this, items[i]);
-            }
-            new AlertDialog.Builder(ComparisonActivity.this).setTitle(R.string.select_item)
-                .setItems(choices, new DialogInterface.OnClickListener() {
-                  @Override
-                  public void onClick(DialogInterface dialog, final int which) {
-                    final Language targetLanguage = (language.getCode() == navigationModel.mLanguageCode)
-                        ? mLanguage2 : mLanguage1;
-                    final ReaderFragment targetFragment = (language.getCode() == navigationModel.mLanguageCode)
-                        ? mRightFragment : mLeftFragment;
-
-                    sourceModel.convertToPivot(volume, page, items[which], new BookDatabaseHelper.OnConvertToPivotListener() {
-                      @Override
-                      public void onConvertToPivotFinish(int aVolume, int aItem, int aSection) {
-                        targetModel.convertFromPivot(aVolume, aItem, aSection, new BookDatabaseHelper.OnConvertFromPivotListener() {
-                          @Override
-                          public void onConvertFromPivotFinish(final int aVolume, final int aPage) {
-                            mHandler.post(new Runnable() {
-                              @Override
-                              public void run() {
-                                targetFragment.openBook(targetLanguage, aVolume, aPage);
-                                targetFragment.getCurrentPageFragment().scrollToItem(items[which]);
-                              }
-                            });
-                          }
-                        });
-                      }
-                    });
-                  }
-                }).create().show();
+    new AlertDialog.Builder(this).setTitle(R.string.select_langauge)
+        .setItems(Constants.COMPARE_TITLES, (dialog, which) -> {
+          final Language targetLanguage = Constants.COMPARE_LANGUAGES[which];
+          if (targetLanguage == sourceModel.getLanguage()) {
+            return;
           }
-        });
-      }
-    });
+          String dbPath = Utils.getDatabasePath(ComparisonActivity.this, targetLanguage);
+          if (!new File(dbPath).exists()) {
+            Toast.makeText(ComparisonActivity.this,
+                R.string.database_not_found, Toast.LENGTH_LONG).show();
+            return;
+          }
+          sourceModel.getComparingItemsAtPage(volume, page, (items, sections) -> {
+            mHandler.post(() -> pickItemAndLaunch(language, targetLanguage, volume, page, items, sections));
+          });
+        }).create().show();
+  }
+
+  private void pickItemAndLaunch(final Language sourceLanguage, final Language targetLanguage,
+                                 final int volume, final int page,
+                                 final Integer[] items, final Integer[] sections) {
+    if (items == null || items.length == 0) {
+      return;
+    }
+    if (items.length == 1) {
+      launchComparison(sourceLanguage, targetLanguage, volume, page, items[0], sections[0]);
+      return;
+    }
+    String[] choices = new String[items.length];
+    for (int i = 0; i < items.length; ++i) {
+      choices[i] = getString(R.string.go_to_item) + " " +
+          Utils.convertToThaiNumber(ComparisonActivity.this, items[i]);
+    }
+    new AlertDialog.Builder(this).setTitle(R.string.select_item)
+        .setItems(choices, (dialog, which) ->
+            launchComparison(sourceLanguage, targetLanguage, volume, page,
+                items[which], sections[which]))
+        .create().show();
+  }
+
+  private void launchComparison(Language sourceLanguage, Language targetLanguage,
+                                int volume, int page, int item, int section) {
+    Intent intent = new Intent(this, ComparisonActivity.class);
+    intent.putExtra(Constants.LANGUAGE_KEY, sourceLanguage.getCode());
+    intent.putExtra(Constants.COMPARING_LANGUAGE_KEY, targetLanguage.getCode());
+    intent.putExtra(Constants.VOLUME_KEY, volume);
+    intent.putExtra(Constants.PAGE_KEY, page);
+    intent.putExtra(Constants.ITEM_KEY, item);
+    intent.putExtra(Constants.SECTION_KEY, section);
+    intent.putExtra(Constants.KEYWORDS_KEY, "");
+    intent.putExtra(Constants.BUDDHAWAJ_KEY, navigationModel.mIsBuddhawaj);
+    startActivity(intent);
+    finish();
   }
 
   @Override
