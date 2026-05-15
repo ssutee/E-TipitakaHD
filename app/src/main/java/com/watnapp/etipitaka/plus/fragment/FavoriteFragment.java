@@ -173,6 +173,7 @@ public class FavoriteFragment extends Fragment
   }
 
   private void editNote(Favorite favorite) {
+    selectedFavorite = favorite;
     String message = Utils.getSubtitle(getActivity(),favorite.getLanguage(),
         favorite.getVolume(), favorite.getPage(),
         favorite.getItem() != 0 ? Utils.convertToThaiNumber(getActivity(), favorite.getItem()) : "");
