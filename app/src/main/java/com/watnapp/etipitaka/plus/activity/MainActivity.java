@@ -16,7 +16,10 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SubMenu;
+import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -73,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements
   private HistoryDaoHelper mHistoryDaoHelper;
 
   private SlidingMenu mSlidingMenu;
+  private final int[] mContentLoc = new int[2];
+  private float mMenuTapDownX;
+  private float mMenuTapDownY;
   private MenuFragment mMenuFragment;
   private ETipitakaApplication application;
   private final Handler mHandler = new Handler(Looper.getMainLooper());
@@ -628,6 +634,34 @@ public class MainActivity extends AppCompatActivity implements
     handleBackPressed();
   }
 
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    if (mSlidingMenu != null && mSlidingMenu.isMenuShowing()) {
+      View content = mSlidingMenu.getContent();
+      if (content != null) {
+        content.getLocationOnScreen(mContentLoc);
+        if (ev.getRawX() >= mContentLoc[0]) {
+          switch (ev.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+              mMenuTapDownX = ev.getRawX();
+              mMenuTapDownY = ev.getRawY();
+              return true;
+            case MotionEvent.ACTION_UP:
+              int slop = ViewConfiguration.get(this).getScaledTouchSlop();
+              if (Math.abs(ev.getRawX() - mMenuTapDownX) < slop
+                      && Math.abs(ev.getRawY() - mMenuTapDownY) < slop) {
+                mSlidingMenu.showContent();
+              }
+              return true;
+            default:
+              return true;
+          }
+        }
+      }
+    }
+    return super.dispatchTouchEvent(ev);
+  }
+
   private void setupBackPressedCallback() {
     getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
       @Override
@@ -663,7 +697,6 @@ public class MainActivity extends AppCompatActivity implements
   private void setupSlidingMenu() {
     mSlidingMenu = new SlidingMenu(this);
     mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
-    mSlidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_NONE);
     mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
     mSlidingMenu.setShadowDrawable(R.drawable.shadow);
     mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
