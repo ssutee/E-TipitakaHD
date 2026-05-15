@@ -122,16 +122,22 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
 
   private void applyBodyBottomPadding(WebView view) {
     androidx.fragment.app.Fragment parent = getParentFragment();
-    if (!(parent instanceof ReaderFragment) || !((ReaderFragment) parent).hasBottomBar()) {
+    if (!(parent instanceof ReaderFragment)) {
       return;
     }
-    int barPx = getResources().getDimensionPixelSize(R.dimen.reader_bottom_controls_space);
+    boolean hasBottomBar = ((ReaderFragment) parent).hasBottomBar();
+    int barPx = hasBottomBar
+            ? getResources().getDimensionPixelSize(R.dimen.reader_bottom_controls_space)
+            : 0;
     int navPx = 0;
     androidx.core.view.WindowInsetsCompat insets =
             androidx.core.view.ViewCompat.getRootWindowInsets(view);
     if (insets != null) {
       navPx = insets.getInsets(
               androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom;
+    }
+    if (barPx == 0 && navPx == 0) {
+      return;
     }
     float density = view.getResources().getDisplayMetrics().density;
     int totalCssPx = Math.round((barPx + navPx) / density);
