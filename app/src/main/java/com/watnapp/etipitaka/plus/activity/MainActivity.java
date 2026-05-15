@@ -663,6 +663,7 @@ public class MainActivity extends AppCompatActivity implements
   private void setupSlidingMenu() {
     mSlidingMenu = new SlidingMenu(this);
     mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+    mSlidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_NONE);
     mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
     mSlidingMenu.setShadowDrawable(R.drawable.shadow);
     mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
