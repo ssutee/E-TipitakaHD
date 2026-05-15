@@ -66,6 +66,23 @@
 }
 
 # ---------------------------------------------------------------------------
+# Dart / Henson navigation model binders (generated via annotation processing).
+# Dart.bind() resolves <Activity>__NavigationModelBinder reflectively, and
+# the binder assigns the @DartModel field on the activity. R8 has no
+# bytecode reference to either, so without these keeps the binder is
+# stripped and Dart.bind silently leaves the model field null.
+# ---------------------------------------------------------------------------
+-keep class **__NavigationModelBinder { *; }
+-keep class **__ExtraBinder { *; }
+-keep class **$$Henson { *; }
+-keepclassmembers class * {
+    @dart.DartModel <fields>;
+    @dart.BindExtra <fields>;
+}
+-dontwarn dart.**
+-dontwarn henson.**
+
+# ---------------------------------------------------------------------------
 # Third-party libraries without bundled consumer rules
 # ---------------------------------------------------------------------------
 # SlidingMenu (com.jeremyfeinstein.slidingmenu)
