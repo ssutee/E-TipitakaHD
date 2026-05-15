@@ -34,6 +34,7 @@ public class Constants {
   public static final int MENU_ITEM_MARK                = 1020;
   public static final int MENU_ITEM_THAI_DICT           = 1021;
   public static final int MENU_ITEM_ENG_DICT            = 1022;
+  public static final int MENU_ITEM_VERSION             = 1023;
 
 
   public static final int GOTO_PAGE_ID      = 0;

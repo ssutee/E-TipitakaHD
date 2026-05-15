@@ -30,11 +30,16 @@ android {
         versionName "2.4.23"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "int", "MIN_SDK", "21"
+        buildConfigField "int", "TARGET_SDK", "36"
+        buildConfigField "int", "COMPILE_SDK", "36"
     }
 
     buildFeatures {
         viewBinding = true
         compose = true
+        buildConfig = true
     }
 
     signingConfigs {

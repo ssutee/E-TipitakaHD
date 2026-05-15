@@ -308,4 +308,8 @@
     <string name="update">ปรับปรุง</string>
     <string name="thaims_short_name">เฉลิมพระเกียรติ</string>
     <string name="download_error">เกิดข้อผิดพลาดในการดาวน์โหลด</string>
+    <string name="version_menu">เวอร์ชั่น</string>
+    <string name="version_label_build">เวอร์ชัน %1$s (%2$d)</string>
+    <string name="version_label_device">อุปกรณ์: Android %1$s (API %2$d)</string>
+    <string name="version_label_sdks">Min %1$d  •  Target %2$d  •  Compile %3$d</string>
 </resources>
