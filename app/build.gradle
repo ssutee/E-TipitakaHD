@@ -84,6 +84,7 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.guava
     implementation libs.kotlinx.coroutines.core
+    implementation libs.okhttp
     implementation libs.androidx.lifecycle.livedata.core.ktx
     implementation libs.androidx.lifecycle.viewmodel.ktx
     implementation libs.commons.io
@@ -102,6 +103,7 @@ dependencies {
     annotationProcessor libs.henson.processor
 
     testImplementation libs.junit
+    testImplementation libs.org.json
     androidTestImplementation platform(libs.androidx.compose.bom)
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
