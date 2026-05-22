@@ -331,8 +331,10 @@
     <string name="account_upload_success">อัปโหลดข้อมูลสำเร็จ</string>
     <string name="account_upload_failed">อัปโหลดข้อมูลไม่สำเร็จ</string>
     <string name="account_file_exists">มีข้อมูลสำรองของวันนี้อยู่แล้ว ลบรายการเดิมก่อนหากต้องการอัปโหลดใหม่</string>
-    <string name="account_download_success">นำข้อมูลเข้าสำเร็จ</string>
-    <string name="account_download_failed">ดาวน์โหลดข้อมูลไม่สำเร็จ</string>
+    <string name="account_download_success">บันทึกไฟล์สำเร็จ</string>
+    <string name="account_download_failed">บันทึกไฟล์ไม่สำเร็จ</string>
+    <string name="account_import_success">นำข้อมูลเข้าสำเร็จ</string>
+    <string name="account_import_failed">นำข้อมูลเข้าไม่สำเร็จ</string>
     <string name="account_delete_failed">ลบข้อมูลไม่สำเร็จ</string>
     <string name="account_platform_ios">iOS</string>
     <string name="account_platform_android">Android</string>

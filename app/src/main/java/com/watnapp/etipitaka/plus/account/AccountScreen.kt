@@ -3,6 +3,8 @@ package com.watnapp.etipitaka.plus.account
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +20,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,15 +43,22 @@ import com.watnapp.etipitaka.plus.R
 fun AccountScreen(viewModel: AccountViewModel) {
     when (val state = viewModel.uiState) {
         is AccountUiState.LoggedOut -> LoggedOutContent(state, viewModel::login)
-        is AccountUiState.LoggedIn -> LoggedInContent(
-            state = state,
-            onUpload = viewModel::upload,
-            onRefresh = viewModel::refreshBackups,
-            onLogout = viewModel::logout,
-            onDownload = viewModel::download,
-            onDelete = viewModel::delete,
-            onMessageShown = viewModel::messageShown,
-        )
+        is AccountUiState.LoggedIn -> {
+            val context = LocalContext.current
+            LoggedInContent(
+                state = state,
+                onUpload = viewModel::upload,
+                onRefresh = viewModel::refreshBackups,
+                onLogout = viewModel::logout,
+                onImport = viewModel::importBackup,
+                onSave = { backup, uri ->
+                    viewModel.saveToFile(backup, uri, context.contentResolver)
+                },
+                onDelete = viewModel::delete,
+                onSelectPlatform = viewModel::selectPlatform,
+                onMessageShown = viewModel::messageShown,
+            )
+        }
     }
 }
 
@@ -107,17 +118,29 @@ private fun LoggedOutContent(
     }
 }
 
+private val BACKUP_PLATFORMS = listOf("android", "ios", "pc")
+
 @Composable
 private fun LoggedInContent(
     state: AccountUiState.LoggedIn,
     onUpload: () -> Unit,
     onRefresh: () -> Unit,
     onLogout: () -> Unit,
-    onDownload: (ServerBackup) -> Unit,
+    onImport: (ServerBackup) -> Unit,
+    onSave: (ServerBackup, Uri) -> Unit,
     onDelete: (ServerBackup) -> Unit,
+    onSelectPlatform: (String) -> Unit,
     onMessageShown: () -> Unit,
 ) {
     val context = LocalContext.current
+    var pendingDownload by remember { mutableStateOf<ServerBackup?>(null) }
+    val saveLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        val backup = pendingDownload
+        if (uri != null && backup != null) onSave(backup, uri)
+        pendingDownload = null
+    }
     LaunchedEffect(state.messageRes) {
         val res = state.messageRes
         if (res != null) {
@@ -160,15 +183,30 @@ private fun LoggedInContent(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
         Divider()
-        if (state.backups.isEmpty()) {
+        TabRow(selectedTabIndex = BACKUP_PLATFORMS.indexOf(state.selectedPlatform).coerceAtLeast(0)) {
+            BACKUP_PLATFORMS.forEach { platform ->
+                Tab(
+                    selected = platform == state.selectedPlatform,
+                    onClick = { onSelectPlatform(platform) },
+                    text = { Text(platformLabel(platform)) },
+                )
+            }
+        }
+        val visibleBackups = state.backups.filter { it.platform == state.selectedPlatform }
+        if (visibleBackups.isEmpty()) {
             Text(stringResource(R.string.account_no_backups))
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(state.backups, key = { it.pk }) { backup ->
+                items(visibleBackups, key = { it.pk }) { backup ->
                     BackupRow(
                         backup = backup,
-                        enabled = !state.busy,
-                        onDownload = { onDownload(backup) },
+                        actionsEnabled = !state.busy && backup.platform == "android",
+                        deleteEnabled = !state.busy,
+                        onDownload = {
+                            pendingDownload = backup
+                            saveLauncher.launch(backup.filename)
+                        },
+                        onImport = { onImport(backup) },
                         onDelete = { onDelete(backup) },
                     )
                 }
@@ -180,18 +218,23 @@ private fun LoggedInContent(
 @Composable
 private fun BackupRow(
     backup: ServerBackup,
-    enabled: Boolean,
+    actionsEnabled: Boolean,
+    deleteEnabled: Boolean,
     onDownload: () -> Unit,
+    onImport: () -> Unit,
     onDelete: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(platformLabel(backup.platform) + "  •  " + backup.filename)
+        Text(backup.filename)
         Text(backup.createdAt)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onDownload, enabled = enabled) {
+            OutlinedButton(onClick = onDownload, enabled = actionsEnabled) {
                 Text(stringResource(R.string.account_download))
             }
-            OutlinedButton(onClick = onDelete, enabled = enabled) {
+            OutlinedButton(onClick = onImport, enabled = actionsEnabled) {
+                Text(stringResource(R.string.import_data))
+            }
+            OutlinedButton(onClick = onDelete, enabled = deleteEnabled) {
                 Text(stringResource(R.string.account_delete))
             }
         }

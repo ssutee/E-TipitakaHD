@@ -1,5 +1,7 @@
 package com.watnapp.etipitaka.plus.account
 
+import android.content.ContentResolver
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +11,7 @@ import com.watnapp.etipitaka.plus.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -23,6 +26,7 @@ sealed interface AccountUiState {
     data class LoggedIn(
         val username: String,
         val backups: List<ServerBackup> = emptyList(),
+        val selectedPlatform: String = "android",
         val busy: Boolean = false,
         val messageRes: Int? = null,
     ) : AccountUiState
@@ -123,7 +127,8 @@ class AccountViewModel(
         }
     }
 
-    fun download(backup: ServerBackup) {
+    /** Fetches a backup and merges it into the local database. */
+    fun importBackup(backup: ServerBackup) {
         val token = session.token ?: return forceLoggedOut()
         val current = uiState as? AccountUiState.LoggedIn ?: return
         uiState = current.copy(busy = true, messageRes = null)
@@ -134,6 +139,35 @@ class AccountViewModel(
                         runCatching { importer.importAndroidJson(dl.value) }
                             .fold({ ApiResult.Success(Unit) },
                                   { ApiResult.ServerError("import failed") })
+                    }
+                    ApiResult.AuthError -> ApiResult.AuthError
+                    ApiResult.NetworkError -> ApiResult.NetworkError
+                    is ApiResult.ServerError -> dl
+                }
+            }
+            when (result) {
+                is ApiResult.Success -> setMessage(R.string.account_import_success)
+                ApiResult.AuthError -> forceLoggedOut(R.string.account_session_expired)
+                else -> setMessage(R.string.account_import_failed)
+            }
+        }
+    }
+
+    /** Fetches a backup and writes it to the user-picked [uri], without importing. */
+    fun saveToFile(backup: ServerBackup, uri: Uri, resolver: ContentResolver) {
+        val token = session.token ?: return forceLoggedOut()
+        val current = uiState as? AccountUiState.LoggedIn ?: return
+        uiState = current.copy(busy = true, messageRes = null)
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                when (val dl = api.downloadBackup(token, backup.pk)) {
+                    is ApiResult.Success -> {
+                        runCatching {
+                            val stream = resolver.openOutputStream(uri)
+                                ?: throw IOException("Unable to open output stream for $uri")
+                            stream.use { it.write(dl.value.toByteArray()) }
+                        }.fold({ ApiResult.Success(Unit) },
+                               { ApiResult.ServerError("write failed") })
                     }
                     ApiResult.AuthError -> ApiResult.AuthError
                     ApiResult.NetworkError -> ApiResult.NetworkError
@@ -159,6 +193,12 @@ class AccountViewModel(
                 else -> setMessage(R.string.account_delete_failed)
             }
         }
+    }
+
+    /** Switches the visible backup-list tab. */
+    fun selectPlatform(platform: String) {
+        val current = uiState as? AccountUiState.LoggedIn ?: return
+        uiState = current.copy(selectedPlatform = platform)
     }
 
     /** Clears a transient message after the UI has shown it. */

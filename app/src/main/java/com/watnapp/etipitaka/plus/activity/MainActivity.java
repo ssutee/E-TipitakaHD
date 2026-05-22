@@ -305,9 +305,9 @@ public class MainActivity extends AppCompatActivity implements
     preferencesMenu.getItem().setIcon(android.R.drawable.ic_menu_preferences)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-    menu.add(Menu.NONE, Constants.MENU_ITEM_VERSION, Menu.NONE, R.string.version_menu)
-        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
     menu.add(Menu.NONE, Constants.MENU_ITEM_ACCOUNT, Menu.NONE, R.string.account_menu)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+    menu.add(Menu.NONE, Constants.MENU_ITEM_VERSION, Menu.NONE, R.string.version_menu)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
 
     return super.onCreateOptionsMenu(menu);
