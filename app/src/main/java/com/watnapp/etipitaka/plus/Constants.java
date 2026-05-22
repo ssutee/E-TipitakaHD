@@ -35,6 +35,7 @@ public class Constants {
   public static final int MENU_ITEM_THAI_DICT           = 1021;
   public static final int MENU_ITEM_ENG_DICT            = 1022;
   public static final int MENU_ITEM_VERSION             = 1023;
+  public static final int MENU_ITEM_ACCOUNT             = 1024;
 
 
   public static final int GOTO_PAGE_ID      = 0;
@@ -53,6 +54,8 @@ public class Constants {
   public static final String THAI_HOST = "http://download.watnapahpong.org/data/etipitaka/android";
   public static final String UPDATE_URL = "http://download.watnapahpong.org/data/etipitaka/android/android.json";
   public static final String GEO_API = "http://media1.watnapahpong.org/geo.php";
+  public static final String DATA_SERVER_URL = "https://data.etipitaka.com";
+  public static final String SIGNUP_URL = DATA_SERVER_URL + "/signup/";
   public static final String DATABASE_ZIP_FILE = "etipitaka_plus.zip";
   public static final String DATABASE_ASSETS_PATH = "databases/" + DATABASE_ZIP_FILE;
 
