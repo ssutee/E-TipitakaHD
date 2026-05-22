@@ -307,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements
 
     menu.add(Menu.NONE, Constants.MENU_ITEM_VERSION, Menu.NONE, R.string.version_menu)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+    menu.add(Menu.NONE, Constants.MENU_ITEM_ACCOUNT, Menu.NONE, R.string.account_menu);
 
     return super.onCreateOptionsMenu(menu);
   }
@@ -374,6 +375,9 @@ public class MainActivity extends AppCompatActivity implements
       case Constants.MENU_ITEM_VERSION:
         showVersionDialog();
         return true;
+      case Constants.MENU_ITEM_ACCOUNT:
+        showAccount();
+        return true;
     }
     return super.onOptionsItemSelected(item);
   }
@@ -381,6 +385,11 @@ public class MainActivity extends AppCompatActivity implements
   private void showVersionDialog() {
     new com.watnapp.etipitaka.plus.fragment.VersionDialogFragment()
         .show(getSupportFragmentManager(), "VersionDialogFragment");
+  }
+
+  private void showAccount() {
+    startActivity(new android.content.Intent(this,
+        com.watnapp.etipitaka.plus.activity.AccountActivity.class));
   }
 
   private void showFontDialog() {
