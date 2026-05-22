@@ -6,6 +6,8 @@ import com.watnapp.etipitaka.plus.adapter.ThaiDictAdapter
 import com.watnapp.etipitaka.plus.helper.EnglishDictDatabaseHelper
 import com.watnapp.etipitaka.plus.helper.PaliDictDatabaseHelper
 import com.watnapp.etipitaka.plus.helper.ThaiDictDatabaseHelper
+import com.watnapp.etipitaka.plus.account.UserDataExporter
+import com.watnapp.etipitaka.plus.account.UserDataImporter
 import com.watnapp.etipitaka.plus.model.FavoriteDaoHelper
 import com.watnapp.etipitaka.plus.model.HistoryDaoHelper
 import com.watnapp.etipitaka.plus.model.HistoryItemDaoHelper
@@ -27,5 +29,7 @@ val appModule = module {
     single { HistoryItemDaoHelper(androidContext()) }
     single { FavoriteDaoHelper(androidContext()) }
     single { HistoryDaoHelper(androidContext()) }
+    single { UserDataExporter(get(), get()) }
+    single { UserDataImporter(get(), get()) }
     viewModel { SharedViewModel() }
 }
