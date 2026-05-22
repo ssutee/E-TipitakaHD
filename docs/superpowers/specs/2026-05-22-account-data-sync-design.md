@@ -57,7 +57,7 @@ Auth header on all authenticated requests: `Authorization: Token <token>`
 |----------|--------|---------|----------|
 | `/rest-auth/login/` | POST | form-encoded `username`, `password` | 200 `{"key": "<token>"}`; 400 `{"non_field_errors": [...]}` |
 | `/rest-auth/logout/` | POST | token header | 200 |
-| `/upload/` | POST | multipart: `file` (the export JSON), `title` | 200/201 |
+| `/upload/` | POST | multipart: `file` (the export JSON), `title` | `{"success": true, "pk": <n>}` / `{"file_exists": true}` / `{"success": false}` |
 | `/user_data_list/` | GET | token header | `{"items": "<json-encoded-string>"}` |
 | `/user_data/{pk}/` | GET | token header | binary backup file (the JSON export) |
 | `/user_data/{pk}/` | DELETE | token header | 204 |
@@ -67,8 +67,26 @@ Notes:
 - `/user_data_list/` returns `items` as a **JSON-encoded string** nested inside
   the JSON object — it must be parsed twice. Each decoded item carries
   `pk`, `file` (server path), `platform`, `created_at`, `deleted`.
-- The upload filename is `edata-YYYY-MM-DD.js`. The backend infers `platform`
-  from the file extension; `.js` maps to `android`.
+- **Platform tagging is by filename extension only.** The backend's
+  `upload_view` (`data-etipitaka/app/user_data/views.py`) sets `platform` from
+  the uploaded filename: `.json.etz` or `.json` → `ios`; `.etz` → `pc`;
+  `.js` → `android`; no match → `platform = None` (a backend bug — the stored
+  path becomes `username/None/filename`). There is no other platform signal —
+  the file content does not matter.
+- **The upload filename MUST end in `.js`** so the backend tags it `android`.
+  This is `edata-YYYY-MM-DD.js`. Note this differs from the SAF export
+  filename, which is `edata-YYYY-MM-DD.json` (the system "Save as" UI appends
+  `.json` for the `application/json` MIME type). The file *content* is
+  identical — the Android export JSON `{favorite_table, history_table}` — only
+  the extension differs, and only to drive backend platform tagging. The
+  upload must not reuse the SAF `.json` name, or the backup would be misfiled
+  as iOS.
+- **Upload response is a JSON body, not a bare status code.** `{"success":
+  true, "pk": <n>}` on success; `{"file_exists": true}` when a non-deleted
+  `UserData` row with the same `username/android/filename` path already
+  exists; `{"success": false}` when the form is invalid.
+- Because the server filename carries only the date (`edata-YYYY-MM-DD.js`), a
+  second upload on the same day collides and returns `{"file_exists": true}`.
 - `created_at` time format: `yyyy-MM-dd'T'HH:mm:ss.SSSZ`.
 
 ## Architecture
@@ -129,7 +147,9 @@ Compose + Material3, consistent with `VersionDialogFragment`.
 - **Logout:** `POST /rest-auth/logout/` → clear `SessionManager` → `LoggedOut`.
   Clear local session even if the network call fails.
 - **Upload:** `UserDataExporter.buildExportJson()` → multipart `POST /upload/`
-  with filename `edata-YYYY-MM-DD.js` → refresh list.
+  with filename `edata-YYYY-MM-DD.js` (the `.js` extension is required — see
+  Backend protocol notes) → on `success` refresh list; on `file_exists` show a
+  "today's backup already exists" message and offer delete-then-re-upload.
 - **List:** `GET /user_data_list/` → parse the double-encoded `items` →
   `List<ServerBackup>`.
 - **Download:** `GET /user_data/{pk}/` → `UserDataImporter.importAndroidJson`
@@ -144,7 +164,10 @@ Coroutines + Koin).
 - Network failure / server error → inline message in the screen + a toast.
 - 401 on an authenticated call → clear session, return to the login state.
 - Login 400 → "login failed" inline error.
-- Upload/download/delete failure → toast, list state left unchanged.
+- Upload `{"file_exists": true}` → "today's backup already exists" message;
+  offer to delete the existing same-day backup and re-upload.
+- Upload `{"success": false}` → generic upload-failed toast.
+- Download/delete failure → toast, list state left unchanged.
 
 ## Security / credential storage
 
