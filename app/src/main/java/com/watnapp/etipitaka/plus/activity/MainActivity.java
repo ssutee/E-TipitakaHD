@@ -41,6 +41,8 @@ import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.model.*;
+import com.watnapp.etipitaka.plus.account.UserDataExporter;
+import com.watnapp.etipitaka.plus.account.UserDataImporter;
 import com.watnapp.etipitaka.plus.vm.SharedViewModel;
 
 import org.json.JSONArray;
@@ -847,19 +849,13 @@ public class MainActivity extends AppCompatActivity implements
 
   private void importAndroidData(String path) {
     try {
-      JSONObject jsonObject = new JSONObject(Utils.readTextFile(path));
-      Log.d(TAG, jsonObject.toString());
-
-      mFavoriteDaoHelper.restoreJSONArray(jsonObject.getJSONArray(FavoriteTable.TABLE_NAME));
-      mHistoryDaoHelper.restoreJSONArray(jsonObject.getJSONArray(HistoryTable.TABLE_NAME));
-
+      ((UserDataImporter) get(UserDataImporter.class)).importAndroidJson(Utils.readTextFile(path));
       mHandler.post(new Runnable() {
         @Override
         public void run() {
           Toast.makeText(MainActivity.this, R.string.import_complete, Toast.LENGTH_SHORT).show();
         }
       });
-
     } catch (IOException | JSONException e) {
       e.printStackTrace();
       mHandler.post(new Runnable() {
@@ -1076,16 +1072,14 @@ public class MainActivity extends AppCompatActivity implements
       public void run() {
         boolean success = false;
         try {
-          JSONObject jsonObject = new JSONObject();
-          jsonObject.put(FavoriteTable.TABLE_NAME, mFavoriteDaoHelper.dumpJSONArray());
-          jsonObject.put(HistoryTable.TABLE_NAME, mHistoryDaoHelper.dumpJSONArray());
+          String exportJson = ((UserDataExporter) get(UserDataExporter.class)).buildExportJson();
           OutputStream os = getContentResolver().openOutputStream(uri);
           if (os == null) {
             throw new IOException("Unable to open output stream for " + uri);
           }
           BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
           try {
-            bw.write(jsonObject.toString());
+            bw.write(exportJson);
             bw.flush();
           } finally {
             bw.close();
