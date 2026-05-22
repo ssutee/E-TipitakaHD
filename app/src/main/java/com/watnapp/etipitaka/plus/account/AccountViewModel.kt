@@ -80,7 +80,7 @@ class AccountViewModel(
     fun refreshBackups() {
         val token = session.token ?: return forceLoggedOut()
         val current = uiState as? AccountUiState.LoggedIn ?: return
-        uiState = current.copy(busy = true, messageRes = null)
+        uiState = current.copy(busy = true)
         viewModelScope.launch {
             when (val result = withContext(Dispatchers.IO) { api.listBackups(token) }) {
                 is ApiResult.Success -> {

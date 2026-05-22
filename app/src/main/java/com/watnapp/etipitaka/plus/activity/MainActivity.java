@@ -307,7 +307,8 @@ public class MainActivity extends AppCompatActivity implements
 
     menu.add(Menu.NONE, Constants.MENU_ITEM_VERSION, Menu.NONE, R.string.version_menu)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
-    menu.add(Menu.NONE, Constants.MENU_ITEM_ACCOUNT, Menu.NONE, R.string.account_menu);
+    menu.add(Menu.NONE, Constants.MENU_ITEM_ACCOUNT, Menu.NONE, R.string.account_menu)
+        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
 
     return super.onCreateOptionsMenu(menu);
   }
