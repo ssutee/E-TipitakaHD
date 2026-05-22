@@ -394,6 +394,12 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
   }
 
   private void showButtons() {
+    // Guard against delayed callbacks (e.g. PageFragment.scrollToItem posts an
+    // 800ms Runnable that calls onScrollDown -> these helpers) firing after the
+    // fragment's view was destroyed and binding was nulled in onDestroyView.
+    if (binding == null) {
+      return;
+    }
     if (!mShowButtons || binding.layoutButtons.getVisibility() == View.VISIBLE || mShowingButtons) {
       return;
     }
@@ -409,6 +415,10 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
       @Override
       public void onAnimationEnd(Animation animation) {
+        if (binding == null) {
+          mShowingButtons = false;
+          return;
+        }
         binding.layoutButtons.setVisibility(View.VISIBLE);
         mShowingButtons = false;
       }
@@ -422,6 +432,9 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
   }
 
   private void hideButtons() {
+    if (binding == null) {
+      return;
+    }
     if (!mShowButtons || binding.layoutButtons.getVisibility() == View.GONE || mHidingButtons) {
       return;
     }
@@ -437,6 +450,10 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
       @Override
       public void onAnimationEnd(Animation animation) {
+        if (binding == null) {
+          mHidingButtons = false;
+          return;
+        }
         binding.layoutButtons.setVisibility(View.GONE);
         mHidingButtons = false;
       }
@@ -449,6 +466,9 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
   }
 
   private void showSeekBar() {
+    if (binding == null) {
+      return;
+    }
     if (binding.seekbar.getVisibility() == View.VISIBLE || mShowingSeekBar) {
       return;
     }
@@ -464,6 +484,10 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
       @Override
       public void onAnimationEnd(Animation animation) {
+        if (binding == null) {
+          mShowingSeekBar = false;
+          return;
+        }
         binding.seekbar.setVisibility(View.VISIBLE);
         mShowingSeekBar = false;
       }
@@ -477,6 +501,9 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
   }
 
   private void hideSeekBar() {
+    if (binding == null) {
+      return;
+    }
     if (binding.seekbar.getVisibility() == View.GONE || mHidingSeekBar) {
       return;
     }
@@ -492,6 +519,10 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
       @Override
       public void onAnimationEnd(Animation animation) {
+        if (binding == null) {
+          mHidingSeekBar = false;
+          return;
+        }
         binding.seekbar.setVisibility(View.GONE);
         mHidingSeekBar = false;
       }
