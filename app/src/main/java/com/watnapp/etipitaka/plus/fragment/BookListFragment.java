@@ -57,8 +57,17 @@ public class BookListFragment extends Fragment {
     super.onViewCreated(view, savedInstanceState);
     renderBookList();
     viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-    viewModel.getSelected().observe(getActivity(), language -> {
-      dataModel = ETDataModelCreator.create(language, getActivity());
+    // Attach the observer to the view's lifecycle so it's removed when the
+    // fragment's view is destroyed — prevents stale callbacks (e.g. when a
+    // background DownloadDatabase callback fires SharedViewModel.select after
+    // the fragment detached) from running with a null Activity, which would
+    // otherwise NPE inside ETThaiSupremeDataModel's Kotlin parameter check.
+    viewModel.getSelected().observe(getViewLifecycleOwner(), language -> {
+      Activity activity = getActivity();
+      if (activity == null) {
+        return;
+      }
+      dataModel = ETDataModelCreator.create(language, activity);
       renderBookList();
     });
   }
