@@ -33,21 +33,49 @@ public abstract class ETBasicDataModel extends ETDataModel {
   public void getItemsAtPage(final int volume, final int page, final BookDatabaseHelper.OnGetItemsListener listener) {
     openDatabase();
     new Thread(() -> {
-      Cursor cursor = db.query("main", null, "volume=? AND page=?",
-          new String[]{volumeFormat(volume), pageFormat(page)}, null, null, null);
-      cursor.moveToFirst();
-      String s = cursor.getString(cursor.getColumnIndex("items"));
-      String[] tokens = (s.isEmpty() ? "0" : s).split("\\s+");
-      ArrayList<Integer> items = new ArrayList<Integer>();
-      for (int i=0; i<tokens.length; ++i) {
-        items.add(Integer.parseInt(tokens[i]));
+      Cursor cursor = null;
+      try {
+        cursor = db.query("main", null, "volume=? AND page=?",
+            new String[]{volumeFormat(volume), pageFormat(page)}, null, null, null);
+        int itemsCol = cursor.getColumnIndex("items");
+        // No matching row (out-of-range page/volume, stale saved position, etc.)
+        // or missing column => report "no items" instead of crashing on getString.
+        if (!cursor.moveToFirst() || itemsCol < 0) {
+          listener.onGetItemsFinish(null, null);
+          return;
+        }
+        String s = cursor.getString(itemsCol);
+        String[] tokens = ((s == null || s.isEmpty()) ? "0" : s).split("\\s+");
+        ArrayList<Integer> items = new ArrayList<Integer>();
+        for (String token : tokens) {
+          if (token.isEmpty()) {
+            continue;
+          }
+          try {
+            items.add(Integer.parseInt(token));
+          } catch (NumberFormatException ignored) {
+            // Skip malformed item; protects against bad rows in older DBs.
+          }
+        }
+        if (items.isEmpty()) {
+          listener.onGetItemsFinish(null, null);
+          return;
+        }
+        int section = BookDatabaseHelper.getSubItem(mContext, getLanguage(), volume, page, items.get(0));
+        ArrayList<Integer> sections = new ArrayList<Integer>();
+        for (int i = 0; i < items.size(); ++i) {
+          sections.add(section);
+        }
+        listener.onGetItemsFinish(items.toArray(new Integer[items.size()]),
+            sections.toArray(new Integer[sections.size()]));
+      } catch (Exception e) {
+        Log.e(TAG, "getItemsAtPage failed for volume=" + volume + ", page=" + page, e);
+        listener.onGetItemsFinish(null, null);
+      } finally {
+        if (cursor != null) {
+          cursor.close();
+        }
       }
-      int section = BookDatabaseHelper.getSubItem(mContext, getLanguage(), volume, page, Integer.parseInt(tokens[0]));
-      ArrayList<Integer> sections = new ArrayList<Integer>();
-      for (int i=0; i<tokens.length; ++i) {
-        sections.add(section);
-      }
-      listener.onGetItemsFinish(items.toArray(new Integer[items.size()]), sections.toArray(new Integer[sections.size()]));
     }).start();
   }
 
