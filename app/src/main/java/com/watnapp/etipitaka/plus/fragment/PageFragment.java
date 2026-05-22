@@ -26,6 +26,7 @@ import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.widget.MyWebView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +50,16 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
   private BookDatabaseHelper.Language mLanguage;
   private boolean mIsBuddhawaj;
   private FragmentPageBinding binding;
+
+  /**
+   * Tracks Runnables we have posted on the WebView so onDestroyView can
+   * cancel them. Without this, a delayed Runnable (e.g. 800ms scroll-down)
+   * keeps firing after the fragment's view is destroyed and can dereference
+   * the now-nulled binding inside the Runnable, or call into a parent
+   * fragment whose binding is also nulled (see ReaderFragment.hideSeekBar
+   * NPE).
+   */
+  private final List<Runnable> mPendingRunnables = new ArrayList<>();
 
   private Handler mHandler = new Handler(this);
 
@@ -251,35 +262,67 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
   }
 
   public void scrollToKeywords() {
-    binding.webview.postDelayed(new Runnable() {
+    postOnWebView(500, new Runnable() {
       @Override
       public void run() {
+        if (binding == null) return;
         binding.webview.loadUrl("javascript:scrollToKeywords();");
       }
-    }, 500);
+    });
 
-    binding.webview.postDelayed(new Runnable() {
+    postOnWebView(800, new Runnable() {
       @Override
       public void run() {
-        binding.webview.getOnScrollChangedListener().onScrollDown(binding.webview);
+        if (binding == null) return;
+        MyWebView.OnScrollChangedListener listener = binding.webview.getOnScrollChangedListener();
+        if (listener != null) {
+          listener.onScrollDown(binding.webview);
+        }
       }
-    }, 800);
+    });
   }
 
   public void scrollToItem(final int number) {
-    binding.webview.postDelayed(new Runnable() {
+    postOnWebView(500, new Runnable() {
       @Override
       public void run() {
+        if (binding == null) return;
         binding.webview.loadUrl(String.format("javascript:scrollToItem(\"%d\");", number));
       }
-    }, 500);
+    });
 
-    binding.webview.postDelayed(new Runnable() {
+    postOnWebView(800, new Runnable() {
       @Override
       public void run() {
-        binding.webview.getOnScrollChangedListener().onScrollDown(binding.webview);
+        if (binding == null) return;
+        MyWebView.OnScrollChangedListener listener = binding.webview.getOnScrollChangedListener();
+        if (listener != null) {
+          listener.onScrollDown(binding.webview);
+        }
       }
-    }, 800);
+    });
+  }
+
+  private void postOnWebView(long delayMs, Runnable runnable) {
+    if (binding == null) return;
+    mPendingRunnables.add(runnable);
+    binding.webview.postDelayed(runnable, delayMs);
+  }
+
+  @Override
+  public void onDestroyView() {
+    // Cancel pending Runnables before the view's WebView is torn down, so
+    // late callbacks cannot fire into a destroyed view tree. Also null the
+    // binding to release the view reference (avoids leaking the view via
+    // the field after onDestroyView).
+    if (binding != null) {
+      for (Runnable r : mPendingRunnables) {
+        binding.webview.removeCallbacks(r);
+      }
+    }
+    mPendingRunnables.clear();
+    binding = null;
+    super.onDestroyView();
   }
 
 }
