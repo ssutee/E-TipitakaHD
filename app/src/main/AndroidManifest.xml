@@ -69,6 +69,11 @@
             android:theme="@style/CustomTheme.NoActionBar"
             android:label="@string/english_dict">
         </activity>
+        <activity
+            android:name=".activity.AccountActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:label="@string/account_title"
+            android:exported="false" />
         <provider
             android:name=".model.DatabaseProvider"
             android:authorities="com.watnapp.etipitaka.plus.model.contentprovider"
