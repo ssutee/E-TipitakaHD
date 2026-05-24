@@ -86,12 +86,20 @@ public class ComparisonActivity extends AppCompatActivity
                         mRightFragment, "right").commit();
 
                 if (page > 0) {
+                  // ReaderFragment.scrollToItemAtPage polls the adapter and
+                  // routes through PageFragment's WebView-load latch — but it
+                  // needs mRightFragment's view-binding to exist (reads
+                  // binding.viewpager). beginTransaction().commit() above is
+                  // async, so delay long enough for onCreateView to run.
+                  // 200ms is conservative on emulator + low-end devices.
                   mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                      mRightFragment.getPageFragment(mRightFragment.getCurrentPage()).scrollToItem(navigationModel.mItem);
+                      mRightFragment.scrollToItemAtPage(
+                              mRightFragment.getCurrentPage(),
+                              navigationModel.mItem);
                     }
-                  }, 500);
+                  }, 200);
                 } else {
                   finish();
                 }

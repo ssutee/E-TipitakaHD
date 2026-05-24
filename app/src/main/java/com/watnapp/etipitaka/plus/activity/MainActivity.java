@@ -788,11 +788,7 @@ public class MainActivity extends AppCompatActivity implements
     final Integer[] pages = dataModel.getPagesByItem(mVolume, item, mItemIndexSystem==0);
 
     if (pages.length == 1) {
-      getReaderFragment().setCurrentPage(pages[0], true);
-      PageFragment fragment = getReaderFragment().getPageFragment(pages[0]);
-      if (fragment != null) {
-        fragment.scrollToItem(item);
-      }
+      getReaderFragment().scrollToItemAtPage(pages[0], item);
     } else if (pages.length > 1) {
       String[] choices = new String[pages.length];
       for (int i=0; i < pages.length; ++i) {
@@ -802,11 +798,7 @@ public class MainActivity extends AppCompatActivity implements
           .setItems(choices, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              getReaderFragment().setCurrentPage(pages[which], true);
-              PageFragment fragment = getReaderFragment().getPageFragment(pages[0]);
-              if (fragment != null) {
-                fragment.scrollToItem(item);
-              }
+              getReaderFragment().scrollToItemAtPage(pages[which], item);
             }
           })
           .create().show();

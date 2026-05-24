@@ -287,6 +287,42 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
     binding.viewpager.setCurrentItem(page - 1, smoothScroll);
   }
 
+  /**
+   * Navigate to {@code page} and scroll its PageFragment to {@code item} once
+   * the fragment is available. ViewPager2's FragmentStateAdapter creates
+   * fragments lazily, so an immediate {@code getPageFragment(page)} after
+   * {@link #setCurrentPage} usually returns {@code null}. We poll the adapter
+   * until the fragment exists, then delegate to PageFragment.scrollToItem
+   * (which latches against the WebView load).
+   */
+  public void scrollToItemAtPage(final int page, final int item) {
+    setCurrentPage(page, true);
+    if (item <= 0) return;
+    tryScrollToItem(page, item, 0);
+  }
+
+  private static final int SCROLL_TO_ITEM_MAX_TRIES = 40;
+  private static final long SCROLL_TO_ITEM_RETRY_MS = 50L;
+
+  private void tryScrollToItem(final int page, final int item, final int tries) {
+    if (binding == null) return;
+    PageFragment fragment = getPageFragment(page);
+    if (fragment != null) {
+      fragment.scrollToItem(item);
+      return;
+    }
+    if (tries >= SCROLL_TO_ITEM_MAX_TRIES) {
+      Log.w(TAG, "scrollToItemAtPage: PageFragment never appeared for page " + page);
+      return;
+    }
+    binding.viewpager.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        tryScrollToItem(page, item, tries + 1);
+      }
+    }, SCROLL_TO_ITEM_RETRY_MS);
+  }
+
   public void openBook(Language language, int volume, int page, String keywords, boolean isBuddhawaj) {
     if (mLanguage != language) {
       if (dataModel != null) {
@@ -331,9 +367,13 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
 
   public void openBook(Language language, int volume, int page, int item) {
     openBook(language, volume, page, "", false);
-    PageFragment fragment = (PageFragment) mPagerAdapter.getFragment(page-1);
-    if (fragment != null && item > 0) {
-      fragment.scrollToItem(item);
+    if (item > 0) {
+      // page is in caller-space (1-based, pre-minimumPageNumber adjustment).
+      // openBook() converts it via getMinimumPageNumber and lands the
+      // ViewPager on (page - minimum) zero-based. Re-derive the adapter
+      // position here to match.
+      int adjusted = page - dataModel.getMinimumPageNumber(volume) + 1;
+      tryScrollToItem(adjusted, item, 0);
     }
   }
 

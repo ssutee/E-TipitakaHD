@@ -61,6 +61,19 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
    */
   private final List<Runnable> mPendingRunnables = new ArrayList<>();
 
+  /**
+   * Latched scroll target. External callers (MainActivity.gotoItem,
+   * ReaderFragment.openBook(..., item), ComparisonActivity) often invoke
+   * scrollToItem / scrollToKeywords immediately after the fragment is
+   * created by ViewPager2's FragmentStateAdapter, before onCreateView has
+   * run (binding == null) or before the WebView finished loading
+   * (JS scrollToItem/scrollToKeywords functions not yet defined). Store
+   * the request and replay from onPageFinished.
+   */
+  private int mPendingScrollItem = -1;
+  private boolean mPendingScrollKeywords = false;
+  private boolean mPageLoaded = false;
+
   private Handler mHandler = new Handler(this);
 
   @Override
@@ -106,8 +119,10 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
           String script = String.format(Locale.ENGLISH, "javascript:search(\"%s\", %d);",
                   Joiner.on("|").join(terms), mIsBuddhawaj ? 2 : 1);
           view.loadUrl(script);
-          scrollToKeywords();
+          mPendingScrollKeywords = true;
         }
+        mPageLoaded = true;
+        flushPendingScroll();
       }
     });
     binding.webview.setVerticalScrollBarEnabled(false);
@@ -262,6 +277,29 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
   }
 
   public void scrollToKeywords() {
+    mPendingScrollKeywords = true;
+    flushPendingScroll();
+  }
+
+  public void scrollToItem(final int number) {
+    mPendingScrollItem = number;
+    flushPendingScroll();
+  }
+
+  private void flushPendingScroll() {
+    if (!mPageLoaded || binding == null) return;
+    if (mPendingScrollItem > 0) {
+      final int number = mPendingScrollItem;
+      mPendingScrollItem = -1;
+      executeScrollToItem(number);
+    }
+    if (mPendingScrollKeywords) {
+      mPendingScrollKeywords = false;
+      executeScrollToKeywords();
+    }
+  }
+
+  private void executeScrollToKeywords() {
     postOnWebView(500, new Runnable() {
       @Override
       public void run() {
@@ -282,7 +320,7 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
     });
   }
 
-  public void scrollToItem(final int number) {
+  private void executeScrollToItem(final int number) {
     postOnWebView(500, new Runnable() {
       @Override
       public void run() {
@@ -321,6 +359,9 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
       }
     }
     mPendingRunnables.clear();
+    // Reset load flag so scrollTo* calls latch until the next onPageFinished
+    // (the WebView reloads on the next onCreateView).
+    mPageLoaded = false;
     binding = null;
     super.onDestroyView();
   }
