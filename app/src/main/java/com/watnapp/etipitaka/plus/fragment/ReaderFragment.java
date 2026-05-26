@@ -413,6 +413,11 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
         mHandler.post(new Runnable() {
           @Override
           public void run() {
+            // dataModel.getItemsAtPage runs async; the user may have left the
+            // fragment by the time this Runnable fires. binding is nulled in
+            // onDestroyView; touching binding.txtSubtitle (or dataModel /
+            // getActivity) without a guard NPEs.
+            if (binding == null || dataModel == null || getActivity() == null) return;
             ReaderChromeBridge.renderSubtitle(binding.txtSubtitle, Utils.getSubtitle(getActivity(), mLanguage, volume,
                     page + dataModel.getMinimumPageNumber(volume) - 1, thaiItem));
           }
