@@ -308,6 +308,12 @@
     <string name="update">ปรับปรุง</string>
     <string name="thaims_short_name">เฉลิมพระเกียรติ</string>
     <string name="download_error">เกิดข้อผิดพลาดในการดาวน์โหลด</string>
+    <string name="bulk_download_title">ดาวน์โหลดฐานข้อมูล</string>
+    <string name="bulk_download_message">ฐานข้อมูลต่อไปนี้ยังไม่ได้ดาวน์โหลด:\n\n%1$s\n\nต้องการดาวน์โหลดทั้งหมดเลยหรือไม่?</string>
+    <string name="bulk_download_yes">ดาวน์โหลด</string>
+    <string name="bulk_download_no">ไม่</string>
+    <string name="bulk_download_progress">กำลังดาวน์โหลด %1$d / %2$d: %3$s</string>
+    <string name="bulk_download_summary">ดาวน์โหลดสำเร็จ %1$d / %2$d รายการ</string>
     <string name="version_menu">เวอร์ชั่น</string>
     <string name="version_label_build">เวอร์ชัน %1$s (%2$d)</string>
     <string name="version_label_device">อุปกรณ์: Android %1$s (API %2$d)</string>
