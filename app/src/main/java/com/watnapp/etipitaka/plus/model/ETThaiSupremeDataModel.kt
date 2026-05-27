@@ -1,6 +1,7 @@
 package com.watnapp.etipitaka.plus.model
 
 import android.content.Context
+import android.util.Log
 import com.watnapp.etipitaka.plus.R
 import com.watnapp.etipitaka.plus.Utils
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper
@@ -8,7 +9,7 @@ import java.util.*
 import kotlin.math.roundToInt
 
 open class ETThaiSupremeDataModel(context: Context) : ETBasicDataModel(context) {
-    protected val TAG = "ETThaiMahaChulaDataModel"
+    protected val TAG = "ETThaiSupremeDataModel"
 
     override fun search(keywords: String?, listener: BookDatabaseHelper.OnSearchListener?) {
         search(keywords, listener, arrayOf(
@@ -42,19 +43,38 @@ open class ETThaiSupremeDataModel(context: Context) : ETBasicDataModel(context) 
             BookDatabaseHelper.getThaiMSBookItems(mContext)
 
     override fun getComparingItemsAtPage(volume: Int, page: Int, listener: BookDatabaseHelper.OnGetItemsListener?) {
-        val pair = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format(Locale.getDefault(),"v%d-p%d", volume, page)] as List<*>?
-        listener!!.onGetItemsFinish(arrayOf(pair!![0].toString().toFloat().roundToInt()),
-                arrayOf(pair[1].toString().toFloat().roundToInt()))
+        if (listener == null) return
+        // Map lookup may return null (page not in the convert map) — previously
+        // `pair!!` NPEd. Treat missing as "no items" instead of crashing.
+        val pair = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)?.get(
+                String.format(Locale.getDefault(), "v%d-p%d", volume, page)) as? List<*>
+        if (pair == null || pair.size < 2 || pair[0] == null || pair[1] == null) {
+            listener.onGetItemsFinish(null, null)
+            return
+        }
+        try {
+            val item = pair[0].toString().toFloat().roundToInt()
+            val section = pair[1].toString().toFloat().roundToInt()
+            listener.onGetItemsFinish(arrayOf(item), arrayOf(section))
+        } catch (e: Exception) {
+            Log.e(TAG, "getComparingItemsAtPage failed for volume=$volume, page=$page", e)
+            listener.onGetItemsFinish(null, null)
+        }
     }
 
     override fun getPagesByItem(volume: Int, item: Int, needConvertToSiamrat: Boolean): Array<Int> {
         if (needConvertToSiamrat) {
             val pages = ArrayList<Int>()
+            val convertMap = BookDatabaseHelper.getThaiMSConvertItemMap(mContext) ?: return emptyArray()
             var section = 1
             while (true) {
-                val page = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format(Locale.getDefault(),"v%d-%d-i%d", volume, section, item)]
+                val page = convertMap[String.format(Locale.getDefault(), "v%d-%d-i%d", volume, section, item)]
                 if (page != null) {
-                    pages.add(Math.round(page.toString().toFloat()))
+                    try {
+                        pages.add(Math.round(page.toString().toFloat()))
+                    } catch (e: NumberFormatException) {
+                        Log.w(TAG, "getPagesByItem: bad page value $page for volume=$volume, item=$item, section=$section")
+                    }
                     section += 1
                     continue
                 }
@@ -69,8 +89,13 @@ open class ETThaiSupremeDataModel(context: Context) : ETBasicDataModel(context) 
         if (!needConvertToSiamrat) {
             return super.getPageByItem(volume, item, section, false)
         }
-        val page = BookDatabaseHelper.getThaiMSConvertItemMap(mContext)[String.format(Locale.getDefault(),"v%d-%d-i%d", volume, section, item)]
-        return page?.toString()?.toFloat()?.roundToInt() ?: 0
+        val convertMap = BookDatabaseHelper.getThaiMSConvertItemMap(mContext) ?: return 0
+        val page = convertMap[String.format(Locale.getDefault(), "v%d-%d-i%d", volume, section, item)]
+        return try {
+            page?.toString()?.toFloat()?.roundToInt() ?: 0
+        } catch (e: NumberFormatException) {
+            0
+        }
     }
 
 

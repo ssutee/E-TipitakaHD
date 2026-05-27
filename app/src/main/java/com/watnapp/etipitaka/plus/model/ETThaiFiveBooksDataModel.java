@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
+import android.util.Log;
+
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
@@ -15,6 +17,9 @@ import java.util.ArrayList;
  * Created by sutee on 16/6/14.
  */
 public class ETThaiFiveBooksDataModel extends ETDataModel {
+
+  private static final String TAG = "ETThaiFiveBooksDataModel";
+
   private static final String TABLE_SPEECH = "speech";
   private static final String[] SEARCH_PROJECTION = {
       "rowid AS _id",
@@ -76,6 +81,10 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
+    if (db == null) {
+      // DB file missing — see ETDataModel.openDatabase.
+      return new MatrixCursor(new String[] { getVolumeColumn() });
+    }
     Cursor cursor = db.query(TABLE_SPEECH, null, "book=?",
         new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
@@ -126,12 +135,24 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
   @Override
   public int getPageById(int pageId) {
     openDatabase();
-    Cursor cursor = db.query(TABLE_SPEECH, SEARCH_PROJECTION, "rowid = ?",
-        new String[] {String.valueOf(pageId)}, null, null, null);
-    cursor.moveToFirst();
-    int page = cursor.getInt(cursor.getColumnIndex("page"));
-    cursor.close();
-    return page;
+    if (db == null) {
+      return 0;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query(TABLE_SPEECH, SEARCH_PROJECTION, "rowid = ?",
+          new String[] {String.valueOf(pageId)}, null, null, null);
+      int pageCol = cursor.getColumnIndex("page");
+      if (pageCol < 0 || !cursor.moveToFirst()) {
+        return 0;
+      }
+      return cursor.getInt(pageCol);
+    } catch (Exception e) {
+      Log.e(TAG, "getPageById failed for pageId=" + pageId, e);
+      return 0;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
@@ -145,6 +166,13 @@ public class ETThaiFiveBooksDataModel extends ETDataModel {
     new Thread(new Runnable() {
       @Override
       public void run() {
+        if (db == null) {
+          if (listener != null) {
+            MatrixCursor empty = new MatrixCursor(new String[] { "_id" });
+            listener.onSearchFinish(keywords, empty, new int[1]);
+          }
+          return;
+        }
         Cursor[] cursors = new Cursor[volumes.length];
         int totalPages[] = new int[1];
 

@@ -2,6 +2,8 @@ package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
+
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -14,6 +16,8 @@ import java.util.regex.Pattern;
  * Created by sutee on 29/10/18.
  */
 public class ETThaiVinayaDataModel extends ETHandbookDataModel {
+
+  private static final String TAG = "ETThaiVinayaDataModel";
 
   private Context context;
 
@@ -57,22 +61,35 @@ public class ETThaiVinayaDataModel extends ETHandbookDataModel {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        Cursor cursor = db.query("main", null, "volume=? AND page=?",
-            new String[]{String.valueOf(volume), String.valueOf(page)}, null, null, null);
-        if (cursor.getCount() == 0) {
+        if (db == null) {
           listener.onGetItemsFinish(null, null);
-        } else {
-          cursor.moveToFirst();
-          String content = cursor.getString(cursor.getColumnIndex("content"));
-
+          return;
+        }
+        Cursor cursor = null;
+        try {
+          cursor = db.query("main", null, "volume=? AND page=?",
+              new String[]{String.valueOf(volume), String.valueOf(page)}, null, null, null);
+          int contentCol = cursor.getColumnIndex("content");
+          if (!cursor.moveToFirst() || contentCol < 0) {
+            listener.onGetItemsFinish(null, null);
+            return;
+          }
+          String content = cursor.getString(contentCol);
+          if (content == null) {
+            listener.onGetItemsFinish(null, null);
+            return;
+          }
           Pattern pattern = Pattern.compile("\\[([๐-๙]+)\\]");
           Matcher matcher = pattern.matcher(content);
           ArrayList<Integer> items = new ArrayList<Integer>();
           ArrayList<Integer> sections = new ArrayList<Integer>();
           while (matcher.find()) {
             String item = Utils.convertToArabicNumber(ETThaiVinayaDataModel.this.context, matcher.group(1));
-            items.add(Integer.parseInt(item));
-            sections.add(1);
+            try {
+              items.add(Integer.parseInt(item));
+              sections.add(1);
+            } catch (NumberFormatException ignored) {
+            }
           }
           if (items.size() > 0) {
             listener.onGetItemsFinish(items.toArray(new Integer[items.size()]),
@@ -80,6 +97,11 @@ public class ETThaiVinayaDataModel extends ETHandbookDataModel {
           } else {
             listener.onGetItemsFinish(null, null);
           }
+        } catch (Exception e) {
+          Log.e(TAG, "getItemsAtPage failed for volume=" + volume + ", page=" + page, e);
+          listener.onGetItemsFinish(null, null);
+        } finally {
+          if (cursor != null) cursor.close();
         }
       }
     }).start();

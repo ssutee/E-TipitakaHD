@@ -109,16 +109,28 @@ public abstract class ETBasicDataModel extends ETDataModel {
   @Override
   public int getMaximumPageNumber(int volume) {
     openDatabase();
-    Cursor cursor = db.query("main", null, "volume = ?",
-       new String[] { volumeFormat(volume) }, null, null, "page");
-    int page = cursor.getCount();
-    cursor.close();
-    return page;
+    if (db == null) {
+      return 0;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query("main", null, "volume = ?",
+         new String[] { volumeFormat(volume) }, null, null, "page");
+      return cursor.getCount();
+    } catch (Exception e) {
+      Log.e(TAG, "getMaximumPageNumber failed for volume=" + volume, e);
+      return 0;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
   public int getMinimumItemNumber(int volume) {
     openDatabase();
+    if (db == null) {
+      return 1;
+    }
     Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { volumeFormat(volume) }, null, null, "page");
     try {
@@ -146,6 +158,9 @@ public abstract class ETBasicDataModel extends ETDataModel {
   @Override
   public int getMaximumItemNumber(int volume) {
     openDatabase();
+    if (db == null) {
+      return 1;
+    }
     Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { volumeFormat(volume) }, null, null, "page");
     try {
@@ -176,31 +191,78 @@ public abstract class ETBasicDataModel extends ETDataModel {
   @Override
   public int getPageIdByItem(int volume, int item, int section) {
     openDatabase();
-    int page = getBookItems().get(volume + "").get(section+"").get(item+"").get(0);
-    Cursor cursor = db.query("main", null, "volume=? AND page=?",
-        new String[] { volumeFormat(volume), pageFormat(page) }, null, null, null);
-    cursor.moveToFirst();
-    int pageId = cursor.getInt(cursor.getColumnIndex("_id"));
-    cursor.close();
-    return pageId;
+    if (db == null) {
+      return 0;
+    }
+    Map<String, Map<String, Map<String, ArrayList<Integer>>>> bookItems = getBookItems();
+    if (bookItems == null
+        || bookItems.get(volume + "") == null
+        || bookItems.get(volume + "").get(section + "") == null
+        || bookItems.get(volume + "").get(section + "").get(item + "") == null
+        || bookItems.get(volume + "").get(section + "").get(item + "").isEmpty()) {
+      return 0;
+    }
+    int page = bookItems.get(volume + "").get(section + "").get(item + "").get(0);
+    Cursor cursor = null;
+    try {
+      cursor = db.query("main", null, "volume=? AND page=?",
+          new String[] { volumeFormat(volume), pageFormat(page) }, null, null, null);
+      int idCol = cursor.getColumnIndex("_id");
+      if (idCol < 0 || !cursor.moveToFirst()) {
+        return 0;
+      }
+      return cursor.getInt(idCol);
+    } catch (Exception e) {
+      Log.e(TAG, "getPageIdByItem failed for volume=" + volume + ", item=" + item, e);
+      return 0;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
   public int getPageById(int pageId) {
     openDatabase();
-    Cursor cursor = db.query("main", null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
-    cursor.moveToFirst();
-    int page = Integer.parseInt(cursor.getString(cursor.getColumnIndex("page")).replaceAll("^0+", ""));
-    cursor.close();
-    return page;
+    if (db == null) {
+      return 0;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query("main", null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
+      int pageCol = cursor.getColumnIndex("page");
+      if (pageCol < 0 || !cursor.moveToFirst()) {
+        return 0;
+      }
+      String raw = cursor.getString(pageCol);
+      if (raw == null) {
+        return 0;
+      }
+      try {
+        return Integer.parseInt(raw.replaceAll("^0+", ""));
+      } catch (NumberFormatException e) {
+        return 0;
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "getPageById failed for pageId=" + pageId, e);
+      return 0;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
   public Integer[] getPagesByItem(int volume, int item) {
     ArrayList<Integer> pages = new ArrayList<Integer>();
-    for (String section : getBookItems().get(volume + "").keySet()) {
-      if (getBookItems().get(volume + "").get(section).containsKey(item+"")) {
-        pages.add(getBookItems().get(volume + "").get(section).get(item + "").get(0));
+    Map<String, Map<String, Map<String, ArrayList<Integer>>>> bookItems = getBookItems();
+    if (bookItems == null || bookItems.get(volume + "") == null) {
+      return new Integer[0];
+    }
+    for (String section : bookItems.get(volume + "").keySet()) {
+      Map<String, ArrayList<Integer>> sectionMap = bookItems.get(volume + "").get(section);
+      if (sectionMap != null && sectionMap.containsKey(item + "")
+          && sectionMap.get(item + "") != null
+          && !sectionMap.get(item + "").isEmpty()) {
+        pages.add(sectionMap.get(item + "").get(0));
       }
     }
     return pages.toArray(new Integer[pages.size()]);
@@ -212,6 +274,13 @@ public abstract class ETBasicDataModel extends ETDataModel {
     new Thread(new Runnable() {
       @Override
       public void run() {
+        if (db == null) {
+          if (listener != null) {
+            MatrixCursor empty = new MatrixCursor(new String[] { "_id", "total" });
+            listener.onSearchFinish(keywords, empty, new int[3]);
+          }
+          return;
+        }
         Cursor[] cursors = new Cursor[volumes.length+1];
         int totalPages[] = new int[3];
         for (int i=0; i < volumes.length; ++i) {

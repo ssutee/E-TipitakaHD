@@ -2,6 +2,8 @@ package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
+
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -61,20 +63,39 @@ public class ETThaiMahaMakutDataModel extends ETBasicDataModel {
 
   @Override
   public int convertVolume(int volume, int section, int item) {
-    return BookDatabaseHelper.getThaiMMVolumeMap(mContext).get(String.format("%d-%d-%d", volume, section, item));
+    Map<String, Integer> map = BookDatabaseHelper.getThaiMMVolumeMap(mContext);
+    Integer mapped = map == null ? null : map.get(String.format("%d-%d-%d", volume, section, item));
+    return mapped == null ? volume : mapped;
   }
 
   @Override
   public int getComparingVolume(int volume, int page) {
     openDatabase();
-    Cursor cursor = db.query("main", new String[] {"volume_orig"}, "volume=? AND page=?",
-        new String[] { String.format("%02d", volume), String.format("%04d", page)}, null, null, null);
-    int comparingVolume = volume;
-    cursor.moveToFirst();
-    if (!cursor.isAfterLast()) {
-      comparingVolume = Integer.parseInt(cursor.getString(0).split("\\s+")[0]);
+    if (db == null) {
+      return volume;
     }
-    cursor.close();
+    int comparingVolume = volume;
+    Cursor cursor = null;
+    try {
+      cursor = db.query("main", new String[] {"volume_orig"}, "volume=? AND page=?",
+          new String[] { String.format("%02d", volume), String.format("%04d", page)}, null, null, null);
+      if (cursor.moveToFirst()) {
+        String raw = cursor.getString(0);
+        if (raw != null) {
+          String[] tokens = raw.split("\\s+");
+          if (tokens.length > 0 && !tokens[0].isEmpty()) {
+            try {
+              comparingVolume = Integer.parseInt(tokens[0]);
+            } catch (NumberFormatException ignored) {
+            }
+          }
+        }
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "getComparingVolume failed for volume=" + volume + ", page=" + page, e);
+    } finally {
+      if (cursor != null) cursor.close();
+    }
     return comparingVolume;
   }
 

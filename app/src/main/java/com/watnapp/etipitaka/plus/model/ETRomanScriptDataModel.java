@@ -69,6 +69,11 @@ public class ETRomanScriptDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
+    if (db == null) {
+      // DB file missing — return empty cursor so callers see getCount() == 0
+      // instead of NPEing on db.query (see ETDataModel.openDatabase).
+      return new MatrixCursor(new String[] { getVolumeColumn() });
+    }
     Cursor cursor = db.query("main", null, "volume=?",
         new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
@@ -81,17 +86,28 @@ public class ETRomanScriptDataModel extends ETDataModel {
   @Override
   public int getMaximumPageNumber(int volume) {
     openDatabase();
-    Cursor cursor = db.query("main", null, "volume = ?",
-        new String[] { String.valueOf(volume) }, null, null, "page");
-    int page = cursor.getCount();
-    cursor.close();
-    return page;
-
+    if (db == null) {
+      return 0;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query("main", null, "volume = ?",
+          new String[] { String.valueOf(volume) }, null, null, "page");
+      return cursor.getCount();
+    } catch (Exception e) {
+      Log.e(TAG, "getMaximumPageNumber failed for volume=" + volume, e);
+      return 0;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
   public int getMinimumItemNumber(int volume) {
     openDatabase();
+    if (db == null) {
+      return 1;
+    }
     Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { String.valueOf(volume) }, null, null, "page");
     try {
@@ -119,6 +135,9 @@ public class ETRomanScriptDataModel extends ETDataModel {
   @Override
   public int getMaximumItemNumber(int volume) {
     openDatabase();
+    if (db == null) {
+      return 1;
+    }
     Cursor cursor = db.query("main", null, "volume = ?",
         new String[] { String.valueOf(volume) }, null, null, "page");
     try {
@@ -147,30 +166,53 @@ public class ETRomanScriptDataModel extends ETDataModel {
   @Override
   public int getPageIdByItem(int volume, int item, int section) {
     openDatabase();
-    if (BookDatabaseHelper.getRomanPageIndex(mContext).get(volume + "") == null) {
+    if (db == null) {
       return 0;
     }
-    int page = BookDatabaseHelper.getRomanPageIndex(mContext).get(volume + "").get(item+"").get(section+"");
-    Cursor cursor = db.query("main", null, "volume=? AND page=?",
-        new String[] {String.valueOf(volume), String.valueOf(page) }, null, null, null);
-    cursor.moveToFirst();
-    int pageId = cursor.getInt(cursor.getColumnIndex("_id"));
-    cursor.close();
-    return pageId;
+    Map<String, Map<String, Map<String, Integer>>> pageIndex = BookDatabaseHelper.getRomanPageIndex(mContext);
+    if (pageIndex.get(volume + "") == null
+        || pageIndex.get(volume + "").get(item + "") == null
+        || pageIndex.get(volume + "").get(item + "").get(section + "") == null) {
+      return 0;
+    }
+    int page = pageIndex.get(volume + "").get(item + "").get(section + "");
+    Cursor cursor = null;
+    try {
+      cursor = db.query("main", null, "volume=? AND page=?",
+          new String[] {String.valueOf(volume), String.valueOf(page) }, null, null, null);
+      int idCol = cursor.getColumnIndex("_id");
+      if (idCol < 0 || !cursor.moveToFirst()) {
+        return 0;
+      }
+      return cursor.getInt(idCol);
+    } catch (Exception e) {
+      Log.e(TAG, "getPageIdByItem failed for volume=" + volume + ", item=" + item, e);
+      return 0;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
   public int getPageById(int pageId) {
     openDatabase();
-    Cursor cursor = db.query("main", null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
-    if (cursor.getCount() == 0) {
-      cursor.close();
+    if (db == null) {
       return 0;
     }
-    cursor.moveToFirst();
-    int page = cursor.getInt(cursor.getColumnIndex("page"));
-    cursor.close();
-    return page;
+    Cursor cursor = null;
+    try {
+      cursor = db.query("main", null, "_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
+      int pageCol = cursor.getColumnIndex("page");
+      if (pageCol < 0 || !cursor.moveToFirst()) {
+        return 0;
+      }
+      return cursor.getInt(pageCol);
+    } catch (Exception e) {
+      Log.e(TAG, "getPageById failed for pageId=" + pageId, e);
+      return 0;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
@@ -192,6 +234,13 @@ public class ETRomanScriptDataModel extends ETDataModel {
     new Thread(new Runnable() {
       @Override
       public void run() {
+        if (db == null) {
+          if (listener != null) {
+            MatrixCursor empty = new MatrixCursor(new String[] { "_id", "total" });
+            listener.onSearchFinish(keywords, empty, new int[3]);
+          }
+          return;
+        }
         Cursor[] cursors = new Cursor[volumes.length+1];
         int totalPages[] = new int[3];
         for (int i=0; i < volumes.length; ++i) {

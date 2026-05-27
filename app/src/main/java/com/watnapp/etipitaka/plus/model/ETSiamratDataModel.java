@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
+import android.util.Log;
+
 import com.watnapp.etipitaka.plus.Constants;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
  * Created by sutee on 4/2/14.
  */
 abstract public class ETSiamratDataModel extends ETDataModel {
+
+  protected static final String TAG = "ETSiamratDataModel";
 
   public ETSiamratDataModel(Context context) {
     super(context);
@@ -26,15 +30,23 @@ abstract public class ETSiamratDataModel extends ETDataModel {
 
   protected int getPageId(int volume, int page) {
     openDatabase();
-    int pageId = -1;
-    Cursor cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ? AND number = ?",
-        new String[] {String.valueOf(getLanguage().getCode()), String.valueOf(volume), String.valueOf(page)},
-        null, null, null);
-    if (cursor.getCount() > 0) {
-      cursor.moveToFirst();
-      pageId = cursor.getInt(0);
+    if (db == null) {
+      return -1;
     }
-    cursor.close();
+    int pageId = -1;
+    Cursor cursor = null;
+    try {
+      cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ? AND number = ?",
+          new String[] {String.valueOf(getLanguage().getCode()), String.valueOf(volume), String.valueOf(page)},
+          null, null, null);
+      if (cursor.moveToFirst()) {
+        pageId = cursor.getInt(0);
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "getPageId failed for volume=" + volume + ", page=" + page, e);
+    } finally {
+      if (cursor != null) cursor.close();
+    }
     return pageId;
   }
 
@@ -44,24 +56,38 @@ abstract public class ETSiamratDataModel extends ETDataModel {
     new Thread(new Runnable() {
       @Override
       public void run() {
+        if (db == null) {
+          listener.onGetItemsFinish(null, null);
+          return;
+        }
         ArrayList<Integer> items = new ArrayList<Integer>();
         ArrayList<Integer> sections = new ArrayList<Integer>();
-        int pageId = getPageId(volume, page);
-        Cursor cursor = db.query("item", new String[] {"number", "section"},
-            "page_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-          int number = cursor.getInt(0);
-          int section = cursor.getInt(1);
-          if (!items.contains(number)) {
-            items.add(number);
-            sections.add(section);
+        Cursor cursor = null;
+        try {
+          int pageId = getPageId(volume, page);
+          cursor = db.query("item", new String[] {"number", "section"},
+              "page_id = ?", new String[] {String.valueOf(pageId)}, null, null, null);
+          if (!cursor.moveToFirst()) {
+            listener.onGetItemsFinish(null, null);
+            return;
           }
-          cursor.moveToNext();
+          while (!cursor.isAfterLast()) {
+            int number = cursor.getInt(0);
+            int section = cursor.getInt(1);
+            if (!items.contains(number)) {
+              items.add(number);
+              sections.add(section);
+            }
+            cursor.moveToNext();
+          }
+          listener.onGetItemsFinish(items.toArray(new Integer[items.size()]),
+              sections.toArray(new Integer[sections.size()]));
+        } catch (Exception e) {
+          Log.e(TAG, "getItemsAtPage failed for volume=" + volume + ", page=" + page, e);
+          listener.onGetItemsFinish(null, null);
+        } finally {
+          if (cursor != null) cursor.close();
         }
-        cursor.close();
-        listener.onGetItemsFinish(items.toArray(new Integer[items.size()]),
-            sections.toArray(new Integer[sections.size()]));
       }
     }).start();
   }
@@ -74,6 +100,11 @@ abstract public class ETSiamratDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
+    if (db == null) {
+      // DB file missing — see ETDataModel.openDatabase. Return empty cursor so
+      // callers see getCount() == 0 instead of NPEing on db.query.
+      return new MatrixCursor(new String[] { getVolumeColumn() });
+    }
     Cursor cursor = db.query("page", null, "language = ? AND volume = ?",
         new String[] {String.valueOf(getLanguage().getCode()), String.valueOf(volume)}, null, null, null);
     cursor.moveToFirst();
@@ -86,138 +117,244 @@ abstract public class ETSiamratDataModel extends ETDataModel {
   @Override
   public int getMaximumPageNumber(int volume) {
     openDatabase();
-    Cursor cursor = db.query("page", new String[] {"number"}, "language = ? AND volume = ?",
-        new String[] { String.valueOf(getLanguage().getCode()), String.valueOf(volume)},
-        null, null, "number");
-    cursor.moveToLast();
-    int page = cursor.getInt(0);
-    cursor.close();
-    return page;
+    if (db == null) {
+      return 0;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query("page", new String[] {"number"}, "language = ? AND volume = ?",
+          new String[] { String.valueOf(getLanguage().getCode()), String.valueOf(volume)},
+          null, null, "number");
+      if (!cursor.moveToLast()) {
+        return 0;
+      }
+      return cursor.getInt(0);
+    } catch (Exception e) {
+      Log.e(TAG, "getMaximumPageNumber failed for volume=" + volume, e);
+      return 0;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   private int getFirstPageId(int volume) {
     openDatabase();
-    Cursor cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
-        new String[] { String.valueOf(getLanguage().getCode()), String.valueOf(volume)},
-        null, null, null);
-    cursor.moveToFirst();
-    int id = cursor.getInt(0);
-    cursor.close();
-    return id;
+    if (db == null) {
+      return -1;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
+          new String[] { String.valueOf(getLanguage().getCode()), String.valueOf(volume)},
+          null, null, null);
+      if (!cursor.moveToFirst()) {
+        return -1;
+      }
+      return cursor.getInt(0);
+    } catch (Exception e) {
+      Log.e(TAG, "getFirstPageId failed for volume=" + volume, e);
+      return -1;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   private int getLastPageId(int volume) {
     openDatabase();
-    Cursor cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
-        new String[] { String.valueOf(getLanguage().getCode()), String.valueOf(volume)},
-        null, null, null);
-    cursor.moveToLast();
-    int id = cursor.getInt(0);
-    cursor.close();
-    return id;
+    if (db == null) {
+      return -1;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
+          new String[] { String.valueOf(getLanguage().getCode()), String.valueOf(volume)},
+          null, null, null);
+      if (!cursor.moveToLast()) {
+        return -1;
+      }
+      return cursor.getInt(0);
+    } catch (Exception e) {
+      Log.e(TAG, "getLastPageId failed for volume=" + volume, e);
+      return -1;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
   public int getMaximumItemNumber(int volume) {
     openDatabase();
+    if (db == null) {
+      return 1;
+    }
     int pageId = getLastPageId(volume);
-    Cursor cursor = db.query("item", new String[] {"number"}, "page_id = ?",
-        new String[] {String.valueOf(pageId)},
-        null, null, null);
-    cursor.moveToFirst();
-    int item = cursor.getInt(0);
-    cursor.close();
-    return item;
+    if (pageId < 0) {
+      return 1;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query("item", new String[] {"number"}, "page_id = ?",
+          new String[] {String.valueOf(pageId)},
+          null, null, null);
+      if (!cursor.moveToFirst()) {
+        return 1;
+      }
+      return cursor.getInt(0);
+    } catch (Exception e) {
+      Log.e(TAG, "getMaximumItemNumber failed for volume=" + volume, e);
+      return 1;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   @Override
   public int getMinimumItemNumber(int volume) {
     openDatabase();
+    if (db == null) {
+      return 1;
+    }
     int pageId = getFirstPageId(volume);
-    Cursor cursor = db.query("item", new String[] {"number"}, "page_id = ?",
-        new String[] {String.valueOf(pageId)},
-        null, null, null);
-    cursor.moveToFirst();
-    int item = cursor.getInt(0);
-    cursor.close();
-    return item;
+    if (pageId < 0) {
+      return 1;
+    }
+    Cursor cursor = null;
+    try {
+      cursor = db.query("item", new String[] {"number"}, "page_id = ?",
+          new String[] {String.valueOf(pageId)},
+          null, null, null);
+      if (!cursor.moveToFirst()) {
+        return 1;
+      }
+      return cursor.getInt(0);
+    } catch (Exception e) {
+      Log.e(TAG, "getMinimumItemNumber failed for volume=" + volume, e);
+      return 1;
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   private String getPagesTuple(int volume) {
     openDatabase();
-    Cursor cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
-        new String[] { String.valueOf(getLanguage().getCode()), String.valueOf(volume)},
-        null, null, null);
-    StringBuilder sb = new StringBuilder();
-    cursor.moveToFirst();
-    sb.append('(');
-    while(!cursor.isAfterLast()) {
-      sb.append(cursor.getInt(0));
-      if (!cursor.isLast()) {
-        sb.append(',');
-      }
-      cursor.moveToNext();
+    if (db == null) {
+      return "()";
     }
-    sb.append(')');
-    cursor.close();
-    return sb.toString();
+    Cursor cursor = null;
+    try {
+      cursor = db.query("page", new String[] {"_id"}, "language = ? AND volume = ?",
+          new String[] { String.valueOf(getLanguage().getCode()), String.valueOf(volume)},
+          null, null, null);
+      StringBuilder sb = new StringBuilder();
+      sb.append('(');
+      if (cursor.moveToFirst()) {
+        while (!cursor.isAfterLast()) {
+          sb.append(cursor.getInt(0));
+          if (!cursor.isLast()) {
+            sb.append(',');
+          }
+          cursor.moveToNext();
+        }
+      }
+      sb.append(')');
+      return sb.toString();
+    } catch (Exception e) {
+      Log.e(TAG, "getPagesTuple failed for volume=" + volume, e);
+      return "()";
+    } finally {
+      if (cursor != null) cursor.close();
+    }
   }
 
   private Integer[] getPageIdsByItem(int volume, int item) {
     openDatabase();
-    Cursor cursor = db.query(true, "item", new String[] {"page_id"},
-        "page_id IN " + getPagesTuple(volume) + " AND start = 1 AND number = ?",
-        new String[] { String.valueOf(item) }, null, null, "page_id", null);
-    ArrayList<Integer> pageIds = new ArrayList<Integer>();
-    cursor.moveToFirst();
-    while (!cursor.isAfterLast()) {
-      pageIds.add(cursor.getInt(0));
-      cursor.moveToNext();
+    if (db == null) {
+      return new Integer[0];
     }
-    cursor.close();
+    ArrayList<Integer> pageIds = new ArrayList<Integer>();
+    Cursor cursor = null;
+    try {
+      cursor = db.query(true, "item", new String[] {"page_id"},
+          "page_id IN " + getPagesTuple(volume) + " AND start = 1 AND number = ?",
+          new String[] { String.valueOf(item) }, null, null, "page_id", null);
+      if (cursor.moveToFirst()) {
+        while (!cursor.isAfterLast()) {
+          pageIds.add(cursor.getInt(0));
+          cursor.moveToNext();
+        }
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "getPageIdsByItem failed for volume=" + volume + ", item=" + item, e);
+    } finally {
+      if (cursor != null) cursor.close();
+    }
     return pageIds.toArray(new Integer[pageIds.size()]);
   }
 
   @Override
   public int getPageIdByItem(int volume, int item, int section) {
     openDatabase();
-    Cursor cursor = db.query(true, "item", new String[] {"page_id"},
-        "page_id IN " + getPagesTuple(volume) + " AND start = 1 AND number = ? AND section = ?",
-        new String[] { String.valueOf(item), String.valueOf(section) }, null, null, "page_id", null);
-    int pageId = -1;
-    if (cursor.getCount() > 0) {
-      cursor.moveToFirst();
-      pageId = cursor.getInt(0);
+    if (db == null) {
+      return -1;
     }
-    cursor.close();
-    return pageId;
+    Cursor cursor = null;
+    try {
+      cursor = db.query(true, "item", new String[] {"page_id"},
+          "page_id IN " + getPagesTuple(volume) + " AND start = 1 AND number = ? AND section = ?",
+          new String[] { String.valueOf(item), String.valueOf(section) }, null, null, "page_id", null);
+      if (cursor.moveToFirst()) {
+        return cursor.getInt(0);
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "getPageIdByItem failed for volume=" + volume + ", item=" + item, e);
+    } finally {
+      if (cursor != null) cursor.close();
+    }
+    return -1;
   }
 
   @Override
   public int getPageById(int pageId) {
     openDatabase();
-    Cursor cursor = db.query("page", new String[] {"number"}, "_id = ?",
-        new String[] { String.valueOf(pageId) }, null, null, null);
-    int page = -1;
-    if (cursor.getCount() > 0) {
-      cursor.moveToFirst();
-      page = cursor.getInt(0);
+    if (db == null) {
+      return -1;
     }
-    cursor.close();
-    return page;
+    Cursor cursor = null;
+    try {
+      cursor = db.query("page", new String[] {"number"}, "_id = ?",
+          new String[] { String.valueOf(pageId) }, null, null, null);
+      if (cursor.moveToFirst()) {
+        return cursor.getInt(0);
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "getPageById failed for pageId=" + pageId, e);
+    } finally {
+      if (cursor != null) cursor.close();
+    }
+    return -1;
   }
 
   @Override
   public Integer[] getPagesByItem(int volume, int item) {
     openDatabase();
+    if (db == null) {
+      return new Integer[0];
+    }
     Integer[] pageIds = getPageIdsByItem(volume, item);
     ArrayList<Integer> pages = new ArrayList<Integer>();
     for (int pageId : pageIds) {
-      Cursor cursor = db.query("page", new String[] {"number"}, "_id = ?",
-          new String[] {String.valueOf(pageId)}, null, null, "number");
-      cursor.moveToFirst();
-      pages.add(cursor.getInt(0));
-      cursor.close();
+      Cursor cursor = null;
+      try {
+        cursor = db.query("page", new String[] {"number"}, "_id = ?",
+            new String[] {String.valueOf(pageId)}, null, null, "number");
+        if (cursor.moveToFirst()) {
+          pages.add(cursor.getInt(0));
+        }
+      } catch (Exception e) {
+        Log.e(TAG, "getPagesByItem failed for volume=" + volume + ", item=" + item + ", pageId=" + pageId, e);
+      } finally {
+        if (cursor != null) cursor.close();
+      }
     }
     return pages.toArray(new Integer[pages.size()]);
   }
@@ -228,6 +365,13 @@ abstract public class ETSiamratDataModel extends ETDataModel {
     new Thread(new Runnable() {
       @Override
       public void run() {
+        if (db == null) {
+          if (listener != null) {
+            MatrixCursor empty = new MatrixCursor(new String[] { "_id", "total" });
+            listener.onSearchFinish(keywords, empty, new int[3]);
+          }
+          return;
+        }
         Cursor[] cursors = new Cursor[volumes.length+1];
         int totalPages[] = new int[3];
         for (int i=0; i < volumes.length; ++i) {
