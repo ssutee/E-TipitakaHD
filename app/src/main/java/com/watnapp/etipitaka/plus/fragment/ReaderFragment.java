@@ -332,6 +332,25 @@ public class ReaderFragment extends Fragment implements MyWebView.OnScrollChange
       mLanguage = language;
     }
 
+    // Guard against the DB file being absent (never downloaded, cleared
+    // app data, storage migration). Without this check, dataModel.read
+    // would hit a null SQLiteDatabase and NPE deep inside the model.
+    if (!dataModel.isAvailable()) {
+      Log.w(TAG, "openBook: database not available for " + language);
+      if (getActivity() != null) {
+        Toast toast = Toast.makeText(getActivity(), R.string.no_data, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+      }
+      mKeywords = keywords;
+      mVolume = volume;
+      mIsBuddhawaj = isBuddhawaj;
+      if (binding != null) {
+        binding.seekbar.setVisibility(View.GONE);
+      }
+      return;
+    }
+
     page = page - dataModel.getMinimumPageNumber(volume) + 1;
     mKeywords = keywords;
     mVolume = volume;

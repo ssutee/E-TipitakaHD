@@ -3,6 +3,8 @@ package com.watnapp.etipitaka.plus.model;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
 import java.io.File;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
  */
 
 public abstract class ETDataModel {
+
+  private static final String TAG = "ETDataModel";
 
   protected SQLiteDatabase db;
   protected Context mContext;
@@ -42,9 +46,29 @@ public abstract class ETDataModel {
   }
 
   public void openDatabase() {
-    if ((db == null || !db.isOpen()) && (new File(getDatabasePath())).exists()) {
-      db = SQLiteDatabase.openDatabase(getDatabasePath(), null, 0);
+    if (db != null && db.isOpen()) {
+      return;
     }
+    String path = getDatabasePath();
+    if (!new File(path).exists()) {
+      // DB file missing (never downloaded, cleared data, storage migration,
+      // unmounted SD card). Leave db = null and let callers handle it.
+      // Without this log, db.query NPEs further down the stack hid the real
+      // cause — see ETHandbookDataModel.read crash report.
+      Log.w(TAG, "openDatabase: database file does not exist at " + path);
+      return;
+    }
+    db = SQLiteDatabase.openDatabase(path, null, 0);
+  }
+
+  /**
+   * @return {@code true} if the underlying database file exists on disk.
+   *         Callers should check this before invoking {@link #read} /
+   *         {@link #search} etc. to avoid downstream NPEs when the DB has
+   *         not been downloaded yet or was removed.
+   */
+  public boolean isAvailable() {
+    return new File(getDatabasePath()).exists();
   }
 
   public void closeDatabase() {

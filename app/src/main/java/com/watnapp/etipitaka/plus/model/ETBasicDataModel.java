@@ -82,6 +82,11 @@ public abstract class ETBasicDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
+    if (db == null) {
+      // DB file missing (see ETDataModel.openDatabase). Return an empty cursor
+      // so callers can detect via getCount() == 0 instead of NPEing on query.
+      return new MatrixCursor(new String[] { getVolumeColumn() });
+    }
     Cursor cursor = db.query("main", null, "volume=?",
         new String[] { volumeFormat(volume) }, null, null, null);
     cursor.moveToFirst();

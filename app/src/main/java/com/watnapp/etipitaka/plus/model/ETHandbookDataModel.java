@@ -2,6 +2,7 @@ package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 
@@ -64,6 +65,12 @@ public abstract class ETHandbookDataModel extends ETDataModel {
   @Override
   public Cursor read(int volume, int page) {
     openDatabase();
+    if (db == null) {
+      // Handbook DB file missing (e.g. user never downloaded it, or app data
+      // was cleared after the language was last selected). Return empty so
+      // ReaderFragment.openBook hits the count==0 branch instead of NPEing.
+      return new MatrixCursor(new String[] { getVolumeColumn() });
+    }
     Cursor cursor = db.query("main", null, "volume=?",
         new String[] { String.valueOf(volume) }, null, null, null);
     cursor.moveToFirst();
