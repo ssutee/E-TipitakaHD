@@ -10,7 +10,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace 'com.watnapp.etipitaka.plus'
-    compileSdk 36
+    compileSdk 37
     ndkVersion "25.1.8937393"
 
     compileOptions {
@@ -25,15 +25,15 @@ android {
     defaultConfig {
         applicationId "com.watnapp.etipitaka.plus"
         minSdk 21
-        targetSdk 36
+        targetSdk 37
         versionCode 3035
         versionName "2.5.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "int", "MIN_SDK", "21"
-        buildConfigField "int", "TARGET_SDK", "36"
-        buildConfigField "int", "COMPILE_SDK", "36"
+        buildConfigField "int", "TARGET_SDK", "37"
+        buildConfigField "int", "COMPILE_SDK", "37"
     }
 
     buildFeatures {
