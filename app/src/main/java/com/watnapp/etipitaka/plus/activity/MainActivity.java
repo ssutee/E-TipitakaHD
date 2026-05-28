@@ -526,9 +526,17 @@ public class MainActivity extends AppCompatActivity implements
       Pattern pattern = Pattern.compile(Constants.REFS_PATTERN);
       Matcher matcher = pattern.matcher(getReaderFragment().getCurrentPageFragment().getContent());
       while (matcher.find()) {
+        // REFS_PATTERN captures Thai-numeral substrings, possibly with
+        // separators (commas, dashes, whitespace) for multi-element
+        // ranges. Integer.parseInt only understands ASCII digits, so we
+        // convert Thai -> Arabic and take the first contiguous digit run.
+        int volume = parseFirstNumber(matcher.group(1));
+        int item = parseFirstNumber(matcher.group(3));
+        if (volume < 0 || item < 0) {
+          continue;
+        }
         references.add(new Pair<String, Pair<Integer, Integer>>(matcher.group(0),
-            new Pair<Integer, Integer>(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(3)))));
-
+            new Pair<Integer, Integer>(volume, item)));
       }
       if (references.size() == 0) {
         return;
@@ -550,6 +558,29 @@ public class MainActivity extends AppCompatActivity implements
               }
             });
     builder.create().show();
+  }
+
+  /**
+   * Extract the first integer from a string that may contain Thai numerals
+   * and/or separators (commas, dashes, whitespace). Returns -1 if no
+   * parseable digit run is found. Used to harden chooseLanguage against
+   * NumberFormatException on multi-element REFS_PATTERN groups (e.g.
+   * "๑, ๒" or "๑–๓").
+   */
+  private int parseFirstNumber(String raw) {
+    if (raw == null) {
+      return -1;
+    }
+    String arabic = Utils.convertToArabicNumber(this, raw);
+    Matcher m = Pattern.compile("\\d+").matcher(arabic);
+    if (!m.find()) {
+      return -1;
+    }
+    try {
+      return Integer.parseInt(m.group());
+    } catch (NumberFormatException e) {
+      return -1;
+    }
   }
 
   private void compare(ArrayList<Pair<String, Pair<Integer, Integer>>> references,
