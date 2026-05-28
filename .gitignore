@@ -80,3 +80,6 @@ ehthumbs.db
 Thumbs.db
 
 app/release/app-release.aab
+
+# Claude memory compiler (third-party tool checked out locally, see .memory-compiler/AGENTS.md)
+.memory-compiler/
