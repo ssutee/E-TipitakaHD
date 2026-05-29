@@ -501,30 +501,57 @@ public class MainActivity extends AppCompatActivity implements
     Toast.makeText(this, R.string.save_complete, Toast.LENGTH_SHORT).show();
   }
 
+  /**
+   * Resolve the currently displayed PageFragment, or {@code null} if the
+   * reader / current page fragment isn't laid out yet (ViewPager2's
+   * FragmentStateAdapter creates fragments lazily; activity restore +
+   * config changes can leave the adapter's hash empty for a frame).
+   * Callers should bail silently or fall back to a sensible default when
+   * this returns null instead of NPEing on the chain.
+   */
+  private PageFragment getCurrentPageFragmentOrNull() {
+    ReaderFragment reader = getReaderFragment();
+    return reader == null ? null : reader.getCurrentPageFragment();
+  }
+
   private void increaseFontSize() {
     int size = getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE)
         .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     size += Constants.FONT_SIZE_STEP;
-    getReaderFragment().getCurrentPageFragment().setFontSize(size);
+    PageFragment frag = getCurrentPageFragmentOrNull();
+    if (frag != null) {
+      frag.setFontSize(size);
+    }
   }
 
   private void decreaseFontSize() {
     int size = getSharedPreferences(Constants.SETTING_PREFERENCES, Context.MODE_PRIVATE)
         .getInt(Constants.FONT_SIZE_KEY, Constants.DEFAULT_FONT_SIZE);
     size -= Constants.FONT_SIZE_STEP;
-    getReaderFragment().getCurrentPageFragment().setFontSize(size);
+    PageFragment frag = getCurrentPageFragmentOrNull();
+    if (frag != null) {
+      frag.setFontSize(size);
+    }
   }
 
   private void setColor(String font, String background) {
-    getReaderFragment().getCurrentPageFragment().setColor(font, background);
+    PageFragment frag = getCurrentPageFragmentOrNull();
+    if (frag != null) {
+      frag.setColor(font, background);
+    }
   }
 
   private void chooseLanguage() {
     final ArrayList<Pair<String, Pair<Integer, Integer>>> references = new ArrayList<Pair<String, Pair<Integer, Integer>>>();
 
     if (dataModel.getLanguage() == Language.THAIBT || dataModel.getLanguage() == Language.THAIPB) {
+      PageFragment currentFrag = getCurrentPageFragmentOrNull();
+      String content = currentFrag == null ? null : currentFrag.getContent();
+      if (content == null) {
+        return;
+      }
       Pattern pattern = Pattern.compile(Constants.REFS_PATTERN);
-      Matcher matcher = pattern.matcher(getReaderFragment().getCurrentPageFragment().getContent());
+      Matcher matcher = pattern.matcher(content);
       while (matcher.find()) {
         // REFS_PATTERN captures Thai-numeral substrings, possibly with
         // separators (commas, dashes, whitespace) for multi-element
@@ -1163,12 +1190,20 @@ public class MainActivity extends AppCompatActivity implements
 
   @Override
   public String getContent() {
-    return getReaderFragment().getCurrentPageFragment().getContent();
+    PageFragment frag = getCurrentPageFragmentOrNull();
+    if (frag == null) {
+      return "";
+    }
+    String html = frag.getContent();
+    return html != null ? html : "";
   }
 
   @Override
   public void onDialogPositiveClick(DialogFragment dialog, int fontSize) {
-    getReaderFragment().getCurrentPageFragment().setFontSize(fontSize);
+    PageFragment frag = getCurrentPageFragmentOrNull();
+    if (frag != null) {
+      frag.setFontSize(fontSize);
+    }
   }
 
   @Override

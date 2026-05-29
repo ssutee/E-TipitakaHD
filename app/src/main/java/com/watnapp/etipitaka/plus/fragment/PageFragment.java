@@ -191,7 +191,11 @@ public class PageFragment extends Fragment implements View.OnTouchListener, Hand
   }
 
   public String getContent() {
-    return mHtml;
+    // mHtml is assigned in onViewCreated. If a caller hits this before the
+    // view is inflated (e.g. dialog opens during activity restore), return
+    // empty instead of null so downstream WebView.loadData / regex
+    // matchers don't NPE.
+    return mHtml != null ? mHtml : "";
   }
 
   public void setColor(String font, String background) {
