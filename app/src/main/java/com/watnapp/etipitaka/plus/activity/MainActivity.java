@@ -616,6 +616,14 @@ public class MainActivity extends AppCompatActivity implements
       if (dataModel.getLanguage() == Language.THAIBT || dataModel.getLanguage() == Language.THAIPB) {
         compare(references, targetLanguage);
       } else {
+        // getComparingItemsAtPage may signal "no items" via null arrays
+        // after the data-model hardening sweep (commits cd0014b, c9ed49e,
+        // b8704d4). Bail before posting to avoid NPE on items.length
+        // inside compare(Integer[], Integer[], Language).
+        if (items == null || sections == null || items.length == 0) {
+          mHandler.post(() -> Toast.makeText(this, R.string.no_data, Toast.LENGTH_SHORT).show());
+          return;
+        }
         mHandler.post(() -> {
           compare(items, sections, targetLanguage);
         });
@@ -673,6 +681,13 @@ public class MainActivity extends AppCompatActivity implements
   }
 
   private void compare(final Integer[] items, final Integer[] sections, final Language language) {
+    // Defensive: callers may invoke this directly via mHandler.post after
+    // a data-model returns null arrays for "no items at page". Bail
+    // gracefully instead of NPEing on items.length.
+    if (items == null || sections == null || items.length == 0) {
+      Toast.makeText(this, R.string.no_data, Toast.LENGTH_SHORT).show();
+      return;
+    }
     CharSequence[] choices = new CharSequence[items.length];
     for (int i=0; i < items.length; ++i) {
       choices[i] = String.format("%s %s", getString(R.string.go_to_item),
