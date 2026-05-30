@@ -153,7 +153,10 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
   }
 
   private void confirmDownloadDatabase(BookDatabaseHelper.Language language, int position) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getContext()));
+    if (getContext() == null) {
+      return;
+    }
+    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
     builder.setTitle(R.string.database_not_found);
     builder.setMessage(R.string.confirm_download_database);
@@ -169,8 +172,16 @@ public class MenuFragment extends Fragment implements HistoryFragment.OnHistoryS
   }
 
   private void downloadDatabase(BookDatabaseHelper.Language language, int position) {
-    download(Objects.requireNonNull(getActivity()), language, binding.progressbar, success -> {
-      if (success) {
+    // The download runs on GlobalScope.launch and the success callback
+    // posts back to the main thread well after the call site returns.
+    // If the user closes the drawer or the activity recreates in the
+    // meantime, binding is nulled in onDestroyView and a naive
+    // binding.spnLanguages.setSelection(...) NPEs (Play Console crash).
+    if (getActivity() == null || binding == null) {
+      return;
+    }
+    download(getActivity(), language, binding.progressbar, success -> {
+      if (success && binding != null) {
         binding.spnLanguages.setSelection(position);
         changeDatabase(position, language);
       }
