@@ -3,6 +3,7 @@ package com.watnapp.etipitaka.plus.model;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -50,7 +51,8 @@ public abstract class ETDataModel {
       return;
     }
     String path = getDatabasePath();
-    if (!new File(path).exists()) {
+    File file = new File(path);
+    if (!file.exists()) {
       // DB file missing (never downloaded, cleared data, storage migration,
       // unmounted SD card). Leave db = null and let callers handle it.
       // Without this log, db.query NPEs further down the stack hid the real
@@ -58,17 +60,35 @@ public abstract class ETDataModel {
       Log.w(TAG, "openDatabase: database file does not exist at " + path);
       return;
     }
-    db = SQLiteDatabase.openDatabase(path, null, 0);
+    try {
+      db = SQLiteDatabase.openDatabase(path, null, 0);
+    } catch (SQLiteException e) {
+      // File exists but SQLite cannot open it. Causes seen in Play
+      // Console crashes:
+      //   - corrupt / partial download (zip extraction failed mid-write)
+      //   - wrong format (placeholder file, 0-byte stub)
+      //   - path is a directory rather than a file
+      //   - external storage unmounted between exists() and openDatabase()
+      // Leave db = null so callers' null-guards (see ETBasicDataModel.read
+      // etc.) return an empty MatrixCursor instead of propagating the
+      // SQLiteCantOpenDatabaseException up to FragmentManager and
+      // crashing the activity on start.
+      Log.e(TAG, "openDatabase: failed to open " + path, e);
+      db = null;
+    }
   }
 
   /**
-   * @return {@code true} if the underlying database file exists on disk.
-   *         Callers should check this before invoking {@link #read} /
-   *         {@link #search} etc. to avoid downstream NPEs when the DB has
-   *         not been downloaded yet or was removed.
+   * @return {@code true} if the underlying database file exists on disk
+   *         and looks like a plausible SQLite file (regular non-empty
+   *         file). Callers should check this before invoking
+   *         {@link #read} / {@link #search} etc. to avoid downstream
+   *         NPEs / SQLiteCantOpenDatabaseException when the DB has not
+   *         been downloaded, was partially downloaded, or was removed.
    */
   public boolean isAvailable() {
-    return new File(getDatabasePath()).exists();
+    File file = new File(getDatabasePath());
+    return file.exists() && file.isFile() && file.length() > 0;
   }
 
   public void closeDatabase() {
