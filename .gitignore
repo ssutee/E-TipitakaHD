@@ -83,3 +83,10 @@ app/release/app-release.aab
 
 # Claude memory compiler (third-party tool checked out locally, see .memory-compiler/AGENTS.md)
 .memory-compiler/
+
+# fastlane — Play Developer API service-account key (NEVER commit) + run artifacts
+fastlane/play-service-account.json
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output/
+fastlane/README.md.bak

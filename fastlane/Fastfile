@@ -1,0 +1,63 @@
+default_platform(:android)
+
+platform :android do
+
+  # ── Build a signed release AAB, then upload to Google Play ──────────────
+  #
+  #   fastlane android release                 # build + upload to production
+  #   fastlane android release track:internal  # build + upload to internal
+  #   fastlane android release rollout:0.1      # staged 10% production rollout
+  #
+  # Reads the signing config from keystore.properties (already wired in
+  # app/build.gradle) and the Play credentials from fastlane/Appfile.
+  desc "Build a signed release AAB and upload it to Google Play"
+  lane :release do |options|
+    track   = options[:track]   || "production"
+    rollout = options[:rollout]            # e.g. "0.1" for a staged 10% rollout
+
+    gradle(task: "clean")
+    gradle(task: "bundle", build_type: "Release")
+
+    upload_to_play_store(
+      track:                  track,
+      rollout:                rollout,
+      release_status:         rollout ? "inProgress" : "completed",
+      aab:                    lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      skip_upload_apk:        true,
+      skip_upload_metadata:   true,
+      skip_upload_images:     true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  # ── Upload an AAB that was already built, without rebuilding ─────────────
+  #
+  #   fastlane android upload                          # uploads app-release.aab
+  #   fastlane android upload track:internal
+  #   fastlane android upload aab:path/to/app.aab
+  desc "Upload an already-built release AAB to Google Play (no rebuild)"
+  lane :upload do |options|
+    track   = options[:track]   || "production"
+    rollout = options[:rollout]
+    aab     = options[:aab] || "app/build/outputs/bundle/release/app-release.aab"
+
+    upload_to_play_store(
+      track:                  track,
+      rollout:                rollout,
+      release_status:         rollout ? "inProgress" : "completed",
+      aab:                    aab,
+      skip_upload_apk:        true,
+      skip_upload_metadata:   true,
+      skip_upload_images:     true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  # ── Verify the service-account JSON can talk to the Play API ────────────
+  #
+  #   fastlane android validate
+  desc "Validate the Google Play service-account credentials"
+  lane :validate do
+    validate_play_store_json_key
+  end
+end

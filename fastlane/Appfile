@@ -1,0 +1,8 @@
+# Google Play Developer API credentials.
+#
+# json_key_file points at the service-account JSON you download from the
+# Google Cloud Console (see fastlane/README.md for the one-time setup).
+# The file is gitignored — never commit it.
+json_key_file("fastlane/play-service-account.json")
+
+package_name("com.watnapp.etipitaka.plus")
