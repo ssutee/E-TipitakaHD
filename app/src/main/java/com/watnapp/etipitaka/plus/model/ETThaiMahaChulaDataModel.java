@@ -1,6 +1,8 @@
 package com.watnapp.etipitaka.plus.model;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
@@ -71,28 +73,62 @@ public class ETThaiMahaChulaDataModel extends ETBasicDataModel {
 
   @Override
   public Integer[] getPagesByItem(int volume, int item, boolean needConvertToSiamrat) {
-    if (needConvertToSiamrat) {
+    if (!needConvertToSiamrat) {
+      return super.getPagesByItem(volume, item, false);
+    }
+    Map<String, Object> map = BookDatabaseHelper.getThaiMCConvertItemMap(mContext);
+    if (map == null) {
+      return new Integer[0];
+    }
+    // The MC mapping table has scattered gaps for some items. When the
+    // exact item is absent, walk down to the nearest lower item that
+    // exists so jump-to-item by Siam indexing lands on the right page
+    // vicinity instead of failing silently. Mirrors PC reference
+    // Engine._NearestItemPage and iOS ETDifferIndexModel.queryPages.
+    for (int target = item; target > 0; --target) {
       ArrayList<Integer> pages = new ArrayList<>();
       int section = 1;
       while (true) {
-        Object page = BookDatabaseHelper.getThaiMCConvertItemMap(mContext).get(String.format("v%d-%d-i%d", volume, section, item));
-        if (page != null) {
-          pages.add(Math.round(Float.parseFloat(page.toString())));
-          section += 1;
-          continue;
+        Object page = map.get(String.format("v%d-%d-i%d", volume, section, target));
+        if (page == null) {
+          break;
         }
-        break;
+        try {
+          pages.add(Math.round(Float.parseFloat(page.toString())));
+        } catch (NumberFormatException ignored) {
+          // Skip malformed entry, continue with next section.
+        }
+        section += 1;
       }
-      return pages.toArray(new Integer[0]);
+      if (!pages.isEmpty()) {
+        return pages.toArray(new Integer[0]);
+      }
     }
-    return super.getPagesByItem(volume, item, false);
+    return new Integer[0];
   }
 
   @Override
   public void getComparingItemsAtPage(int volume, int page, BookDatabaseHelper.OnGetItemsListener listener) {
-    List<Double> pair = (List<Double>) BookDatabaseHelper.getThaiMCConvertItemMap(mContext).get(String.format("v%d-p%d", volume, page));
-    listener.onGetItemsFinish(new Integer[] { Math.round(Float.parseFloat(pair.get(0).toString())) },
-        new Integer[] { Math.round(Float.parseFloat(pair.get(1).toString()))});
+    if (listener == null) return;
+    Map<String, Object> map = BookDatabaseHelper.getThaiMCConvertItemMap(mContext);
+    Object raw = map == null ? null : map.get(String.format("v%d-p%d", volume, page));
+    if (!(raw instanceof List)) {
+      listener.onGetItemsFinish(null, null);
+      return;
+    }
+    List<?> pair = (List<?>) raw;
+    if (pair.size() < 2 || pair.get(0) == null || pair.get(1) == null) {
+      listener.onGetItemsFinish(null, null);
+      return;
+    }
+    try {
+      int itemNumber = Math.round(Float.parseFloat(pair.get(0).toString()));
+      int section = Math.round(Float.parseFloat(pair.get(1).toString()));
+      listener.onGetItemsFinish(new Integer[] { itemNumber }, new Integer[] { section });
+    } catch (Exception e) {
+      Log.e(TAG, "getComparingItemsAtPage failed for volume=" + volume + ", page=" + page, e);
+      listener.onGetItemsFinish(null, null);
+    }
   }
 
   @Override
@@ -101,9 +137,24 @@ public class ETThaiMahaChulaDataModel extends ETBasicDataModel {
       return super.getPageByItem(volume, item, section, false);
     }
 
-    Object page = BookDatabaseHelper.getThaiMCConvertItemMap(mContext).get(String.format("v%d-%d-i%d", volume, section, item));
-    if (page != null) {
-      return Math.round(Float.parseFloat(page.toString()));
+    Map<String, Object> map = BookDatabaseHelper.getThaiMCConvertItemMap(mContext);
+    if (map == null) {
+      return 0;
+    }
+    // Mapping table has scattered gaps (e.g. v37-1-i124 absent while
+    // v37-1-i123 exists). Walk down to the nearest lower item that exists
+    // so compare lands on the right page vicinity instead of page 0.
+    // Mirrors PC reference Engine._NearestItemPage and iOS
+    // ETDifferIndexModel.convert(fromPivot:).
+    for (int i = item; i > 0; --i) {
+      Object page = map.get(String.format("v%d-%d-i%d", volume, section, i));
+      if (page != null) {
+        try {
+          return Math.round(Float.parseFloat(page.toString()));
+        } catch (NumberFormatException ignored) {
+          // Skip malformed entry and keep walking down.
+        }
+      }
     }
     return 0;
   }

@@ -63,26 +63,35 @@ open class ETThaiSupremeDataModel(context: Context) : ETBasicDataModel(context) 
     }
 
     override fun getPagesByItem(volume: Int, item: Int, needConvertToSiamrat: Boolean): Array<Int> {
-        if (needConvertToSiamrat) {
+        if (!needConvertToSiamrat) {
+            return super.getPagesByItem(volume, item, false)
+        }
+        val convertMap = BookDatabaseHelper.getThaiMSConvertItemMap(mContext) ?: return emptyArray()
+        // The MS mapping table has scattered gaps for some items. When the
+        // exact item is absent, walk down to the nearest lower item that
+        // exists so jump-to-item by Siam indexing lands on the right page
+        // vicinity instead of failing silently. Mirrors PC reference
+        // Engine._NearestItemPage and iOS ETDifferIndexModel.queryPages.
+        var target = item
+        while (target > 0) {
             val pages = ArrayList<Int>()
-            val convertMap = BookDatabaseHelper.getThaiMSConvertItemMap(mContext) ?: return emptyArray()
             var section = 1
             while (true) {
-                val page = convertMap[String.format(Locale.getDefault(), "v%d-%d-i%d", volume, section, item)]
-                if (page != null) {
-                    try {
-                        pages.add(Math.round(page.toString().toFloat()))
-                    } catch (e: NumberFormatException) {
-                        Log.w(TAG, "getPagesByItem: bad page value $page for volume=$volume, item=$item, section=$section")
-                    }
-                    section += 1
-                    continue
+                val page = convertMap[String.format(Locale.getDefault(), "v%d-%d-i%d", volume, section, target)]
+                        ?: break
+                try {
+                    pages.add(Math.round(page.toString().toFloat()))
+                } catch (e: NumberFormatException) {
+                    Log.w(TAG, "getPagesByItem: bad page value $page for volume=$volume, item=$target, section=$section")
                 }
-                break
+                section += 1
             }
-            return pages.toTypedArray()
+            if (pages.isNotEmpty()) {
+                return pages.toTypedArray()
+            }
+            target -= 1
         }
-        return super.getPagesByItem(volume, item, false)
+        return emptyArray()
     }
 
     override fun getPageByItem(volume: Int, item: Int, section: Int, needConvertToSiamrat: Boolean): Int {
@@ -90,12 +99,23 @@ open class ETThaiSupremeDataModel(context: Context) : ETBasicDataModel(context) 
             return super.getPageByItem(volume, item, section, false)
         }
         val convertMap = BookDatabaseHelper.getThaiMSConvertItemMap(mContext) ?: return 0
-        val page = convertMap[String.format(Locale.getDefault(), "v%d-%d-i%d", volume, section, item)]
-        return try {
-            page?.toString()?.toFloat()?.roundToInt() ?: 0
-        } catch (e: NumberFormatException) {
-            0
+        // Mapping table has scattered gaps. Walk down to the nearest lower
+        // item that exists so compare lands on the right page vicinity
+        // instead of page 0. Mirrors PC reference Engine._NearestItemPage
+        // and iOS ETDifferIndexModel.convert(fromPivot:).
+        var i = item
+        while (i > 0) {
+            val page = convertMap[String.format(Locale.getDefault(), "v%d-%d-i%d", volume, section, i)]
+            if (page != null) {
+                try {
+                    return page.toString().toFloat().roundToInt()
+                } catch (e: NumberFormatException) {
+                    Log.w(TAG, "getPageByItem: bad page value $page for volume=$volume, item=$i, section=$section")
+                }
+            }
+            i -= 1
         }
+        return 0
     }
 
 
