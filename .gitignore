@@ -90,3 +90,6 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/test_output/
 fastlane/README.md.bak
+
+# fastlane auto-generates README.md on every run — keep the hand-written guide in SETUP.md
+fastlane/README.md
