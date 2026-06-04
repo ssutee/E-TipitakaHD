@@ -26,8 +26,8 @@ android {
         applicationId "com.watnapp.etipitaka.plus"
         minSdk 21
         targetSdk 37
-        versionCode 3038
-        versionName "2.5.3"
+        versionCode 3039
+        versionName "2.5.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
