@@ -11,7 +11,10 @@ fastlane android validate                # check the service-account credentials
 ```
 
 Signing comes from `keystore.properties` (already wired in `app/build.gradle`).
-Play credentials come from `fastlane/play-service-account.json` (gitignored).
+Play credentials come from `~/.config/etipitaka/play-service-account.json`,
+which lives **outside the repo** so the key can never be committed (Google
+auto-disables service-account keys found in public repos). Override the path
+with the `SUPPLY_JSON_KEY` env var.
 
 ---
 
@@ -29,12 +32,17 @@ key that lets fastlane talk to the Play Developer API.
    - Skip the optional role/grant steps → **Done**.
 4. Open the new service account → **Keys** tab → **Add key → Create new key → JSON** → **Create**.
    - A `.json` file downloads. This is your key.
-5. Move it into the repo at the gitignored path:
+5. Move it to the secrets location **outside the repo** (so it can never be
+   committed — Google auto-disables keys found in public repos):
 
    ```bash
+   mkdir -p ~/.config/etipitaka
    mv ~/Downloads/<project>-<hash>.json \
-      "/Volumes/SeagateBackup/Works/watnapahpong/E-TipitakaHD/fastlane/play-service-account.json"
+      ~/.config/etipitaka/play-service-account.json
+   chmod 600 ~/.config/etipitaka/play-service-account.json
    ```
+
+   (Or store it anywhere and point `SUPPLY_JSON_KEY` at it.)
 
    Note the service-account email (looks like
    `play-publisher@<project>.iam.gserviceaccount.com`) — you need it next.
@@ -107,10 +115,12 @@ fastlane android release track:beta
   release of an app on the production track to go through the Play Console UI.
   After that, the API (and therefore fastlane) can publish. This app already
   has prior production releases, so this is only relevant for a brand-new app.
-- **Service-account JSON is secret.** It is gitignored
-  (`fastlane/play-service-account.json`). Anyone with it can publish to your
-  Play account. If leaked, delete the key in Google Cloud Console and create a
-  new one.
+- **Service-account JSON is secret and lives outside the repo.** Default
+  `~/.config/etipitaka/play-service-account.json`. It is *not* in the project
+  tree, so it cannot be `git add`-ed by accident. Anyone with it can publish to
+  your Play account. Google auto-disables service-account keys it finds in
+  public repos — if that happens (or the key leaks), delete the key in Google
+  Cloud Console and create a new one.
 - **Permission propagation lag.** A freshly invited service account may return
   `403` for a while. Wait and retry `fastlane android validate`.
 - **`completed` rollout to production** publishes to all users after Google

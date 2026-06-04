@@ -1,8 +1,19 @@
 # Google Play Developer API credentials.
 #
-# json_key_file points at the service-account JSON you download from the
-# Google Cloud Console (see fastlane/README.md for the one-time setup).
-# The file is gitignored — never commit it.
-json_key_file("fastlane/play-service-account.json")
+# SECURITY: the service-account JSON is stored OUTSIDE the repo tree so it
+# can never be accidentally committed. Public repos with a leaked key get
+# the key auto-disabled by Google. Default location:
+#
+#     ~/.config/etipitaka/play-service-account.json
+#
+# Override with the SUPPLY_JSON_KEY env var to point somewhere else:
+#
+#     export SUPPLY_JSON_KEY="$HOME/secrets/etipitaka-play.json"
+#
+# See fastlane/README.md for the one-time setup.
+json_key_file(
+  ENV["SUPPLY_JSON_KEY"] ||
+    File.expand_path("~/.config/etipitaka/play-service-account.json")
+)
 
 package_name("com.watnapp.etipitaka.plus")
