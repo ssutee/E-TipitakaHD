@@ -1,12 +1,14 @@
 package com.watnapp.etipitaka.plus.helper
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
 import com.koushikdutta.ion.Ion
@@ -175,6 +177,110 @@ fun download(activity: Activity,
             toast.setGravity(Gravity.CENTER, 0,0)
             toast.show()
             onDownloadFinish(result)
+        }
+    }
+}
+
+/**
+ * Show a confirmation dialog offering to download the (missing) database for
+ * [language]; on confirm, download it with a modal progress dialog and, on
+ * success, invoke [onSuccess]. Used by the compare flows when the target
+ * language's DB is not yet on disk. [onSuccess] runs on the UI thread.
+ *
+ * No-ops (with an offline toast) when there is no network. Does NOT invoke
+ * [onSuccess] on cancel or on download failure.
+ */
+@OptIn(DelicateCoroutinesApi::class)
+fun confirmAndDownloadDatabase(
+    activity: Activity,
+    language: BookDatabaseHelper.Language,
+    onSuccess: () -> Unit
+) {
+    if (!Utils.isNetworkConnected(activity)) {
+        Toast.makeText(activity, R.string.no_internet_connection, Toast.LENGTH_LONG).show()
+        return
+    }
+    AlertDialog.Builder(activity)
+        .setTitle(R.string.database_not_found)
+        .setMessage(R.string.confirm_download_database)
+        .setPositiveButton(R.string.download) { dialog, _ ->
+            dialog.dismiss()
+            downloadDatabaseWithDialog(activity, language) { success ->
+                if (success) onSuccess()
+            }
+        }
+        .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+        .create()
+        .show()
+}
+
+/**
+ * Download [language]'s database zip with a non-cancelable modal progress
+ * dialog, unzip it, and report the result via [onFinish] on the UI thread.
+ * Reuses the same suspend helpers as [download]. Builds its progress UI
+ * programmatically so callers need no layout of their own.
+ */
+@OptIn(DelicateCoroutinesApi::class)
+private fun downloadDatabaseWithDialog(
+    activity: Activity,
+    language: BookDatabaseHelper.Language,
+    onFinish: (success: Boolean) -> Unit
+) {
+    val progressBar = ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal)
+    val pad = (16 * activity.resources.displayMetrics.density).toInt()
+    val container = LinearLayout(activity).apply {
+        orientation = LinearLayout.VERTICAL
+        setPadding(pad, pad, pad, pad)
+        addView(progressBar)
+    }
+    val dialog = AlertDialog.Builder(activity)
+        .setTitle(R.string.downloading)
+        .setView(container)
+        .setCancelable(false)
+        .create()
+
+    fun alive() = !activity.isFinishing && !activity.isDestroyed
+
+    GlobalScope.launch {
+        try {
+            val host = if (isThaiClient(activity)) Constants.THAI_HOST else Constants.S3_HOST
+            activity.runOnUiThread {
+                progressBar.isIndeterminate = false
+                if (alive()) {
+                    try { dialog.show() } catch (e: Exception) { Log.w("UPDATE", "dialog.show failed", e) }
+                }
+            }
+
+            val filename = "${language.stringCode}.zip"
+            val url = "$host/$filename"
+            val path = Utils.getDatabaseDirectory(activity) + "/" + filename
+
+            var result = downloadDatabaseZipFile(activity, url, path, progressBar)
+            activity.runOnUiThread { progressBar.isIndeterminate = true }
+
+            var messageId = if (result) R.string.download_complete else R.string.download_error
+            if (result) {
+                result = unzipDatabase(activity, path)
+                messageId = if (result) R.string.download_complete else R.string.space_error
+            }
+
+            val finalResult = result
+            val finalMessageId = messageId
+            activity.runOnUiThread {
+                if (alive()) {
+                    try { dialog.dismiss() } catch (e: Exception) { Log.w("UPDATE", "dialog.dismiss failed", e) }
+                    Toast.makeText(activity, finalMessageId, Toast.LENGTH_SHORT).show()
+                }
+                onFinish(finalResult)
+            }
+        } catch (e: Exception) {
+            Log.e("UPDATE", "downloadDatabaseWithDialog failed for ${language.stringCode}", e)
+            activity.runOnUiThread {
+                if (alive()) {
+                    try { dialog.dismiss() } catch (ignored: Exception) {}
+                }
+                onFinish(false)
+            }
         }
     }
 }

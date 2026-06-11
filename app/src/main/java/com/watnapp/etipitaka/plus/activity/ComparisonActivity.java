@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,11 +18,13 @@ import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.plus.model.ComparisonActivityNavigationModel;
 import com.watnapp.etipitaka.plus.model.ETDataModel;
 import com.watnapp.etipitaka.plus.model.ETDataModelCreator;
+import com.watnapp.etipitaka.plus.helper.DownloadDatabaseKt;
 
 import java.io.File;
 
 import dart.Dart;
 import dart.DartModel;
+import kotlin.Unit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -160,15 +161,30 @@ public class ComparisonActivity extends AppCompatActivity
             return;
           }
           String dbPath = Utils.getDatabasePath(ComparisonActivity.this, targetLanguage);
-          if (!new File(dbPath).exists()) {
-            Toast.makeText(ComparisonActivity.this,
-                R.string.database_not_found, Toast.LENGTH_LONG).show();
-            return;
+          if (new File(dbPath).exists()) {
+            proceedCompare(sourceModel, language, targetLanguage, volume, page);
+          } else {
+            // Target DB missing — offer download, then resume on success.
+            DownloadDatabaseKt.confirmAndDownloadDatabase(
+                ComparisonActivity.this, targetLanguage, () -> {
+                  if (!isFinishing() && !isDestroyed()) {
+                    proceedCompare(sourceModel, language, targetLanguage, volume, page);
+                  }
+                  return Unit.INSTANCE;
+                });
           }
-          sourceModel.getComparingItemsAtPage(volume, page, (items, sections) -> {
-            mHandler.post(() -> pickItemAndLaunch(language, targetLanguage, volume, page, items, sections));
-          });
         }).create().show();
+  }
+
+  /**
+   * Fetch the comparable items at (volume, page) from sourceModel and present
+   * the item picker / launch. Shared by the normal path and the
+   * post-download continuation so the resume behaves identically.
+   */
+  private void proceedCompare(final ETDataModel sourceModel, final Language sourceLanguage,
+                              final Language targetLanguage, final int volume, final int page) {
+    sourceModel.getComparingItemsAtPage(volume, page, (items, sections) ->
+        mHandler.post(() -> pickItemAndLaunch(sourceLanguage, targetLanguage, volume, page, items, sections)));
   }
 
   private void pickItemAndLaunch(final Language sourceLanguage, final Language targetLanguage,

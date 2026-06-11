@@ -39,6 +39,7 @@ import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.fragment.*;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
+import com.watnapp.etipitaka.plus.helper.DownloadDatabaseKt;
 import com.watnapp.etipitaka.plus.R;
 import com.watnapp.etipitaka.plus.model.*;
 import com.watnapp.etipitaka.plus.account.UserDataExporter;
@@ -59,6 +60,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import static org.koin.java.KoinJavaComponent.*;
+
+import kotlin.Unit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -580,8 +583,15 @@ public class MainActivity extends AppCompatActivity implements
               if (new File(dbPath).exists()) {
                 compare(references, page, targetLanguage);
               } else {
-                Toast.makeText(MainActivity.this,
-                        R.string.database_not_found, Toast.LENGTH_LONG).show();
+                // DB for the chosen compare target is missing — offer to
+                // download it, then resume the comparison automatically.
+                DownloadDatabaseKt.confirmAndDownloadDatabase(
+                    MainActivity.this, targetLanguage, () -> {
+                      if (!isFinishing() && !isDestroyed()) {
+                        compare(references, page, targetLanguage);
+                      }
+                      return Unit.INSTANCE;
+                    });
               }
             });
     builder.create().show();
