@@ -24,12 +24,26 @@ import kotlin.coroutines.suspendCoroutine
 
 suspend fun getLocalDatabaseVersion(context: Context, language: BookDatabaseHelper.Language)
         : Int = suspendCoroutine { cont ->
-    val db = SQLiteDatabase.openDatabase(Utils.getDatabasePath(context, language), null, 0)
-    val cursor = db.rawQuery("pragma user_version", null)
-    cursor.moveToFirst()
-    val version = cursor.getString(0).toInt()
-    cursor.close()
-    db.close()
+    // Callers check File.exists() on the main thread, but this runs later on a
+    // worker coroutine — the file can vanish in between (concurrent re-download
+    // replacing it, external storage unmounted), and openDatabase then throws
+    // SQLiteCantOpenDatabaseException which would kill the process from
+    // GlobalScope. Treat any failure as version 0 ("unknown / not installed").
+    val path = Utils.getDatabasePath(context, language)
+    val version = try {
+        if (!File(path).isFile) {
+            0
+        } else {
+            SQLiteDatabase.openDatabase(path, null, 0).use { db ->
+                db.rawQuery("pragma user_version", null).use { cursor ->
+                    if (cursor.moveToFirst()) cursor.getString(0)?.toIntOrNull() ?: 0 else 0
+                }
+            }
+        }
+    } catch (e: Exception) {
+        Log.w("UPDATE", "getLocalDatabaseVersion: cannot read $path", e)
+        0
+    }
     cont.resume(version)
 }
 
@@ -101,14 +115,21 @@ fun update(activity: Activity,
            language: BookDatabaseHelper.Language,
            onCheckUpdateFinish : (needUpdate: Boolean) -> Unit) {
     GlobalScope.launch {
-        if (Utils.isNetworkConnected(activity)) {
-            val localVersion = getLocalDatabaseVersion(activity, language)
-            val currentVersion = getCurrentDatabase(activity, language)
-            Log.d("UPDATE", language.stringCode)
-            Log.d("UPDATE", "$localVersion : $currentVersion" )
-            val ret = localVersion != currentVersion
-            activity.runOnUiThread { onCheckUpdateFinish(ret) }
-        } else {
+        // An exception escaping GlobalScope.launch has no parent scope to
+        // handle it and crashes the process — resolve to "no update" instead.
+        try {
+            if (Utils.isNetworkConnected(activity)) {
+                val localVersion = getLocalDatabaseVersion(activity, language)
+                val currentVersion = getCurrentDatabase(activity, language)
+                Log.d("UPDATE", language.stringCode)
+                Log.d("UPDATE", "$localVersion : $currentVersion" )
+                val ret = localVersion != currentVersion
+                activity.runOnUiThread { onCheckUpdateFinish(ret) }
+            } else {
+                activity.runOnUiThread { onCheckUpdateFinish(false) }
+            }
+        } catch (e: Exception) {
+            Log.e("UPDATE", "update check failed for ${language.stringCode}", e)
             activity.runOnUiThread { onCheckUpdateFinish(false) }
         }
     }

@@ -105,13 +105,23 @@ abstract public class ETSiamratDataModel extends ETDataModel {
       // callers see getCount() == 0 instead of NPEing on db.query.
       return new MatrixCursor(new String[] { getVolumeColumn() });
     }
-    Cursor cursor = db.query("page", null, "language = ? AND volume = ?",
-        new String[] {String.valueOf(getLanguage().getCode()), String.valueOf(volume)}, null, null, null);
-    cursor.moveToFirst();
-    if (page > 0 && page <= cursor.getCount()) {
-      cursor.moveToPosition(page-1);
+    Cursor cursor = null;
+    try {
+      cursor = db.query("page", null, "language = ? AND volume = ?",
+          new String[] {String.valueOf(getLanguage().getCode()), String.valueOf(volume)}, null, null, null);
+      // moveToFirst fills the cursor window — a corrupt DB file throws
+      // SQLiteDatabaseCorruptException here even though openDatabase
+      // succeeded (only the header is checked at open).
+      cursor.moveToFirst();
+      if (page > 0 && page <= cursor.getCount()) {
+        cursor.moveToPosition(page-1);
+      }
+      return cursor;
+    } catch (Exception e) {
+      Log.e(TAG, "read failed for volume=" + volume, e);
+      if (cursor != null) cursor.close();
+      return new MatrixCursor(new String[] { getVolumeColumn() });
     }
-    return cursor;
   }
 
   @Override

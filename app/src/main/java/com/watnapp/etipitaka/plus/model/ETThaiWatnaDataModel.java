@@ -113,13 +113,23 @@ public class ETThaiWatnaDataModel extends ETDataModel {
       // instead of NPEing on db.query (see ETDataModel.openDatabase).
       return new MatrixCursor(new String[] { getVolumeColumn() });
     }
-    Cursor cursor = db.query("main", null, "volume=?",
-        new String[] { String.valueOf(volume) }, null, null, null);
-    cursor.moveToFirst();
-    if (page > 0 && page <= cursor.getCount()) {
-      cursor.moveToPosition(page-1);
+    Cursor cursor = null;
+    try {
+      cursor = db.query("main", null, "volume=?",
+          new String[] { String.valueOf(volume) }, null, null, null);
+      // moveToFirst fills the cursor window — a corrupt DB file throws
+      // SQLiteDatabaseCorruptException here even though openDatabase
+      // succeeded (only the header is checked at open).
+      cursor.moveToFirst();
+      if (page > 0 && page <= cursor.getCount()) {
+        cursor.moveToPosition(page-1);
+      }
+      return cursor;
+    } catch (Exception e) {
+      Log.e(TAG, "read failed for volume=" + volume, e);
+      if (cursor != null) cursor.close();
+      return new MatrixCursor(new String[] { getVolumeColumn() });
     }
-    return cursor;
   }
 
   @Override

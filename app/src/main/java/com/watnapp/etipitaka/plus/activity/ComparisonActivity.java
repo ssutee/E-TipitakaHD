@@ -70,6 +70,13 @@ public class ComparisonActivity extends AppCompatActivity
             mHandler.post(new Runnable() {
               @Override
               public void run() {
+                // convertToPivot/convertFromPivot run on a background thread,
+                // so this can be posted (or still be queued) after the user
+                // backed out — committing a transaction then throws
+                // "FragmentManager has been destroyed".
+                if (isFinishing() || isDestroyed()) {
+                  return;
+                }
                 mLeftFragment = ReaderFragment.newInstance(
                         mLanguage1, navigationModel.mVolume, navigationModel.mPage,
                         navigationModel.mKeywords, navigationModel.mIsBuddhawaj, true);
@@ -86,20 +93,7 @@ public class ComparisonActivity extends AppCompatActivity
                         mRightFragment, "right").commit();
 
                 if (page > 0) {
-                  // ReaderFragment.scrollToItemAtPage polls the adapter and
-                  // routes through PageFragment's WebView-load latch — but it
-                  // needs mRightFragment's view-binding to exist (reads
-                  // binding.viewpager). beginTransaction().commit() above is
-                  // async, so delay long enough for onCreateView to run.
-                  // 200ms is conservative on emulator + low-end devices.
-                  mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                      mRightFragment.scrollToItemAtPage(
-                              mRightFragment.getCurrentPage(),
-                              navigationModel.mItem);
-                    }
-                  }, 200);
+                  scrollRightFragmentToItem(navigationModel.mItem, 0);
                 } else {
                   finish();
                 }
@@ -113,8 +107,39 @@ public class ComparisonActivity extends AppCompatActivity
 
   }
 
+  private static final int SCROLL_MAX_TRIES = 40;
+  private static final long SCROLL_RETRY_MS = 50L;
+
+  /**
+   * Scroll the right ReaderFragment to {@code item} once its view exists.
+   * beginTransaction().commit() is async, so right after committing the
+   * fragment its view (and binding) does not exist yet — a fixed delay
+   * raced the fragment's onCreateView on slow devices and NPE'd inside
+   * ReaderFragment.getCurrentPage. Poll for view readiness instead;
+   * onViewCreated (which positions the pager via openBook) runs in the
+   * same transaction pass as onCreateView, so a non-null getView() means
+   * getCurrentPage is safe to call.
+   */
+  private void scrollRightFragmentToItem(final int item, final int tries) {
+    if (isFinishing() || isDestroyed() || mRightFragment == null) {
+      return;
+    }
+    if (mRightFragment.getView() == null) {
+      if (tries >= SCROLL_MAX_TRIES) {
+        Log.w(TAG, "scrollRightFragmentToItem: right fragment view never appeared");
+        return;
+      }
+      mHandler.postDelayed(() -> scrollRightFragmentToItem(item, tries + 1), SCROLL_RETRY_MS);
+      return;
+    }
+    mRightFragment.scrollToItemAtPage(mRightFragment.getCurrentPage(), item);
+  }
+
   @Override
   protected void onDestroy() {
+    // Drop any queued fragment-commit / scroll runnables so they cannot
+    // run against a destroyed activity.
+    mHandler.removeCallbacksAndMessages(null);
     mDataModel1.closeDatabase();
     mDataModel2.closeDatabase();
     super.onDestroy();
