@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +14,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,12 +29,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.watnapp.etipitaka.plus.R
 import com.watnapp.etipitaka.plus.Utils
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper
@@ -296,30 +303,13 @@ internal fun FavoriteActionDialog(
     onMark: () -> Unit,
     onSort: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        // Bound the note used as the title: it is free-form, user-entered text
-        // and can be arbitrarily long. Material3 AlertDialog does not scroll
-        // the title, so an unbounded note consumed the dialog height and
-        // clipped the action list below (only "open note" stayed visible).
-        title = {
-            Text(
-                favorite.getNote().orEmpty(),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
-        text = {
-            Column {
-                DialogAction(text = stringResource(R.string.open_note), onClick = onOpen)
-                DialogAction(text = stringResource(R.string.edit_note), onClick = onEdit)
-                DialogAction(text = stringResource(R.string.delete), onClick = onDelete)
-                DialogAction(text = stringResource(R.string.mark), onClick = onMark)
-                DialogAction(text = stringResource(R.string.sorting), onClick = onSort)
-            }
-        },
-        confirmButton = {},
-    )
+    ActionListDialog(headerText = favorite.getNote().orEmpty(), onDismiss = onDismiss) {
+        DialogAction(text = stringResource(R.string.open_note), onClick = onOpen)
+        DialogAction(text = stringResource(R.string.edit_note), onClick = onEdit)
+        DialogAction(text = stringResource(R.string.delete), onClick = onDelete)
+        DialogAction(text = stringResource(R.string.mark), onClick = onMark)
+        DialogAction(text = stringResource(R.string.sorting), onClick = onSort)
+    }
 }
 
 @Composable
@@ -330,26 +320,50 @@ private fun HistoryActionDialog(
     onMark: () -> Unit,
     onSort: () -> Unit,
 ) {
-    AlertDialog(
+    ActionListDialog(headerText = history.getKeywords().orEmpty(), onDismiss = onDismiss) {
+        DialogAction(text = stringResource(R.string.delete), onClick = onDelete)
+        DialogAction(text = stringResource(R.string.mark), onClick = onMark)
+        DialogAction(text = stringResource(R.string.sorting), onClick = onSort)
+    }
+}
+
+@Composable
+private fun ActionListDialog(
+    headerText: String,
+    onDismiss: () -> Unit,
+    actions: @Composable ColumnScope.() -> Unit,
+) {
+    val maxHeight = (LocalConfiguration.current.screenHeightDp * 0.9f).dp
+    Dialog(
         onDismissRequest = onDismiss,
-        // Same guard as FavoriteActionDialog: bound the (potentially long)
-        // keyword title so it can't squeeze the action list out of view.
-        title = {
-            Text(
-                history.getKeywords().orEmpty(),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
-        text = {
-            Column {
-                DialogAction(text = stringResource(R.string.delete), onClick = onDelete)
-                DialogAction(text = stringResource(R.string.mark), onClick = onMark)
-                DialogAction(text = stringResource(R.string.sorting), onClick = onSort)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.large,
+            tonalElevation = 6.dp,
+            modifier = Modifier
+                .fillMaxWidth(0.92f)
+                .heightIn(max = maxHeight),
+        ) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                if (headerText.isNotBlank()) {
+                    Text(
+                        text = headerText,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 24.dp, vertical = 16.dp),
+                    )
+                    HorizontalDivider()
+                }
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    actions()
+                }
             }
-        },
-        confirmButton = {},
-    )
+        }
+    }
 }
 
 @Composable
