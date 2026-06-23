@@ -59,5 +59,8 @@ class NoteActionDialogInstrumentedTest {
     composeRule.onNodeWithText(str(R.string.delete)).assertIsDisplayed()
     composeRule.onNodeWithText(str(R.string.mark)).assertIsDisplayed()
     composeRule.onNodeWithText(str(R.string.sorting)).assertIsDisplayed()
+
+    // The note header itself must be visible (full text shown, not hidden).
+    composeRule.onNodeWithText("บันทึกบรรทัดที่ 1", substring = true).assertIsDisplayed()
   }
 }
