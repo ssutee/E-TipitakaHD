@@ -287,7 +287,7 @@ private fun SavedItemRow(
 }
 
 @Composable
-private fun FavoriteActionDialog(
+internal fun FavoriteActionDialog(
     favorite: Favorite,
     onDismiss: () -> Unit,
     onOpen: () -> Unit,
@@ -298,7 +298,17 @@ private fun FavoriteActionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(favorite.getNote().orEmpty()) },
+        // Bound the note used as the title: it is free-form, user-entered text
+        // and can be arbitrarily long. Material3 AlertDialog does not scroll
+        // the title, so an unbounded note consumed the dialog height and
+        // clipped the action list below (only "open note" stayed visible).
+        title = {
+            Text(
+                favorite.getNote().orEmpty(),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
         text = {
             Column {
                 DialogAction(text = stringResource(R.string.open_note), onClick = onOpen)
@@ -322,7 +332,15 @@ private fun HistoryActionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(history.getKeywords().orEmpty()) },
+        // Same guard as FavoriteActionDialog: bound the (potentially long)
+        // keyword title so it can't squeeze the action list out of view.
+        title = {
+            Text(
+                history.getKeywords().orEmpty(),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
         text = {
             Column {
                 DialogAction(text = stringResource(R.string.delete), onClick = onDelete)
