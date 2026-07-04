@@ -1,6 +1,7 @@
 package com.watnapp.etipitaka
 
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -12,12 +13,15 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeFalse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import java.io.RandomAccessFile
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * Regression tests for two Play Console crash classes around unhealthy
@@ -110,6 +114,52 @@ class DatabaseFailureInstrumentedTest {
     assertNotNull(cursor)
     assertEquals(0, cursor.count)
     cursor.close()
+    model.closeDatabase()
+  }
+
+  // ── ET*DataModel.search on a background thread ─────────────────────────
+  //
+  // Play Console: SQLiteException at nativePrepareStatement from
+  // ETThaiFiveBooksDataModel$1.run — search() queries on a raw Thread, so a
+  // DB that *opens* (valid header) but can't serve the query (wrong schema /
+  // corrupt btree) throws where no one catches and kills the process.
+
+  @Test
+  fun search_missingTable_finishesWithZeroResults() {
+    // Valid SQLite file, but no "main" table — prepare fails exactly like
+    // the Play trace (openDatabase succeeds, db != null guard passes).
+    SQLiteDatabase.openOrCreateDatabase(dbFile, null).use { db ->
+      db.execSQL("CREATE TABLE not_main (_id INTEGER PRIMARY KEY)")
+    }
+    assertSearchFinishesEmpty()
+  }
+
+  @Test
+  fun search_corruptBody_finishesWithZeroResults() {
+    val pageSize = createDatabaseWithIntactHeaderAndRows()
+    RandomAccessFile(dbFile, "rw").use { raf ->
+      raf.seek(pageSize)
+      raf.write(ByteArray((raf.length() - pageSize).toInt()) { 0x55 })
+    }
+    assertSearchFinishesEmpty()
+  }
+
+  private fun assertSearchFinishesEmpty() {
+    val model = ETThaiWatnaDataModel(context)
+    val latch = CountDownLatch(1)
+    var finishTotal = -1
+    model.search("พุทธ", object : BookDatabaseHelper.OnSearchListener {
+      override fun onSearchProgress(keywords: String, volume: Int, progress: Int, cursor: Cursor) = Unit
+      override fun onSearchFinish(keywords: String, cursor: Cursor, totalPages: IntArray) {
+        finishTotal = totalPages.sum()
+        cursor.close()
+        latch.countDown()
+      }
+    }, arrayOf(1, 2, 3))
+    // An uncaught SQLiteException on the search thread kills the test
+    // process outright — reaching the assert at all is part of the fix.
+    assertTrue("search never finished", latch.await(30, TimeUnit.SECONDS))
+    assertEquals(0, finishTotal)
     model.closeDatabase()
   }
 

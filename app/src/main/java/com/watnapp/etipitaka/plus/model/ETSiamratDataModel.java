@@ -396,8 +396,17 @@ abstract public class ETSiamratDataModel extends ETDataModel {
             selectionArgs.add("%" + keyword.replace('+', ' ') + "%");
           }
 
-          Cursor cursor = db.query("page", null, selection, selectionArgs.toArray(new String[selectionArgs.size()]),
-              null, null, null);
+          Cursor cursor;
+          try {
+            cursor = db.query("page", null, selection, selectionArgs.toArray(new String[selectionArgs.size()]),
+                null, null, null);
+            // Fill the cursor window now — a corrupt DB throws here, not at
+            // query(). Uncaught on this raw Thread it would kill the process.
+            cursor.getCount();
+          } catch (Exception e) {
+            Log.e(TAG, "search failed for volume=" + volume, e);
+            cursor = new MatrixCursor(new String[] { "_id" });
+          }
 
           if (listener != null) {
             listener.onSearchProgress(keywords, volume, i+1, cursor);
