@@ -314,12 +314,22 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
   @Override
   public void onSearchProgress(String keywords, int volume, int progress, Cursor cursor) {
     mProgressBar.setProgress(progress);
+    int count;
+    try {
+      // Runs on the model's search thread — a corrupt DB throws here on the
+      // cursor-window fill, and nothing above us catches it (Play Console:
+      // SQLiteDatabaseCorruptException at onSearchProgress getCount).
+      count = cursor.getCount();
+    } catch (Exception e) {
+      Log.e(TAG, "onSearchProgress: cursor unreadable for volume=" + volume, e);
+      count = 0;
+    }
     if (volume <= dataModel.getSectionBoundary(0)) {
-      mResultsCount[0] += cursor.getCount();
+      mResultsCount[0] += count;
     } else if (volume >= dataModel.getSectionBoundary(0)+1 && volume <= dataModel.getSectionBoundary(1)) {
-      mResultsCount[1] += cursor.getCount();
+      mResultsCount[1] += count;
     } else {
-      mResultsCount[2] += cursor.getCount();
+      mResultsCount[2] += count;
     }
   }
 
@@ -336,17 +346,24 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
       history.setBuddhawaj(mIsBuddhawaj);
       StringBuilder sb = new StringBuilder();
       int start = Utils.isTipitaka(application.getLanguage()) ? 3 : 0;
-      if (cursor.getCount() > start) {
-        cursor.moveToPosition(start);
-        while (!cursor.isAfterLast()) {
-          sb.append(dataModel.getVolume(cursor));
-          sb.append(':');
-          sb.append(dataModel.getPageNumber(cursor));
-          if (!cursor.isLast()) {
-            sb.append(',');
+      try {
+        // Walks every row, so the cursor window refills repeatedly — each
+        // refill can throw SQLiteDatabaseCorruptException on this (search)
+        // thread. Degrade to a partial/empty history entry instead of dying.
+        if (cursor.getCount() > start) {
+          cursor.moveToPosition(start);
+          while (!cursor.isAfterLast()) {
+            sb.append(dataModel.getVolume(cursor));
+            sb.append(':');
+            sb.append(dataModel.getPageNumber(cursor));
+            if (!cursor.isLast()) {
+              sb.append(',');
+            }
+            cursor.moveToNext();
           }
-          cursor.moveToNext();
         }
+      } catch (Exception e) {
+        Log.e(TAG, "onSearchFinish: cursor unreadable while building history content", e);
       }
       Log.d(TAG, sb.toString());
       history.setContent(sb.toString());
@@ -361,8 +378,13 @@ public class SearchFragment extends Fragment implements BookDatabaseHelper.OnSea
     listView.post(new Runnable() {
       @Override
       public void run() {
-        cursor.moveToFirst();
-        mAdapter.swapCursor(cursor);
+        try {
+          cursor.moveToFirst();
+          mAdapter.swapCursor(cursor);
+        } catch (Exception e) {
+          // Corrupt window refill would otherwise crash the UI thread.
+          Log.e(TAG, "onSearchFinish: could not display search results", e);
+        }
       }
     });
 
