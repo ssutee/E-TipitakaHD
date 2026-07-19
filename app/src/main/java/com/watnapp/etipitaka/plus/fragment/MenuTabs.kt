@@ -1,6 +1,8 @@
 package com.watnapp.etipitaka.plus.fragment
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -8,9 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.watnapp.etipitaka.plus.R
 import com.watnapp.etipitaka.plus.ui.compose.ETipitakaTheme
 import com.watnapp.etipitaka.plus.ui.compose.ETipitakaThemeTokens
@@ -39,7 +43,7 @@ object MenuTabsBridge {
 }
 
 @Composable
-private fun MenuTabs(
+internal fun MenuTabs(
     selectedIndex: Int,
     onTabSelected: (Int) -> Unit,
 ) {
@@ -50,9 +54,33 @@ private fun MenuTabs(
         R.string.favorite,
     )
 
+    // SlidingMenu's CustomViewBehind can measure this ComposeView with an
+    // UNSPECIFIED width during RelativeLayout's pre-measure pass (behind
+    // width not resolved yet -> negative child dimension -> UNSPECIFIED).
+    // M3 TabRow divides an unbounded maxWidth by the tab count and feeds the
+    // result to maxIntrinsicHeight, which cannot be encoded in Constraints
+    // (Play Console: IllegalArgumentException at invalidConstraint). Give
+    // the strip a real width for that throwaway pass; the follow-up pass is
+    // bounded and behaves as before.
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+        val tabRowModifier =
+            if (constraints.hasBoundedWidth) Modifier.fillMaxWidth()
+            else Modifier.requiredWidth(screenWidth)
+        MenuTabRow(tabs, selectedIndex, onTabSelected, tabRowModifier)
+    }
+}
+
+@Composable
+private fun MenuTabRow(
+    tabs: List<Int>,
+    selectedIndex: Int,
+    onTabSelected: (Int) -> Unit,
+    modifier: Modifier,
+) {
     TabRow(
         selectedTabIndex = selectedIndex.coerceIn(tabs.indices),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = ETipitakaThemeTokens.colors.tabStripLine,
     ) {
