@@ -91,8 +91,16 @@ public class FavoriteFragment extends Fragment
     super.onViewCreated(view, savedInstanceState);
     viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
     viewModel.getSelected().observe(getViewLifecycleOwner(), language ->  {
-      composeView.post(() -> LoaderManager.getInstance(FavoriteFragment.this)
-          .restartLoader(Constants.FAVORITE_LOADER, null, FavoriteFragment.this));
+      composeView.post(() -> {
+        // The posted runnable can outlive the fragment: if it was detached
+        // before this frame, LoaderManager.getInstance would throw
+        // "Can't access ViewModels from detached fragment".
+        if (!isAdded()) {
+          return;
+        }
+        LoaderManager.getInstance(FavoriteFragment.this)
+            .restartLoader(Constants.FAVORITE_LOADER, null, FavoriteFragment.this);
+      });
     });
   }
 
