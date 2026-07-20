@@ -24,6 +24,28 @@ import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+private var lastDownloadToast: Toast? = null
+
+/**
+ * Show a download-status toast, canceling the one before it. The system
+ * queues toasts and shows them serially (~2s each), so during a bulk
+ * download the "downloading"/"finished" messages lag far behind the actual
+ * events — canceling the previous toast keeps the visible message current.
+ * Must be called on the UI thread. Uses the application context so the
+ * retained reference does not leak the Activity.
+ */
+fun showDownloadToast(activity: Activity, message: CharSequence, duration: Int) {
+    lastDownloadToast?.cancel()
+    lastDownloadToast = Toast.makeText(activity.applicationContext, message, duration).apply {
+        setGravity(Gravity.CENTER, 0, 0)
+        show()
+    }
+}
+
+fun showDownloadToast(activity: Activity, messageId: Int, duration: Int) {
+    showDownloadToast(activity, activity.getText(messageId), duration)
+}
+
 suspend fun getLocalDatabaseVersion(context: Context, language: BookDatabaseHelper.Language)
         : Int = suspendCoroutine { cont ->
     // Callers check File.exists() on the main thread, but this runs later on a
@@ -145,9 +167,7 @@ fun download(activity: Activity,
     GlobalScope.launch {
         val host = if (isThaiClient(activity)) Constants.THAI_HOST else Constants.S3_HOST
         activity.runOnUiThread {
-            val toast = Toast.makeText(activity, R.string.downloading, Toast.LENGTH_SHORT)
-            toast.setGravity(Gravity.CENTER, 0 ,0)
-            toast.show()
+            showDownloadToast(activity, R.string.downloading, Toast.LENGTH_SHORT)
             progressBar.isIndeterminate = false
             progressBar.visibility = View.VISIBLE
             activity.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
@@ -173,9 +193,7 @@ fun download(activity: Activity,
         activity.runOnUiThread {
             progressBar.visibility = View.GONE
             activity.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            val toast = Toast.makeText(activity, messageId, Toast.LENGTH_SHORT)
-            toast.setGravity(Gravity.CENTER, 0,0)
-            toast.show()
+            showDownloadToast(activity, messageId, Toast.LENGTH_SHORT)
             onDownloadFinish(result)
         }
     }
@@ -269,7 +287,7 @@ private fun downloadDatabaseWithDialog(
             activity.runOnUiThread {
                 if (alive()) {
                     try { dialog.dismiss() } catch (e: Exception) { Log.w("UPDATE", "dialog.dismiss failed", e) }
-                    Toast.makeText(activity, finalMessageId, Toast.LENGTH_SHORT).show()
+                    showDownloadToast(activity, finalMessageId, Toast.LENGTH_SHORT)
                 }
                 onFinish(finalResult)
             }

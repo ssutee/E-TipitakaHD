@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -21,6 +20,7 @@ import com.watnapp.etipitaka.plus.Utils;
 import com.watnapp.etipitaka.plus.databinding.ActivityStartupBinding;
 import com.watnapp.etipitaka.plus.helper.BookDatabaseHelper.Language;
 import com.watnapp.etipitaka.plus.helper.BulkDownloadDatabasesKt;
+import com.watnapp.etipitaka.plus.helper.DownloadDatabaseKt;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -169,13 +169,13 @@ public class StartupActivity extends AppCompatActivity
         result -> {
           binding.progressBar.setVisibility(View.VISIBLE);
           if (!isFinishing() && !isDestroyed()) {
-            Toast toast = Toast.makeText(
+            // Cancels the last per-file toast so the summary shows at once
+            // instead of waiting out the queued "downloading"/"finished" ones.
+            DownloadDatabaseKt.showDownloadToast(
                 this,
                 getString(R.string.bulk_download_summary,
                     result.getSucceeded(), result.getTotal()),
                 Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
           }
           source.setResult(null);
           return kotlin.Unit.INSTANCE;
